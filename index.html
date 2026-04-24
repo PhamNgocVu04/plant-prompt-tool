@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Plant Prompt Generator v3</title>
+<title>Plant Prompt Generator v4</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
@@ -44,8 +44,8 @@ header { background: var(--green-deep); padding: 0 40px; display: flex; align-it
 .ver-badge { font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.45); background: rgba(255,255,255,0.08); padding: 4px 12px; border-radius: 100px; }
 
 /* ── MAIN LAYOUT ── */
-main { max-width: 1100px; margin: 0 auto; padding: 36px 24px 80px; display: grid; grid-template-columns: 460px 1fr; gap: 28px; align-items: start; }
-@media (max-width: 860px) { main { grid-template-columns: 1fr; } header { padding: 0 20px; } }
+main { max-width: 1100px; margin: 0 auto; padding: 36px 24px 80px; display: grid; grid-template-columns: 470px 1fr; gap: 28px; align-items: start; }
+@media (max-width: 880px) { main { grid-template-columns: 1fr; } header { padding: 0 20px; } }
 
 /* ── CARD ── */
 .card { background: var(--white); border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); overflow: hidden; }
@@ -54,8 +54,11 @@ main { max-width: 1100px; margin: 0 auto; padding: 36px 24px 80px; display: grid
 .card-head p { font-size: 12px; color: var(--muted); line-height: 1.5; }
 .card-body { padding: 26px 28px; }
 
+/* ── SECTION LABEL ── */
+.section-lbl { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+
 /* ── NICHE PICKER ── */
-.niche-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 22px; }
+.niche-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 6px; }
 .niche-opt input { display: none; }
 .niche-btn { display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 14px 6px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; transition: all 0.18s; background: var(--cream); text-align: center; }
 .niche-btn .icon { font-size: 24px; line-height: 1; }
@@ -65,49 +68,77 @@ main { max-width: 1100px; margin: 0 auto; padding: 36px 24px 80px; display: grid
 .niche-opt input:checked + .niche-btn .lbl { color: var(--green-deep); }
 .niche-btn:hover { border-color: var(--green-soft); }
 
-/* ── IMAGE TYPE TOGGLE ── */
-.type-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 22px; }
+/* ── IMAGE TYPE ── */
+.type-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 6px; }
 .type-opt input { display: none; }
 .type-btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 11px 12px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; transition: all 0.18s; background: var(--cream); font-size: 13px; font-weight: 500; color: var(--muted); }
-.type-btn .t-icon { font-size: 16px; }
-
-/* Main = green active */
+.type-btn .t-icon { font-size: 15px; }
 #t-main:checked + .type-btn { border-color: var(--green-mid); background: var(--green-pale); color: var(--green-deep); }
-/* Tip Care = amber active */
-#t-tip:checked + .type-btn { border-color: var(--amber); background: var(--amber-pale); color: var(--amber); }
+#t-tip:checked  + .type-btn { border-color: var(--amber);     background: var(--amber-pale); color: var(--amber); }
 .type-btn:hover { border-color: var(--green-soft); }
+
+/* ── PRESENTATION (Soil Plug / Potted) ── */
+.pres-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 6px; }
+.pres-opt input { display: none; }
+.pres-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  padding: 13px 8px;
+  border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+  cursor: pointer; transition: all 0.18s; background: var(--cream); text-align: center;
+}
+.pres-btn .p-icon { font-size: 22px; line-height: 1; }
+.pres-btn .p-lbl { font-size: 12px; font-weight: 600; color: var(--muted); }
+.pres-btn .p-sub { font-size: 10px; color: var(--muted); line-height: 1.4; }
+.pres-opt input:checked + .pres-btn { border-color: var(--earth); background: var(--earth-pale); }
+.pres-opt input:checked + .pres-btn .p-lbl { color: #5a3e1b; }
+.pres-btn:hover { border-color: var(--earth); }
+
+/* Pot size field — chỉ hiện khi chọn Potted */
+.pot-extra { display: none; }
+.pot-extra.show { display: block; }
 
 /* ── FIELDS ── */
 .field { margin-bottom: 16px; }
 .field > label { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--ink-soft); margin-bottom: 7px; }
 .req { color: var(--green-mid); font-size: 16px; line-height: 1; }
 .opt-tag { font-size: 10px; font-weight: 400; color: var(--muted); background: #f0ece3; padding: 2px 8px; border-radius: 100px; }
-input[type="text"], input[type="number"] { width: 100%; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--ink); background: var(--cream); outline: none; transition: border-color 0.18s, box-shadow 0.18s; }
-input:focus { border-color: var(--green-mid); box-shadow: 0 0 0 3px rgba(74,124,89,0.12); background: var(--white); }
+input[type="text"], input[type="number"], select {
+  width: 100%; padding: 10px 14px;
+  border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+  font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--ink);
+  background: var(--cream); outline: none;
+  transition: border-color 0.18s, box-shadow 0.18s;
+  appearance: none;
+}
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a9080' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; cursor: pointer;
+}
+input:focus, select:focus { border-color: var(--green-mid); box-shadow: 0 0 0 3px rgba(74,124,89,0.12); background: var(--white); }
 input::placeholder { color: #b5c4bb; }
 input.err { border-color: var(--red-err) !important; }
 .field-err { font-size: 11px; color: var(--red-err); margin-top: 5px; display: none; }
 .field-err.show { display: block; }
 .field-hint { font-size: 11px; color: var(--muted); margin-top: 5px; font-style: italic; }
-.height-row { display: flex; gap: 8px; }
-.height-row input { flex: 1; }
-.unit-box { padding: 10px 14px; background: var(--green-pale); border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; color: var(--green-mid); display: flex; align-items: center; white-space: nowrap; }
 
-/* ── TIP CARE EXTRA FIELDS ── */
+/* Height + unit toggle row */
+.height-wrap { display: flex; gap: 8px; align-items: stretch; }
+.height-wrap input { flex: 1; }
+.unit-display {
+  padding: 10px 16px; background: var(--green-pale);
+  border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+  font-size: 14px; font-weight: 600; color: var(--green-mid);
+  display: flex; align-items: center; white-space: nowrap;
+  min-width: 56px; justify-content: center;
+}
+
+/* ── TIP CARE EXTRA ── */
 .tip-extra { display: none; }
 .tip-extra.show { display: block; }
-.tip-notice {
-  background: var(--amber-pale);
-  border: 1px solid var(--amber-border);
-  border-radius: var(--radius-sm);
-  padding: 12px 16px;
-  font-size: 12px; color: #92400e;
-  line-height: 1.5; margin-bottom: 16px;
-}
-.tip-notice strong { font-weight: 600; }
+.tip-notice { background: var(--amber-pale); border: 1px solid var(--amber-border); border-radius: var(--radius-sm); padding: 12px 16px; font-size: 12px; color: #92400e; line-height: 1.5; margin-bottom: 14px; }
 
 /* ── OPT TOGGLE ── */
-.opt-toggle { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 500; color: var(--muted); cursor: pointer; margin: 0 0 14px; user-select: none; padding: 8px 12px; border: 1px dashed var(--border); border-radius: var(--radius-sm); transition: all 0.15s; }
+.opt-toggle { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 500; color: var(--muted); cursor: pointer; margin: 4px 0 14px; user-select: none; padding: 8px 12px; border: 1px dashed var(--border); border-radius: var(--radius-sm); transition: all 0.15s; }
 .opt-toggle:hover { color: var(--green-mid); border-color: var(--green-soft); }
 .opt-toggle::before { content: '▸'; transition: transform 0.2s; display: inline-block; }
 .opt-toggle.open::before { transform: rotate(90deg); }
@@ -116,10 +147,9 @@ input.err { border-color: var(--red-err) !important; }
 
 /* ── DIVIDER ── */
 .divider { height: 1px; background: var(--border); margin: 18px 0; }
-.section-lbl { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
 
 /* ── BUTTONS ── */
-.btn-gen { width: 100%; padding: 13px 24px; background: var(--green-deep); color: var(--white); border: none; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.18s, transform 0.12s; letter-spacing: 0.02em; }
+.btn-gen { width: 100%; padding: 13px 24px; background: var(--green-deep); color: var(--white); border: none; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.18s, transform 0.12s; }
 .btn-gen:hover { background: var(--green-mid); }
 .btn-gen:active { transform: scale(0.98); }
 .btn-gen.tip-mode { background: var(--amber); }
@@ -127,16 +157,16 @@ input.err { border-color: var(--red-err) !important; }
 .btn-reset { width: 100%; margin-top: 10px; padding: 10px; background: transparent; color: var(--muted); border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; transition: all 0.15s; }
 .btn-reset:hover { border-color: var(--green-soft); color: var(--green-mid); }
 
-/* ── OUTPUT PANEL ── */
+/* ── OUTPUT ── */
 .out-sticky { position: sticky; top: 88px; }
 .out-card { background: var(--green-deep); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-lg); }
-.out-card.tip-theme { background: #2a2010; }
 .out-head { padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); }
 .out-label { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.35); }
-.out-tags { display: flex; gap: 6px; }
+.out-tags { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
 .out-tag { font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 100px; background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.35); }
 .out-tag.on-green { background: rgba(106,158,122,0.35); color: #a0d4b0; }
 .out-tag.on-amber { background: rgba(217,119,6,0.35); color: #fcd34d; }
+.out-tag.on-earth { background: rgba(139,111,71,0.35); color: #f5c97a; }
 .out-body { padding: 24px; min-height: 260px; }
 .out-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 36px 20px; text-align: center; color: rgba(255,255,255,0.2); }
 .out-empty svg { opacity: 0.18; }
@@ -186,7 +216,7 @@ input.err { border-color: var(--red-err) !important; }
     <div class="logo-mark">🌿</div>
     <h1>Plant Prompt Generator <span>/ Nội bộ</span></h1>
   </div>
-  <span class="ver-badge">Gemini Image · v3.0</span>
+  <span class="ver-badge">Gemini Image · v4.0</span>
 </header>
 
 <main>
@@ -196,11 +226,11 @@ input.err { border-color: var(--red-err) !important; }
   <div class="card">
     <div class="card-head">
       <h2>Tạo prompt ảnh sản phẩm</h2>
-      <p>Chọn ngách + loại ảnh → nhập thông tin → copy vào Gemini</p>
+      <p>Chọn ngách · loại ảnh · cách trình bày → nhập thông tin → copy vào Gemini</p>
     </div>
     <div class="card-body">
 
-      <!-- STEP 1: NGÁCH -->
+      <!-- ① NGÁCH -->
       <div class="section-lbl">① Ngách sản phẩm</div>
       <div class="niche-grid">
         <div class="niche-opt">
@@ -224,28 +254,81 @@ input.err { border-color: var(--red-err) !important; }
       </div>
       <div class="field-err" id="err-niche">Vui lòng chọn ngách sản phẩm</div>
 
-      <!-- STEP 2: LOẠI ẢNH -->
-      <div class="section-lbl" style="margin-top:18px">② Loại ảnh</div>
+      <div class="divider"></div>
+
+      <!-- ② LOẠI ẢNH -->
+      <div class="section-lbl">② Loại ảnh</div>
       <div class="type-row">
         <div class="type-opt">
           <input type="radio" name="imgtype" id="t-main" value="main"/>
-          <label class="type-btn" for="t-main">
-            <span class="t-icon">📸</span> Ảnh chính (Main)
-          </label>
+          <label class="type-btn" for="t-main"><span class="t-icon">📸</span> Ảnh chính (Main)</label>
         </div>
         <div class="type-opt">
           <input type="radio" name="imgtype" id="t-tip" value="tip"/>
-          <label class="type-btn" for="t-tip">
-            <span class="t-icon">💧</span> Tip Care
-          </label>
+          <label class="type-btn" for="t-tip"><span class="t-icon">💧</span> Tip Care</label>
         </div>
       </div>
       <div class="field-err" id="err-type">Vui lòng chọn loại ảnh</div>
 
       <div class="divider"></div>
 
-      <!-- STEP 3: THÔNG TIN CÂY -->
-      <div class="section-lbl">③ Thông tin cây</div>
+      <!-- ③ CÁCH TRÌNH BÀY -->
+      <div class="section-lbl">③ Cách trình bày cây</div>
+      <div class="pres-row">
+        <div class="pres-opt">
+          <input type="radio" name="pres" id="p-plug" value="plug"/>
+          <label class="pres-btn" for="p-plug">
+            <span class="p-icon">🪨</span>
+            <span class="p-lbl">Soil Plug</span>
+            <span class="p-sub">Bọc đất, không chậu<br/>root ball lộ ra</span>
+          </label>
+        </div>
+        <div class="pres-opt">
+          <input type="radio" name="pres" id="p-pot" value="pot"/>
+          <label class="pres-btn" for="p-pot">
+            <span class="p-icon">🪴</span>
+            <span class="p-lbl">Potted</span>
+            <span class="p-sub">Đựng trong chậu<br/>terracotta / nursery</span>
+          </label>
+        </div>
+      </div>
+      <div class="field-err" id="err-pres">Vui lòng chọn cách trình bày</div>
+
+      <!-- Pot size — chỉ hiện khi chọn Potted -->
+      <div class="pot-extra" id="pot-extra">
+        <div class="field" style="margin-top:12px">
+          <label for="pot-size">Kích thước chậu <span class="opt-tag">Tùy chọn</span></label>
+          <select id="pot-size">
+            <option value="">-- Chọn size chậu --</option>
+            <option value="2-inch">2 inch pot</option>
+            <option value="4-inch">4 inch pot</option>
+            <option value="6-inch">6 inch pot</option>
+            <option value="8-inch">8 inch pot</option>
+            <option value="10-inch">10 inch pot</option>
+            <option value="12-inch">12 inch pot</option>
+            <option value="1-gallon">1 gallon pot</option>
+            <option value="2-gallon">2 gallon pot</option>
+            <option value="3-gallon">3 gallon pot</option>
+            <option value="5-gallon">5 gallon pot</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="pot-style">Kiểu chậu <span class="opt-tag">Tùy chọn</span></label>
+          <select id="pot-style">
+            <option value="">-- Chọn kiểu chậu --</option>
+            <option value="terracotta pot">Terracotta (đất nung)</option>
+            <option value="black nursery pot">Black nursery pot (nhựa đen)</option>
+            <option value="white ceramic pot">White ceramic (sứ trắng)</option>
+            <option value="gray concrete pot">Gray concrete (xi măng)</option>
+            <option value="woven basket planter">Woven basket (giỏ đan)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- ④ THÔNG TIN CÂY -->
+      <div class="section-lbl">④ Thông tin cây</div>
 
       <div class="field">
         <label for="plant-name">Tên cây <span class="req">*</span></label>
@@ -256,17 +339,18 @@ input.err { border-color: var(--red-err) !important; }
 
       <div class="field">
         <label for="plant-height">Chiều cao cây <span class="req">*</span></label>
-        <div class="height-row">
-          <input type="number" id="plant-height" placeholder="VD: 25" min="1" max="500"/>
-          <div class="unit-box">cm</div>
+        <div class="height-wrap">
+          <input type="number" id="plant-height" placeholder="VD: 1.5" min="0.1" max="50" step="0.1"/>
+          <div class="unit-display">ft</div>
         </div>
         <div class="field-err" id="err-height">Vui lòng nhập chiều cao</div>
+        <div class="field-hint" id="height-convert"></div>
       </div>
 
-      <!-- TIP CARE EXTRA: Tip name -->
+      <!-- TIP CARE: tên mẹo -->
       <div class="tip-extra" id="tip-extra">
         <div class="tip-notice">
-          <strong>💡 Tip Care</strong> — ảnh minh họa một mẹo chăm sóc cụ thể. Nhập tên mẹo để AI tạo đúng hành động (VD: <em>watering, pruning, repotting…</em>). Để trống → dùng mẹo mặc định phù hợp.
+          <strong>💡 Tip Care</strong> — nhập tên mẹo để AI tạo đúng hành động. VD: <em>watering, pruning, fertilizing, repotting…</em> Để trống → dùng mẹo mặc định.
         </div>
         <div class="field">
           <label for="tip-name">Tên mẹo chăm sóc <span class="opt-tag">Tùy chọn</span></label>
@@ -274,7 +358,7 @@ input.err { border-color: var(--red-err) !important; }
         </div>
       </div>
 
-      <!-- OPTIONAL: đặc điểm chi tiết -->
+      <!-- OPT: đặc điểm -->
       <div class="opt-toggle" id="opt-toggle" onclick="toggleOpt()">
         &nbsp;Thêm đặc điểm chi tiết (tùy chọn)
       </div>
@@ -284,7 +368,7 @@ input.err { border-color: var(--red-err) !important; }
           <input type="text" id="leaf-desc" placeholder="VD: glossy, broad green / soft, deeply veined"/>
         </div>
         <div class="field" id="feat-wrap">
-          <label for="feat-desc"><span id="feat-lbl">Đặc điểm hoa / quả nổi bật</span> <span class="opt-tag">Tùy chọn</span></label>
+          <label for="feat-desc"><span id="feat-lbl">Đặc điểm hoa / quả</span> <span class="opt-tag">Tùy chọn</span></label>
           <input type="text" id="feat-desc" placeholder="VD: vibrant red petals with yellow center"/>
         </div>
         <div class="field" id="extra-wrap" style="display:none">
@@ -302,16 +386,14 @@ input.err { border-color: var(--red-err) !important; }
     </div>
   </div>
 
-  <!-- Template note -->
   <div class="tpl-note">
-    <h3>📋 Template đang áp dụng (v3)</h3>
-    <div class="tpl-row"><span class="tpl-chk">✓</span><span><strong>Main:</strong> Soil plug, không pot, root ball + peat soil, white BG, 8K, 1:1</span></div>
-    <div class="tpl-row"><span class="tpl-chk">✓</span><span><strong>Tip Care:</strong> Lifestyle/editorial, tay cầm dụng cụ, bokeh BG, square 1:1</span></div>
-    <div class="tpl-row"><span class="tpl-chk">✓</span><span>6 loại template: 3 ngách × 2 loại ảnh</span></div>
-    <div class="tpl-row"><span class="tpl-chk">✓</span><span>Để trống đặc điểm → hệ thống tự điền mô tả mặc định phù hợp</span></div>
+    <h3>📋 Template v4 — Tính năng mới</h3>
+    <div class="tpl-row"><span class="tpl-chk">✓</span><span>Chiều cao đơn vị <strong>feet (ft)</strong> — hiển thị quy đổi inches tự động</span></div>
+    <div class="tpl-row"><span class="tpl-chk">✓</span><span><strong>Soil Plug</strong>: bọc đất, root ball lộ ra, không chậu — như template gốc</span></div>
+    <div class="tpl-row"><span class="tpl-chk">✓</span><span><strong>Potted</strong>: đựng trong chậu — chọn size và kiểu chậu</span></div>
+    <div class="tpl-row"><span class="tpl-chk">✓</span><span>6 template: 3 ngách × 2 loại ảnh — mỗi loại hỗ trợ cả 2 cách trình bày</span></div>
   </div>
 
-  <!-- History -->
   <div class="hist-wrap">
     <div class="hist-title">Lịch sử phiên làm việc</div>
     <div class="hist-list" id="hist-list">
@@ -324,13 +406,13 @@ input.err { border-color: var(--red-err) !important; }
 <div class="out-sticky">
   <div class="out-card" id="out-card">
     <div class="out-head">
-      <span class="out-label" id="out-label">Prompt · Gemini Image</span>
+      <span class="out-label">Prompt · Gemini Image</span>
       <div class="out-tags">
         <span class="out-tag" id="tag-niche">—</span>
         <span class="out-tag" id="tag-type">—</span>
+        <span class="out-tag" id="tag-pres">—</span>
       </div>
     </div>
-
     <div class="out-body">
       <div class="out-empty" id="out-empty">
         <svg width="60" height="60" viewBox="0 0 64 64" fill="none">
@@ -338,15 +420,13 @@ input.err { border-color: var(--red-err) !important; }
           <path d="M32 40C32 40 20 36 18 24C26 22 34 28 34 36" fill="white" opacity="0.5"/>
           <path d="M32 34C32 34 44 28 46 16C38 14 30 22 30 32" fill="white" opacity="0.35"/>
         </svg>
-        <p>Chọn ngách + loại ảnh<br/>nhập tên cây → nhấn <strong style="color:rgba(255,255,255,0.4)">Tạo Prompt</strong></p>
+        <p>Chọn ngách · loại ảnh · cách trình bày<br/>nhập tên cây → nhấn <strong style="color:rgba(255,255,255,0.4)">Tạo Prompt</strong></p>
       </div>
       <pre class="out-text" id="out-text"></pre>
     </div>
-
     <div class="char-bar" id="char-bar">
       <span class="char-count" id="char-count"></span>
     </div>
-
     <div class="out-foot" id="out-foot">
       <button class="btn-copy" id="btn-copy" onclick="copyPrompt()">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
@@ -360,155 +440,179 @@ input.err { border-color: var(--red-err) !important; }
 </main>
 
 <script>
-// ══════════════════════════════════════════════════════════════
-//  TEMPLATE ENGINE v3 — Main + Tip Care × 3 niches
-// ══════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════════════════════════════════════
 
-const DEFAULTS = {
-  flower: {
-    leaf:    'textured, dark green',
-    feature: 'vibrant, large velvety petals with a delicate center',
-    tip:     'watering'
-  },
-  fruit: {
-    leaf:    'glossy, broad green',
-    feature: 'numerous bright ripe fruits hanging clustered from delicate stems',
-    tip:     'watering'
-  },
-  herb: {
-    leaf:    'soft, deeply veined, light green',
-    extra:   '',
-    tip:     'pruning'
-  }
-};
-
-// ── MAIN TEMPLATES (giữ nguyên template chuẩn của chủ shop) ──
-
-function mainFlower(name, h, leaf, feat) {
-  const l = leaf || DEFAULTS.flower.leaf;
-  const f = feat || DEFAULTS.flower.feature;
-  return `A highly photorealistic, hyper-detailed botanical product photograph of a robust young ${name} starter plant. Standing exactly ${h} cm tall. The bushy plant is covered in characteristic ${l} leaves and is abundantly in bloom. It features ${f}. It is presented strictly as a well-developed soil plug (root ball only) standing freely and upright, completely without a pot. The perfectly proportioned cylindrical base reveals dark, moist peat soil firmly bound by a dense, healthy network of intricate fine white roots. Isolated on a seamless pure white background. Bright, crisp studio lighting. Square aspect ratio (1:1). 8k resolution.`;
+function feetToDisplay(ft) {
+  const whole = Math.floor(ft);
+  const inches = Math.round((ft - whole) * 12);
+  if (whole === 0) return `${inches} inches`;
+  if (inches === 0) return `${whole} ft`;
+  return `${whole} ft ${inches} in`;
 }
 
-function mainFruit(name, h, leaf, feat) {
-  const l = leaf || DEFAULTS.fruit.leaf;
-  const f = feat || DEFAULTS.fruit.feature;
-  return `A highly photorealistic, hyper-detailed botanical product photograph of a robust young ${name} starter plant. Standing exactly ${h} cm tall. The bushy plant is covered in characteristic ${l} leaves and is actively bearing fruit. It features ${f}. It is presented strictly as a well-developed soil plug (root ball only) standing freely and upright, completely without a pot. The perfectly proportioned cylindrical base reveals dark, moist peat soil firmly bound by a dense, healthy network of intricate fine white roots. Isolated on a seamless pure white background. Bright, crisp studio lighting. Square aspect ratio (1:1). 8k resolution.`;
+// ── PRESENTATION PHRASE BUILDERS ──────────────────────────────
+
+function plugPhrase() {
+  return `It is presented strictly as a well-developed soil plug (root ball only) standing freely and upright, completely without a pot. The perfectly proportioned cylindrical base reveals dark, moist peat soil firmly bound by a dense, healthy network of intricate fine white roots.`;
 }
 
-function mainHerb(name, h, leaf, extra) {
-  const l = leaf || DEFAULTS.herb.leaf;
-  const e = extra ? ` ${extra}.` : '';
-  return `A highly photorealistic, hyper-detailed botanical product photograph of a robust young ${name} starter plant. Standing exactly ${h} cm tall. The lush, bushy plant is covered in characteristic ${l} leaves, showcasing dense, vigorous foliage typical of a healthy herb.${e} It is presented strictly as a well-developed soil plug (root ball only) standing freely and upright, completely without a pot. The perfectly proportioned cylindrical base reveals dark, moist peat soil firmly bound by a dense, healthy network of intricate fine white roots. Isolated on a seamless pure white background. Bright, crisp studio lighting. Square aspect ratio (1:1). 8k resolution.`;
+function pottedPhrase(potSize, potStyle) {
+  const style = potStyle || 'terracotta pot';
+  const size  = potSize  ? `a ${potSize} ` : 'a ';
+  return `It is presented potted in ${size}${style}, sitting upright and well-centered. The pot is clean and proportional to the plant, showcasing the plant's healthy root system and vibrant growth.`;
 }
 
-// ── TIP CARE TEMPLATES ──
+// ── TIP CARE helpers ──────────────────────────────────────────
 
-function tipFlower(name, h, leaf, feat, tip) {
-  const l   = leaf || DEFAULTS.flower.leaf;
-  const f   = feat || DEFAULTS.flower.feature;
-  const t   = tip  || DEFAULTS.flower.tip;
-  const act = tipAction(t);
-  return `A highly photorealistic, hyper-detailed lifestyle photograph illustrating a ${t} tip for a ${name} flowering plant. The scene shows a pair of clean, well-kept hands ${act} a healthy ${name} plant (approximately ${h} cm tall) with ${l} leaves and ${f}. The plant is in a terracotta or ceramic pot, set on a bright wooden surface or light marble countertop. Natural soft window light from the side. The background is softly blurred (shallow depth of field), creating a warm, editorial botanical atmosphere. Include a subtle prop — a small ${tipProp(t)} — placed naturally nearby. Square aspect ratio (1:1). Bright, clean, airy tones. 8k resolution. No text overlays.`;
-}
-
-function tipFruit(name, h, leaf, feat, tip) {
-  const l   = leaf || DEFAULTS.fruit.leaf;
-  const f   = feat || DEFAULTS.fruit.feature;
-  const t   = tip  || DEFAULTS.fruit.tip;
-  const act = tipAction(t);
-  return `A highly photorealistic, hyper-detailed lifestyle photograph illustrating a ${t} tip for a ${name} fruit plant. The scene shows a pair of clean, well-kept hands ${act} a healthy ${name} plant (approximately ${h} cm tall) with ${l} leaves and ${f}. The plant is in a terracotta or ceramic pot on a bright wooden table or light stone surface. Natural soft daylight from the side. Background softly blurred, warm and editorial feel. Include a small ${tipProp(t)} as a natural prop nearby. Square aspect ratio (1:1). Vivid yet natural colors. 8k resolution. No text overlays.`;
-}
-
-function tipHerb(name, h, leaf, extra, tip) {
-  const l   = leaf  || DEFAULTS.herb.leaf;
-  const t   = tip   || DEFAULTS.herb.tip;
-  const act = tipAction(t);
-  const extraNote = extra ? ` The herb displays ${extra}.` : '';
-  return `A highly photorealistic, hyper-detailed lifestyle photograph illustrating a ${t} tip for a ${name} herb plant. The scene shows a pair of clean, well-kept hands ${act} a lush ${name} plant (approximately ${h} cm tall) with ${l} leaves, showcasing dense healthy foliage.${extraNote} The herb sits in a small terracotta or white ceramic pot on a bright kitchen surface — wooden board or light marble. Warm natural light from a nearby window. Background softly out of focus, fresh and culinary-inspired atmosphere. Small ${tipProp(t)} placed naturally as a prop. Square aspect ratio (1:1). Clean, fresh tones. 8k resolution. No text overlays.`;
-}
-
-// ── HELPER: tip action phrasing ──
 function tipAction(tip) {
-  const t = (tip || '').toLowerCase().trim();
-  if (t.includes('water'))    return 'carefully watering';
-  if (t.includes('prun'))     return 'precisely pruning';
-  if (t.includes('fertil'))   return 'gently applying fertilizer to';
-  if (t.includes('repot'))    return 'carefully repotting';
-  if (t.includes('harvest'))  return 'harvesting leaves from';
-  if (t.includes('mist'))     return 'misting';
-  if (t.includes('trim'))     return 'trimming';
-  if (t.includes('check') || t.includes('inspect')) return 'inspecting the soil and roots of';
+  const t = (tip||'').toLowerCase();
+  if (t.includes('water'))   return 'carefully watering';
+  if (t.includes('prun'))    return 'precisely pruning';
+  if (t.includes('fertil'))  return 'gently applying fertilizer to';
+  if (t.includes('repot'))   return 'carefully repotting';
+  if (t.includes('harvest')) return 'harvesting fresh leaves from';
+  if (t.includes('mist'))    return 'misting';
+  if (t.includes('trim'))    return 'trimming';
+  if (t.includes('check')||t.includes('inspect')) return 'inspecting the roots and soil of';
   return `performing ${tip} care on`;
 }
 
-// ── HELPER: tip prop ──
 function tipProp(tip) {
-  const t = (tip || '').toLowerCase().trim();
-  if (t.includes('water'))    return 'small copper watering can';
-  if (t.includes('prun') || t.includes('trim')) return 'pair of clean pruning scissors';
-  if (t.includes('fertil'))   return 'small bottle of liquid fertilizer';
-  if (t.includes('repot'))    return 'bag of fresh potting soil';
-  if (t.includes('harvest'))  return 'small wooden cutting board';
-  if (t.includes('mist'))     return 'glass spray bottle';
+  const t = (tip||'').toLowerCase();
+  if (t.includes('water'))   return 'small copper watering can';
+  if (t.includes('prun')||t.includes('trim')) return 'pair of clean pruning scissors';
+  if (t.includes('fertil'))  return 'small bottle of liquid fertilizer';
+  if (t.includes('repot'))   return 'bag of fresh potting soil';
+  if (t.includes('harvest')) return 'small wooden cutting board';
+  if (t.includes('mist'))    return 'glass spray bottle';
   return 'small gardening tool';
 }
 
-// ── MASTER BUILD ──
-function buildPrompt(niche, imgtype, name, h, leaf, feat, extra, tip) {
+function tipContainerPhrase(pres, potSize, potStyle) {
+  if (pres === 'plug') return `The plant's root ball is wrapped neatly in dark moist peat soil, held without a pot.`;
+  const style = potStyle || 'terracotta pot';
+  const size  = potSize  ? `a ${potSize} ` : 'a ';
+  return `The plant sits in ${size}${style}.`;
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  DEFAULTS
+// ══════════════════════════════════════════════════════════════════
+
+const DEFAULTS = {
+  flower: { leaf: 'textured, dark green', feature: 'vibrant, large velvety petals with a delicate center', tip: 'watering' },
+  fruit:  { leaf: 'glossy, broad green',  feature: 'numerous bright ripe fruits hanging clustered from delicate stems', tip: 'watering' },
+  herb:   { leaf: 'soft, deeply veined, light green', extra: '', tip: 'pruning' }
+};
+
+// ══════════════════════════════════════════════════════════════════
+//  TEMPLATE ENGINE
+// ══════════════════════════════════════════════════════════════════
+
+function buildPrompt(niche, imgtype, pres, name, heightFt, leaf, feat, extra, tip, potSize, potStyle) {
+  const hDisp    = feetToDisplay(parseFloat(heightFt));
+  const presLine = pres === 'plug' ? plugPhrase() : pottedPhrase(potSize, potStyle);
+  const bg       = 'Isolated on a seamless pure white background. Bright, crisp studio lighting. Square aspect ratio (1:1). 8k resolution.';
+
+  // ── MAIN ──
   if (imgtype === 'main') {
-    if (niche === 'flower') return mainFlower(name, h, leaf, feat);
-    if (niche === 'fruit')  return mainFruit(name, h, leaf, feat);
-    if (niche === 'herb')   return mainHerb(name, h, leaf, extra);
+    const l = leaf || DEFAULTS[niche].leaf;
+
+    if (niche === 'flower') {
+      const f = feat || DEFAULTS.flower.feature;
+      return `A highly photorealistic, hyper-detailed botanical product photograph of a robust young ${name} starter plant. Standing exactly ${hDisp} tall. The bushy plant is covered in characteristic ${l} leaves and is abundantly in bloom. It features ${f}. ${presLine} ${bg}`;
+    }
+    if (niche === 'fruit') {
+      const f = feat || DEFAULTS.fruit.feature;
+      return `A highly photorealistic, hyper-detailed botanical product photograph of a robust young ${name} starter plant. Standing exactly ${hDisp} tall. The bushy plant is covered in characteristic ${l} leaves and is actively bearing fruit. It features ${f}. ${presLine} ${bg}`;
+    }
+    if (niche === 'herb') {
+      const e = extra ? ` ${extra}.` : '';
+      return `A highly photorealistic, hyper-detailed botanical product photograph of a robust young ${name} starter plant. Standing exactly ${hDisp} tall. The lush, bushy plant is covered in characteristic ${l} leaves, showcasing dense, vigorous foliage typical of a healthy herb.${e} ${presLine} ${bg}`;
+    }
   }
+
+  // ── TIP CARE ──
   if (imgtype === 'tip') {
-    if (niche === 'flower') return tipFlower(name, h, leaf, feat, tip);
-    if (niche === 'fruit')  return tipFruit(name, h, leaf, feat, tip);
-    if (niche === 'herb')   return tipHerb(name, h, leaf, extra, tip);
+    const t      = tip || DEFAULTS[niche].tip;
+    const act    = tipAction(t);
+    const prop   = tipProp(t);
+    const contPh = tipContainerPhrase(pres, potSize, potStyle);
+    const l      = leaf || DEFAULTS[niche].leaf;
+
+    if (niche === 'flower') {
+      const f = feat || DEFAULTS.flower.feature;
+      return `A highly photorealistic, hyper-detailed lifestyle photograph illustrating a ${t} tip for a ${name} flowering plant. The scene shows a pair of clean, well-kept hands ${act} a healthy ${name} plant (approximately ${hDisp} tall) with ${l} leaves and ${f}. ${contPh} The plant is set on a bright wooden surface or light marble countertop. Natural soft window light from the side. The background is softly blurred (shallow depth of field), creating a warm, editorial botanical atmosphere. Include a subtle prop — a small ${prop} — placed naturally nearby. Square aspect ratio (1:1). Bright, clean, airy tones. 8k resolution. No text overlays.`;
+    }
+    if (niche === 'fruit') {
+      const f = feat || DEFAULTS.fruit.feature;
+      return `A highly photorealistic, hyper-detailed lifestyle photograph illustrating a ${t} tip for a ${name} fruit plant. The scene shows a pair of clean, well-kept hands ${act} a healthy ${name} plant (approximately ${hDisp} tall) with ${l} leaves and ${f}. ${contPh} The plant is placed on a bright wooden table or light stone surface. Natural soft daylight from the side. Background softly blurred, warm and editorial feel. Include a small ${prop} as a natural prop nearby. Square aspect ratio (1:1). Vivid yet natural colors. 8k resolution. No text overlays.`;
+    }
+    if (niche === 'herb') {
+      const e = extra ? ` The herb displays ${extra}.` : '';
+      return `A highly photorealistic, hyper-detailed lifestyle photograph illustrating a ${t} tip for a ${name} herb plant. The scene shows a pair of clean, well-kept hands ${act} a lush ${name} plant (approximately ${hDisp} tall) with ${l} leaves, showcasing dense healthy foliage.${e} ${contPh} The herb is placed on a bright kitchen surface — wooden board or light marble. Warm natural light from a nearby window. Background softly out of focus, fresh and culinary-inspired atmosphere. Small ${prop} placed naturally as a prop. Square aspect ratio (1:1). Clean, fresh tones. 8k resolution. No text overlays.`;
+    }
   }
 }
 
-// ══════════════════════════════════════════════════════════════
-//  UI LOGIC
-// ══════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════════
+//  UI
+// ══════════════════════════════════════════════════════════════════
 
 const NICHE_LBL = { flower:'🌸 FLOWER', fruit:'🍋 FRUIT', herb:'🌿 HERB' };
-const TYPE_LBL  = { main:'📸 Main · Soil Plug', tip:'💧 Tip Care' };
+const TYPE_LBL  = { main:'📸 Main', tip:'💧 Tip Care' };
+const PRES_LBL  = { plug:'🪨 Soil Plug', pot:'🪴 Potted' };
 let history = [], currentPrompt = '';
 
-// Sync UI when niche changes
+// Live height conversion hint
+document.getElementById('plant-height').addEventListener('input', function() {
+  const v = parseFloat(this.value);
+  const el = document.getElementById('height-convert');
+  if (!isNaN(v) && v > 0) {
+    const totalIn = Math.round(v * 12);
+    el.textContent = `≈ ${totalIn} inches`;
+  } else {
+    el.textContent = '';
+  }
+});
+
+// Niche change
 document.querySelectorAll('input[name="niche"]').forEach(r =>
   r.addEventListener('change', syncNiche));
-
-// Sync UI when type changes
-document.querySelectorAll('input[name="imgtype"]').forEach(r =>
-  r.addEventListener('change', syncType));
 
 function syncNiche() {
   const n = document.querySelector('input[name="niche"]:checked')?.value;
   if (!n) return;
-  const featLbl   = document.getElementById('feat-lbl');
-  const featWrap  = document.getElementById('feat-wrap');
-  const extraWrap = document.getElementById('extra-wrap');
-  if (n === 'flower') { featLbl.textContent='Đặc điểm hoa nổi bật'; featWrap.style.display=''; extraWrap.style.display='none'; }
-  if (n === 'fruit')  { featLbl.textContent='Đặc điểm quả nổi bật'; featWrap.style.display=''; extraWrap.style.display='none'; }
-  if (n === 'herb')   { featWrap.style.display='none'; extraWrap.style.display=''; }
+  const fl = document.getElementById('feat-lbl');
+  const fw = document.getElementById('feat-wrap');
+  const ew = document.getElementById('extra-wrap');
+  if (n === 'flower') { fl.textContent='Đặc điểm hoa nổi bật'; fw.style.display=''; ew.style.display='none'; }
+  if (n === 'fruit')  { fl.textContent='Đặc điểm quả nổi bật'; fw.style.display=''; ew.style.display='none'; }
+  if (n === 'herb')   { fw.style.display='none'; ew.style.display=''; }
 }
+
+// Image type change
+document.querySelectorAll('input[name="imgtype"]').forEach(r =>
+  r.addEventListener('change', syncType));
 
 function syncType() {
   const t = document.querySelector('input[name="imgtype"]:checked')?.value;
-  const tipExtra = document.getElementById('tip-extra');
-  const btnGen   = document.getElementById('btn-gen');
-  const btnLbl   = document.getElementById('btn-lbl');
-  if (t === 'tip') {
-    tipExtra.classList.add('show');
-    btnGen.classList.add('tip-mode');
-    btnLbl.textContent = 'Tạo Tip Care Prompt';
-  } else {
-    tipExtra.classList.remove('show');
-    btnGen.classList.remove('tip-mode');
-    btnLbl.textContent = 'Tạo Prompt';
-  }
+  const te = document.getElementById('tip-extra');
+  const bg = document.getElementById('btn-gen');
+  const bl = document.getElementById('btn-lbl');
+  if (t === 'tip') { te.classList.add('show'); bg.classList.add('tip-mode'); bl.textContent='Tạo Tip Care Prompt'; }
+  else             { te.classList.remove('show'); bg.classList.remove('tip-mode'); bl.textContent='Tạo Prompt'; }
+}
+
+// Presentation change — show/hide pot fields
+document.querySelectorAll('input[name="pres"]').forEach(r =>
+  r.addEventListener('change', syncPres));
+
+function syncPres() {
+  const p = document.querySelector('input[name="pres"]:checked')?.value;
+  document.getElementById('pot-extra').classList.toggle('show', p === 'pot');
 }
 
 function toggleOpt() {
@@ -518,57 +622,55 @@ function toggleOpt() {
 
 function generate() {
   // clear errors
-  ['err-niche','err-name','err-height','err-type'].forEach(id =>
+  ['err-niche','err-name','err-height','err-type','err-pres'].forEach(id =>
     document.getElementById(id).classList.remove('show'));
   ['plant-name','plant-height'].forEach(id =>
     document.getElementById(id).classList.remove('err'));
 
   const niche   = document.querySelector('input[name="niche"]:checked')?.value;
   const imgtype = document.querySelector('input[name="imgtype"]:checked')?.value;
+  const pres    = document.querySelector('input[name="pres"]:checked')?.value;
   const name    = document.getElementById('plant-name').value.trim();
   const height  = document.getElementById('plant-height').value.trim();
   const leaf    = document.getElementById('leaf-desc').value.trim();
   const feat    = document.getElementById('feat-desc').value.trim();
   const extra   = document.getElementById('extra-desc').value.trim();
   const tip     = document.getElementById('tip-name').value.trim();
+  const potSize = document.getElementById('pot-size').value;
+  const potStyle= document.getElementById('pot-style').value;
 
   let ok = true;
   if (!niche)   { document.getElementById('err-niche').classList.add('show'); ok=false; }
   if (!imgtype) { document.getElementById('err-type').classList.add('show');  ok=false; }
+  if (!pres)    { document.getElementById('err-pres').classList.add('show');  ok=false; }
   if (!name)    { document.getElementById('err-name').classList.add('show');  document.getElementById('plant-name').classList.add('err');   ok=false; }
   if (!height)  { document.getElementById('err-height').classList.add('show'); document.getElementById('plant-height').classList.add('err'); ok=false; }
   if (!ok) return;
 
-  const prompt = buildPrompt(niche, imgtype, name, height, leaf, feat, extra, tip);
+  const prompt = buildPrompt(niche, imgtype, pres, name, height, leaf, feat, extra, tip, potSize, potStyle);
   currentPrompt = prompt;
   const isTip = imgtype === 'tip';
 
-  // show output
   document.getElementById('out-empty').style.display = 'none';
-  const outCard = document.getElementById('out-card');
-  outCard.style.background = isTip ? '#2a2010' : '';
-
+  document.getElementById('out-card').style.background = isTip ? '#2a2010' : '';
   const el = document.getElementById('out-text');
   el.textContent = prompt;
   el.className = 'out-text show' + (isTip ? ' tip-color' : '');
-
   document.getElementById('out-foot').classList.add('show');
   document.getElementById('char-bar').classList.add('show');
   document.getElementById('char-count').textContent = prompt.length + ' ký tự';
 
-  // tags
   const tn = document.getElementById('tag-niche');
   const tt = document.getElementById('tag-type');
-  tn.textContent = NICHE_LBL[niche];
-  tt.textContent = TYPE_LBL[imgtype];
-  tn.className = 'out-tag ' + (isTip ? 'on-amber' : 'on-green');
-  tt.className = 'out-tag ' + (isTip ? 'on-amber' : 'on-green');
+  const tp = document.getElementById('tag-pres');
+  tn.textContent = NICHE_LBL[niche];   tn.className = 'out-tag ' + (isTip?'on-amber':'on-green');
+  tt.textContent = TYPE_LBL[imgtype];  tt.className = 'out-tag ' + (isTip?'on-amber':'on-green');
+  tp.textContent = PRES_LBL[pres];     tp.className = 'out-tag on-earth';
 
-  // copy button color
   const bc = document.getElementById('btn-copy');
-  bc.className = 'btn-copy' + (isTip ? ' amber' : '');
+  bc.className = 'btn-copy' + (isTip?' amber':'');
 
-  addHistory(name, niche, imgtype, prompt);
+  addHistory(name, niche, imgtype, pres, prompt);
 }
 
 function copyPrompt() {
@@ -576,12 +678,12 @@ function copyPrompt() {
   navigator.clipboard.writeText(currentPrompt).then(() => {
     const btn = document.getElementById('btn-copy');
     const lbl = document.getElementById('copy-lbl');
-    const wasTip = btn.classList.contains('amber');
+    const wasAmber = btn.classList.contains('amber');
     btn.classList.add('done');
     lbl.textContent = '✓ Đã copy!';
     setTimeout(() => {
       btn.classList.remove('done');
-      if (wasTip) btn.classList.add('amber');
+      if (wasAmber) btn.classList.add('amber');
       lbl.textContent = 'Copy Prompt';
     }, 2500);
   });
@@ -589,33 +691,38 @@ function copyPrompt() {
 
 function resetAll() {
   ['plant-name','leaf-desc','feat-desc','extra-desc','tip-name'].forEach(id =>
-    document.getElementById(id).value = '');
-  document.getElementById('plant-height').value = '';
-  document.querySelectorAll('input[name="niche"], input[name="imgtype"]').forEach(r => r.checked=false);
-  ['err-niche','err-name','err-height','err-type'].forEach(id =>
+    document.getElementById(id).value='');
+  document.getElementById('plant-height').value='';
+  document.getElementById('pot-size').value='';
+  document.getElementById('pot-style').value='';
+  document.getElementById('height-convert').textContent='';
+  document.querySelectorAll('input[name="niche"],input[name="imgtype"],input[name="pres"]')
+    .forEach(r => r.checked=false);
+  ['err-niche','err-name','err-height','err-type','err-pres'].forEach(id =>
     document.getElementById(id).classList.remove('show'));
   ['plant-name','plant-height'].forEach(id =>
     document.getElementById(id).classList.remove('err'));
   document.getElementById('tip-extra').classList.remove('show');
-  document.getElementById('out-empty').style.display = '';
-  document.getElementById('out-card').style.background = '';
-  const el = document.getElementById('out-text');
-  el.className = 'out-text';
+  document.getElementById('pot-extra').classList.remove('show');
+  document.getElementById('out-empty').style.display='';
+  document.getElementById('out-card').style.background='';
+  document.getElementById('out-text').className='out-text';
   document.getElementById('out-foot').classList.remove('show');
   document.getElementById('char-bar').classList.remove('show');
-  document.getElementById('tag-niche').textContent = '—';
-  document.getElementById('tag-niche').className = 'out-tag';
-  document.getElementById('tag-type').textContent = '—';
-  document.getElementById('tag-type').className = 'out-tag';
+  ['tag-niche','tag-type','tag-pres'].forEach(id => {
+    document.getElementById(id).textContent='—';
+    document.getElementById(id).className='out-tag';
+  });
   document.getElementById('btn-gen').classList.remove('tip-mode');
-  document.getElementById('btn-lbl').textContent = 'Tạo Prompt';
+  document.getElementById('btn-lbl').textContent='Tạo Prompt';
   document.getElementById('opt-toggle').classList.remove('open');
   document.getElementById('opt-fields').classList.remove('open');
-  currentPrompt = '';
+  document.getElementById('btn-copy').className='btn-copy';
+  currentPrompt='';
 }
 
-function addHistory(name, niche, imgtype, prompt) {
-  history.unshift({ name, niche, imgtype, prompt, time: new Date() });
+function addHistory(name, niche, imgtype, pres, prompt) {
+  history.unshift({ name, niche, imgtype, pres, prompt, time: new Date() });
   if (history.length > 10) history.pop();
   renderHistory();
 }
@@ -627,7 +734,7 @@ function renderHistory() {
       <div class="hist-dot${h.imgtype==='tip'?' amber':''}"></div>
       <div>
         <div class="hname">${h.name}</div>
-        <div class="hmeta">${NICHE_LBL[h.niche]} · ${TYPE_LBL[h.imgtype]}</div>
+        <div class="hmeta">${NICHE_LBL[h.niche]} · ${TYPE_LBL[h.imgtype]} · ${PRES_LBL[h.pres]}</div>
       </div>
       <span class="htime">${fmt(h.time)}</span>
     </div>`).join('');
@@ -635,26 +742,23 @@ function renderHistory() {
 function loadHist(i) {
   const h = history[i];
   currentPrompt = h.prompt;
-  const isTip = h.imgtype === 'tip';
-  document.getElementById('out-empty').style.display = 'none';
-  document.getElementById('out-card').style.background = isTip ? '#2a2010' : '';
-  const el = document.getElementById('out-text');
-  el.textContent = h.prompt;
-  el.className = 'out-text show' + (isTip ? ' tip-color' : '');
+  const isTip = h.imgtype==='tip';
+  document.getElementById('out-empty').style.display='none';
+  document.getElementById('out-card').style.background=isTip?'#2a2010':'';
+  const el=document.getElementById('out-text');
+  el.textContent=h.prompt; el.className='out-text show'+(isTip?' tip-color':'');
   document.getElementById('out-foot').classList.add('show');
   document.getElementById('char-bar').classList.add('show');
-  document.getElementById('char-count').textContent = h.prompt.length+' ký tự';
-  const tn = document.getElementById('tag-niche');
-  const tt = document.getElementById('tag-type');
-  tn.textContent = NICHE_LBL[h.niche]; tn.className = 'out-tag '+(isTip?'on-amber':'on-green');
-  tt.textContent = TYPE_LBL[h.imgtype]; tt.className = 'out-tag '+(isTip?'on-amber':'on-green');
-  const bc = document.getElementById('btn-copy');
-  bc.className = 'btn-copy'+(isTip?' amber':'');
+  document.getElementById('char-count').textContent=h.prompt.length+' ký tự';
+  const tn=document.getElementById('tag-niche'), tt=document.getElementById('tag-type'), tp=document.getElementById('tag-pres');
+  tn.textContent=NICHE_LBL[h.niche]; tn.className='out-tag '+(isTip?'on-amber':'on-green');
+  tt.textContent=TYPE_LBL[h.imgtype]; tt.className='out-tag '+(isTip?'on-amber':'on-green');
+  tp.textContent=PRES_LBL[h.pres]; tp.className='out-tag on-earth';
+  document.getElementById('btn-copy').className='btn-copy'+(isTip?' amber':'');
   window.scrollTo({top:0,behavior:'smooth'});
 }
 function fmt(d) { return d.toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}); }
 
-// keyboard shortcuts
 document.getElementById('plant-name').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('plant-height').focus(); });
 document.getElementById('plant-height').addEventListener('keydown', e => { if(e.key==='Enter') generate(); });
 </script>
