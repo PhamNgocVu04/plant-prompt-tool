@@ -3,321 +3,310 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Plant Prompt Generator</title>
+<title>Exotic Roots | Prompt Generator</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --sage: #4a7c59;
-    --sage-light: #6a9e7a;
-    --sage-pale: #e8f0ea;
-    --sage-soft: #c8dece;
-    --earth: #8b6f47;
-    --earth-light: #c4a882;
-    --cream: #faf8f3;
-    --cream-dark: #f0ece1;
-    --ink: #1a2e1f;
-    --ink-soft: #3d5248;
-    --muted: #7a9080;
-    --white: #ffffff;
-    --red: #c0392b;
-    --border: #d4e2d8;
-    --shadow: 0 4px 24px rgba(74,124,89,0.10);
-    --shadow-sm: 0 2px 8px rgba(74,124,89,0.08);
-    --radius: 16px;
-    --radius-sm: 10px;
+    --primary: #0f172a;       /* Slate 900 */
+    --primary-hover: #1e293b; /* Slate 800 */
+    --accent: #2563eb;        /* Blue 600 */
+    --accent-hover: #1d4ed8;  /* Blue 700 */
+    --accent-light: #eff6ff;  /* Blue 50 */
+    --bg-main: #f8fafc;       /* Slate 50 */
+    --bg-card: #ffffff;
+    --text-main: #0f172a;
+    --text-muted: #64748b;    /* Slate 500 */
+    --border: #e2e8f0;        /* Slate 200 */
+    --border-hover: #cbd5e1;  /* Slate 300 */
+    --danger: #ef4444;        /* Red 500 */
+    --success: #10b981;       /* Emerald 500 */
+    --radius: 8px;
+    --radius-sm: 6px;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   }
 
   html { scroll-behavior: smooth; }
 
   body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--cream);
-    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-main);
+    color: var(--text-main);
     min-height: 100vh;
-    position: relative;
-    overflow-x: hidden;
-  }
-
-  /* Decorative background */
-  body::before {
-    content: '';
-    position: fixed;
-    top: -200px; right: -200px;
-    width: 600px; height: 600px;
-    background: radial-gradient(circle, rgba(74,124,89,0.07) 0%, transparent 70%);
-    pointer-events: none; z-index: 0;
-  }
-  body::after {
-    content: '';
-    position: fixed;
-    bottom: -150px; left: -150px;
-    width: 500px; height: 500px;
-    background: radial-gradient(circle, rgba(139,111,71,0.06) 0%, transparent 70%);
-    pointer-events: none; z-index: 0;
+    line-height: 1.5;
   }
 
   /* ── HEADER ── */
   header {
-    position: relative; z-index: 10;
-    padding: 28px 40px 20px;
-    display: flex; align-items: center; justify-content: space-between;
+    background: var(--bg-card);
     border-bottom: 1px solid var(--border);
-    background: rgba(250,248,243,0.85);
-    backdrop-filter: blur(8px);
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    box-shadow: var(--shadow-sm);
   }
   .logo {
-    display: flex; align-items: center; gap: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
   }
-  .logo-leaf {
-    width: 36px; height: 36px;
-    background: var(--sage);
-    border-radius: 50% 10px 50% 10px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px; flex-shrink: 0;
+  .logo-icon {
+    width: 32px;
+    height: 32px;
+    background: var(--primary);
+    color: #fff;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: -0.5px;
   }
   .logo-text h1 {
-    font-family: 'DM Serif Display', serif;
-    font-size: 20px; color: var(--ink); line-height: 1;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-main);
   }
   .logo-text p {
-    font-size: 12px; color: var(--muted); margin-top: 2px;
+    font-size: 12px;
+    color: var(--text-muted);
   }
   .header-badge {
-    background: var(--sage-pale);
-    color: var(--sage);
-    font-size: 12px; font-weight: 500;
-    padding: 6px 14px;
+    background: var(--accent-light);
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 12px;
     border-radius: 100px;
-    border: 1px solid var(--sage-soft);
+    border: 1px solid rgba(37, 99, 235, 0.2);
   }
 
   /* ── MAIN LAYOUT ── */
   main {
-    position: relative; z-index: 1;
-    max-width: 1100px;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 40px 24px 80px;
+    padding: 32px 24px;
     display: grid;
-    grid-template-columns: 1fr 420px;
+    grid-template-columns: 1fr 480px;
     gap: 32px;
     align-items: start;
   }
 
-  @media (max-width: 860px) {
+  @media (max-width: 960px) {
     main { grid-template-columns: 1fr; }
-    header { padding: 20px 20px 16px; }
-    .header-badge { display: none; }
+    header { padding: 16px 20px; }
   }
 
   /* ── SECTION TITLE ── */
   .section-label {
     font-size: 11px;
     font-weight: 600;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 10px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
   }
   .form-card {
-    background: var(--white);
+    background: var(--bg-card);
     border-radius: var(--radius);
     border: 1px solid var(--border);
     padding: 32px;
-    box-shadow: var(--shadow);
+    box-shadow: var(--shadow-sm);
   }
   .form-card h2 {
-    font-family: 'DM Serif Display', serif;
-    font-size: 22px; color: var(--ink);
-    margin-bottom: 6px;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 8px;
+    letter-spacing: -0.02em;
   }
   .form-card .subtitle {
-    font-size: 13px; color: var(--muted);
-    margin-bottom: 28px; line-height: 1.5;
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 28px;
   }
 
   /* ── FORM FIELDS ── */
-  .field { margin-bottom: 22px; }
+  .field { margin-bottom: 24px; }
   .field label {
-    display: flex; align-items: center; gap: 6px;
-    font-size: 13px; font-weight: 500;
-    color: var(--ink-soft);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-main);
     margin-bottom: 8px;
   }
   .field label .req {
-    color: var(--sage); font-size: 15px; line-height: 1;
+    color: var(--danger);
   }
   .field label .opt-tag {
-    font-size: 10px; font-weight: 400;
-    color: var(--muted);
-    background: var(--cream-dark);
-    padding: 2px 8px; border-radius: 100px;
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--text-muted);
+    background: var(--bg-main);
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
   }
 
   input[type="text"], input[type="number"], select, textarea {
     width: 100%;
     padding: 10px 14px;
-    border: 1.5px solid var(--border);
+    border: 1px solid var(--border);
     border-radius: var(--radius-sm);
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Inter', sans-serif;
     font-size: 14px;
-    color: var(--ink);
-    background: var(--cream);
+    color: var(--text-main);
+    background: var(--bg-card);
     outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    appearance: none;
+    transition: all 0.2s ease;
+  }
+  input:hover, select:hover, textarea:hover {
+    border-color: var(--border-hover);
   }
   input:focus, select:focus, textarea:focus {
-    border-color: var(--sage);
-    box-shadow: 0 0 0 3px rgba(74,124,89,0.12);
-    background: var(--white);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
   }
-  input::placeholder { color: #b0bcb5; }
-
-  select {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a9080' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 14px center;
-    padding-right: 36px;
-    cursor: pointer;
-  }
+  input::placeholder { color: #94a3b8; }
 
   /* Two-column grid for small fields */
   .field-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 14px;
+    gap: 16px;
   }
 
   /* ── SEGMENT CONTROL (Ngách & Loại ảnh) ── */
   .seg-group {
     display: flex;
-    gap: 0;
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius-sm);
-    overflow: hidden;
-    background: var(--cream);
+    gap: 8px;
   }
   .seg-group input[type="radio"] { display: none; }
   .seg-group label {
     flex: 1;
-    padding: 9px 6px;
+    padding: 10px;
     text-align: center;
-    font-size: 13px; font-weight: 500;
-    color: var(--muted);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-muted);
     cursor: pointer;
-    border-right: 1px solid var(--border);
-    transition: background 0.18s, color 0.18s;
-    margin: 0;
-    display: block;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg-card);
+    transition: all 0.2s;
+    user-select: none;
   }
-  .seg-group label:last-child { border-right: none; }
+  .seg-group label:hover {
+    border-color: var(--border-hover);
+    background: var(--bg-main);
+  }
   .seg-group input[type="radio"]:checked + label {
-    background: var(--sage);
-    color: var(--white);
+    background: var(--accent-light);
+    color: var(--accent);
+    border-color: var(--accent);
   }
-
-  /* ── COLOR CHIPS ── */
-  .color-chips {
-    display: flex; flex-wrap: wrap; gap: 8px;
-  }
-  .chip-input { display: none; }
-  .chip-label {
-    padding: 6px 14px;
-    border-radius: 100px;
-    border: 1.5px solid var(--border);
-    font-size: 12px; font-weight: 500;
-    color: var(--ink-soft);
-    cursor: pointer;
-    transition: all 0.15s;
-    background: var(--cream);
-    white-space: nowrap;
-  }
-  .chip-input:checked + .chip-label {
-    background: var(--sage);
-    border-color: var(--sage);
-    color: var(--white);
-  }
-  .chip-label:hover { border-color: var(--sage-light); }
 
   /* ── GENERATE BUTTON ── */
   .btn-generate {
     width: 100%;
-    padding: 14px 24px;
-    background: var(--sage);
-    color: var(--white);
+    padding: 12px 24px;
+    background: var(--primary);
+    color: #fff;
     border: none;
     border-radius: var(--radius-sm);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 15px; font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
     cursor: pointer;
     margin-top: 8px;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    transition: background 0.2s, transform 0.15s;
-    letter-spacing: 0.02em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background 0.2s;
   }
-  .btn-generate:hover { background: var(--sage-light); }
-  .btn-generate:active { transform: scale(0.98); }
+  .btn-generate:hover { background: var(--primary-hover); }
   .btn-generate svg { flex-shrink: 0; }
 
   .btn-reset {
     width: 100%;
     padding: 10px 24px;
     background: transparent;
-    color: var(--muted);
-    border: 1.5px solid var(--border);
+    color: var(--text-muted);
+    border: 1px solid transparent;
     border-radius: var(--radius-sm);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px; font-weight: 500;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
     cursor: pointer;
-    margin-top: 10px;
-    transition: all 0.15s;
+    margin-top: 8px;
+    transition: all 0.2s;
   }
-  .btn-reset:hover { border-color: var(--sage); color: var(--sage); }
+  .btn-reset:hover { 
+    color: var(--text-main);
+    background: var(--bg-main);
+  }
 
   /* ── RIGHT PANEL: OUTPUT ── */
   .output-panel {
     position: sticky;
-    top: 24px;
+    top: 88px;
   }
 
   .output-card {
-    background: var(--ink);
+    background: var(--primary);
     border-radius: var(--radius);
-    padding: 28px;
-    box-shadow: 0 8px 40px rgba(26,46,31,0.18);
-    min-height: 320px;
+    padding: 24px;
+    box-shadow: var(--shadow-lg);
+    min-height: 380px;
     display: flex;
     flex-direction: column;
     gap: 16px;
+    color: #f8fafc;
   }
 
   .output-header {
-    display: flex; align-items: center; justify-content: space-between;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 12px;
   }
   .output-title {
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 600;
-    letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: rgba(255,255,255,0.4);
+    letter-spacing: 0.05em;
+    color: #94a3b8;
   }
   .output-badges {
-    display: flex; gap: 6px;
+    display: flex;
+    gap: 8px;
   }
   .badge {
-    font-size: 10px; font-weight: 600;
-    padding: 3px 10px;
-    border-radius: 100px;
-    background: rgba(255,255,255,0.1);
-    color: rgba(255,255,255,0.5);
+    font-size: 11px;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #94a3b8;
   }
   .badge.active {
-    background: rgba(106,158,122,0.3);
-    color: #a8d5b5;
+    background: rgba(37, 99, 235, 0.2);
+    color: #60a5fa;
+    border: 1px solid rgba(37, 99, 235, 0.3);
   }
 
   .output-empty {
@@ -327,127 +316,116 @@
     align-items: center;
     justify-content: center;
     gap: 12px;
-    color: rgba(255,255,255,0.2);
+    color: #64748b;
     text-align: center;
-    padding: 20px 0;
   }
   .output-empty .empty-icon {
-    font-size: 40px; opacity: 0.4;
+    font-size: 32px;
+    opacity: 0.5;
   }
-  .output-empty p { font-size: 13px; line-height: 1.6; }
+  .output-empty p { font-size: 14px; }
 
   .output-text {
     flex: 1;
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Inter', monospace;
     font-size: 13px;
-    line-height: 1.75;
-    color: #d4e8da;
+    line-height: 1.6;
+    color: #f1f5f9;
     word-break: break-word;
     white-space: pre-wrap;
     display: none;
+    background: rgba(0,0,0,0.2);
+    padding: 16px;
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(255,255,255,0.05);
   }
   .output-text.visible { display: block; }
 
   .output-actions {
-    display: flex; gap: 10px;
+    display: flex;
+    gap: 12px;
     display: none;
   }
   .output-actions.visible { display: flex; }
 
   .btn-copy {
     flex: 1;
-    padding: 11px 16px;
-    background: var(--sage);
+    padding: 10px 16px;
+    background: var(--accent);
     color: white;
     border: none;
-    border-radius: 10px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px; font-weight: 600;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center; gap: 6px;
-    transition: all 0.15s;
-  }
-  .btn-copy:hover { background: var(--sage-light); }
-  .btn-copy.copied {
-    background: #2d6a4f;
-  }
-
-  .btn-new {
-    padding: 11px 16px;
-    background: rgba(255,255,255,0.08);
-    color: rgba(255,255,255,0.6);
-    border: none;
-    border-radius: 10px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px; font-weight: 500;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .btn-new:hover { background: rgba(255,255,255,0.13); color: white; }
-
-  /* ── TEMPLATE INFO ── */
-  .template-info {
-    background: var(--sage-pale);
-    border: 1px solid var(--sage-soft);
     border-radius: var(--radius-sm);
-    padding: 16px 20px;
-    margin-top: 16px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background 0.2s;
   }
-  .template-info h3 {
-    font-size: 12px; font-weight: 600;
-    color: var(--sage); margin-bottom: 8px;
-    text-transform: uppercase; letter-spacing: 0.08em;
+  .btn-copy:hover { background: var(--accent-hover); }
+  .btn-copy.copied {
+    background: var(--success);
   }
-  .template-info ul {
-    list-style: none; display: flex; flex-direction: column; gap: 4px;
-  }
-  .template-info ul li {
-    font-size: 12px; color: var(--ink-soft);
-    display: flex; align-items: flex-start; gap: 6px;
-  }
-  .template-info ul li::before { content: '✓'; color: var(--sage); flex-shrink: 0; }
 
   /* ── HISTORY ── */
   .history-section { margin-top: 24px; }
   .history-section h3 {
-    font-size: 11px; font-weight: 600;
-    letter-spacing: 0.1em; text-transform: uppercase;
-    color: var(--muted); margin-bottom: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 12px;
   }
   .history-list { display: flex; flex-direction: column; gap: 8px; }
   .history-item {
-    background: var(--white);
+    background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     padding: 12px 16px;
     cursor: pointer;
-    transition: border-color 0.15s;
+    transition: all 0.2s;
   }
-  .history-item:hover { border-color: var(--sage); }
+  .history-item:hover { 
+    border-color: var(--accent); 
+    box-shadow: var(--shadow-sm);
+  }
   .history-item .h-name {
-    font-size: 13px; font-weight: 500; color: var(--ink);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-main);
   }
   .history-item .h-meta {
-    font-size: 11px; color: var(--muted); margin-top: 2px;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 4px;
   }
   .history-empty {
-    font-size: 12px; color: var(--muted);
-    text-align: center; padding: 16px 0;
-    font-style: italic;
+    font-size: 13px;
+    color: var(--text-muted);
+    text-align: center;
+    padding: 24px 0;
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-sm);
   }
 
   /* ── VALIDATION ── */
   .field-error {
-    font-size: 11px; color: var(--red);
-    margin-top: 5px; display: none;
+    font-size: 12px;
+    color: var(--danger);
+    margin-top: 6px;
+    display: none;
   }
   .field-error.show { display: block; }
-  input.error, select.error { border-color: var(--red) !important; }
+  input.error, select.error { border-color: var(--danger) !important; }
 
   /* ── DIVIDER ── */
   .divider {
-    height: 1px; background: var(--border);
-    margin: 24px 0;
+    height: 1px;
+    background: var(--border);
+    margin: 32px 0;
   }
 </style>
 </head>
@@ -455,172 +433,130 @@
 
 <header>
   <div class="logo">
-    <div class="logo-leaf">🌿</div>
+    <div class="logo-icon">ER</div>
     <div class="logo-text">
-      <h1>Plant Prompt Generator</h1>
-      <p>Tạo prompt ảnh chuẩn cho Gemini AI</p>
+      <h1>Exotic Roots</h1>
+      <p>Content Production Tool</p>
     </div>
   </div>
-  <span class="header-badge">Nội bộ — 20 nhân viên</span>
+  <span class="header-badge">Hệ thống Nội bộ</span>
 </header>
 
 <main>
-  <!-- ── LEFT: FORM ── -->
   <div>
     <div class="form-card">
       <div class="section-label">Thông tin sản phẩm</div>
-      <h2>Tạo prompt ảnh</h2>
-      <p class="subtitle">Điền thông tin bên dưới, hệ thống sẽ ghép thành prompt chuẩn để dán vào Gemini.</p>
+      <h2>Trình Tạo Prompt Chuẩn</h2>
+      <p class="subtitle">Điền thông số sản phẩm, hệ thống sẽ tự động ghép template tối ưu cho Gemini AI.</p>
 
-      <!-- Tên cây -->
       <div class="field">
         <label>
           <span>Tên cây / sản phẩm</span>
           <span class="req">*</span>
         </label>
-        <input type="text" id="plant-name" placeholder="VD: Mango, Lavender, Basil…" autocomplete="off"/>
+        <input type="text" id="plant-name" placeholder="VD: Mango, Lavender, Basil..." autocomplete="off"/>
         <div class="field-error" id="err-name">Vui lòng nhập tên cây</div>
       </div>
 
-      <!-- Ngách -->
       <div class="field">
-        <label>Ngách sản phẩm <span class="req">*</span></label>
+        <label>Ngách phân loại <span class="req">*</span></label>
         <div class="seg-group">
           <input type="radio" name="niche" id="n1" value="fruit"/>
-          <label for="n1">🍋 Cây ăn quả</label>
+          <label for="n1">Cây ăn quả</label>
           <input type="radio" name="niche" id="n2" value="flower"/>
-          <label for="n2">🌸 Hoa</label>
+          <label for="n2">Hoa</label>
           <input type="radio" name="niche" id="n3" value="herb"/>
-          <label for="n3">🌿 Herb</label>
+          <label for="n3">Herb (Gia vị)</label>
         </div>
         <div class="field-error" id="err-niche">Vui lòng chọn ngách</div>
       </div>
 
-      <!-- Loại ảnh -->
       <div class="field">
         <label>Loại ảnh cần tạo <span class="req">*</span></label>
         <div class="seg-group">
           <input type="radio" name="imgtype" id="t1" value="main"/>
-          <label for="t1">📸 Ảnh chính (Main)</label>
+          <label for="t1">Ảnh Listing (Trắng)</label>
           <input type="radio" name="imgtype" id="t2" value="tipcare"/>
-          <label for="t2">💧 Tip Care</label>
+          <label for="t2">Ảnh Tip Care (Lifestyle)</label>
         </div>
         <div class="field-error" id="err-type">Vui lòng chọn loại ảnh</div>
       </div>
 
-      <!-- Màu sắc -->
-      <div class="field">
-        <label>Màu hoa / quả <span class="opt-tag">Tùy chọn</span></label>
-        <div class="color-chips">
-          <input type="checkbox" class="chip-input" id="c-red" value="red"/>
-          <label class="chip-label" for="c-red">🔴 Đỏ</label>
-          <input type="checkbox" class="chip-input" id="c-orange" value="orange"/>
-          <label class="chip-label" for="c-orange">🟠 Cam</label>
-          <input type="checkbox" class="chip-input" id="c-yellow" value="yellow"/>
-          <label class="chip-label" for="c-yellow">🟡 Vàng</label>
-          <input type="checkbox" class="chip-input" id="c-pink" value="pink"/>
-          <label class="chip-label" for="c-pink">🩷 Hồng</label>
-          <input type="checkbox" class="chip-input" id="c-purple" value="purple"/>
-          <label class="chip-label" for="c-purple">🟣 Tím</label>
-          <input type="checkbox" class="chip-input" id="c-white" value="white"/>
-          <label class="chip-label" for="c-white">⚪ Trắng</label>
-          <input type="checkbox" class="chip-input" id="c-green" value="green"/>
-          <label class="chip-label" for="c-green">🟢 Xanh</label>
-          <input type="checkbox" class="chip-input" id="c-multi" value="multicolor"/>
-          <label class="chip-label" for="c-multi">🌈 Nhiều màu</label>
+      <div class="divider"></div>
+
+      <div class="section-label">Thông số chi tiết</div>
+      <div class="field-row">
+        <div class="field" style="margin-bottom:0">
+          <label>Chiều cao cây <span class="opt-tag">Tùy chọn</span></label>
+          <input type="text" id="plant-height" placeholder="VD: 12 inches, 2 ft..."/>
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <label>Kích thước Pot <span class="opt-tag">Tùy chọn</span></label>
+          <input type="text" id="pot-size" placeholder="VD: 4 inch, 6 inch..."/>
         </div>
       </div>
 
       <div class="divider"></div>
 
-      <!-- Thông tin cây -->
-      <div class="section-label">Chi tiết cây</div>
-      <div class="field-row">
-        <div class="field" style="margin-bottom:0">
-          <label>Chiều cao cây <span class="opt-tag">Tùy chọn</span></label>
-          <input type="text" id="plant-height" placeholder="VD: 12 inches, 2 ft…"/>
-        </div>
-        <div class="field" style="margin-bottom:0">
-          <label>Kích thước pot <span class="opt-tag">Tùy chọn</span></label>
-          <input type="text" id="pot-size" placeholder="VD: 4 inch, 6 inch…"/>
-        </div>
-      </div>
-
-      <br/>
-
-      <!-- Buttons -->
       <button class="btn-generate" onclick="generatePrompt()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
         </svg>
         Tạo Prompt
       </button>
-      <button class="btn-reset" onclick="resetForm()">↺ Làm mới form</button>
+      <button class="btn-reset" onclick="resetForm()">Làm mới biểu mẫu</button>
     </div>
 
-    <!-- Template info -->
-    <div class="template-info">
-      <h3>📋 Template đang dùng</h3>
-      <ul>
-        <li>6 template chuẩn: 3 ngách × 2 loại ảnh</li>
-        <li>Tối ưu cho Gemini image generation</li>
-        <li>Tự động ghép tên cây, màu sắc, kích thước</li>
-        <li>Copy 1 click — dán thẳng vào Gemini</li>
-      </ul>
-    </div>
-
-    <!-- History -->
     <div class="history-section">
-      <h3>Lịch sử tạo prompt (phiên này)</h3>
+      <h3>Lịch sử phiên làm việc</h3>
       <div class="history-list" id="history-list">
-        <div class="history-empty">Chưa có prompt nào được tạo</div>
+        <div class="history-empty">Chưa có prompt nào được tạo.</div>
       </div>
     </div>
   </div>
 
-  <!-- ── RIGHT: OUTPUT ── -->
   <div class="output-panel">
     <div class="output-card">
       <div class="output-header">
-        <span class="output-title">Prompt đã tạo</span>
+        <span class="output-title">Kết quả Prompt</span>
         <div class="output-badges">
-          <span class="badge" id="badge-niche">—</span>
-          <span class="badge" id="badge-type">—</span>
+          <span class="badge" id="badge-niche">NGÁCH</span>
+          <span class="badge" id="badge-type">LOẠI ẢNH</span>
         </div>
       </div>
 
       <div class="output-empty" id="output-empty">
-        <div class="empty-icon">🌱</div>
-        <p>Điền thông tin bên trái<br/>và nhấn <strong style="color:rgba(255,255,255,0.4)">"Tạo Prompt"</strong></p>
+        <div class="empty-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+          </svg>
+        </div>
+        <p>Kết quả sẽ hiển thị tại đây.</p>
       </div>
 
       <pre class="output-text" id="output-text"></pre>
 
       <div class="output-actions" id="output-actions">
         <button class="btn-copy" id="btn-copy" onclick="copyPrompt()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
           </svg>
-          <span id="copy-label">Copy Prompt</span>
+          <span id="copy-label">Sao chép Prompt</span>
         </button>
-        <button class="btn-new" onclick="resetForm()">Tạo mới</button>
       </div>
     </div>
 
-    <!-- Char count -->
-    <div style="text-align:right; margin-top:8px; font-size:11px; color:var(--muted); display:none" id="char-count"></div>
+    <div style="text-align:right; margin-top:12px; font-size:12px; color:var(--text-muted); display:none" id="char-count"></div>
   </div>
 </main>
 
 <script>
 // ═══════════════════════════════════════════════════
-// TEMPLATE LIBRARY — chỉnh sửa tại đây khi cần
+// TEMPLATE LIBRARY 
 // ═══════════════════════════════════════════════════
 const TEMPLATES = {
-
   // ── CÂY ĂN QUẢ ──────────────────────────────────
   fruit_main: (d) => `A stunning product photograph of a ${d.name} plant for an online plant shop.
-${d.colors ? `The fruit features beautiful ${d.colors} tones.` : ''}
 ${d.height ? `The plant stands approximately ${d.height} tall,` : 'A healthy, well-grown specimen,'} ${d.pot ? `potted in a ${d.pot} nursery pot.` : 'in a clean nursery pot.'}
 Style: bright, airy studio photography on a pure white background. 
 Sharp focus on leaves and fruit with vibrant, natural colors. 
@@ -631,7 +567,6 @@ High resolution, photorealistic, clean background. Shot for a premium plant reta
 
   fruit_tipcare: (d) => `A clean, editorial-style infographic photograph for a plant care tip post.
 Subject: ${d.name} plant care — watering & sunlight guide.
-${d.colors ? `The plant has ${d.colors} fruit.` : ''}
 ${d.height ? `Plant shown is approximately ${d.height}.` : ''}
 Style: flat lay or overhead shot on a soft cream or light sage background.
 Show the ${d.name} plant ${d.pot ? `in a ${d.pot} pot` : 'in a small pot'} alongside minimal care props: a small watering can, a sun icon card, or soil.
@@ -642,7 +577,7 @@ Photorealistic, high resolution. Suitable for Instagram or e-commerce product pa
 
   // ── HOA ─────────────────────────────────────────
   flower_main: (d) => `A professional product photograph of a ${d.name} flowering plant for an online plant nursery.
-${d.colors ? `The blooms display gorgeous ${d.colors} colors.` : 'The flowers are in full, beautiful bloom.'}
+The flowers are in full, beautiful bloom.
 ${d.height ? `Plant height: approximately ${d.height}.` : ''} ${d.pot ? `Presented in a ${d.pot} grower pot.` : 'In a clean grower pot.'}
 Style: bright white studio background, pure and clean.
 The plant is full of blooms and lush green foliage — showcasing peak health.
@@ -652,7 +587,6 @@ High resolution, photorealistic. No props. No text.
 Perfect for e-commerce listing photo.`,
 
   flower_tipcare: (d) => `A beautiful lifestyle-style photograph for a ${d.name} flower care tip.
-${d.colors ? `Feature ${d.colors} blooms prominently.` : ''}
 ${d.height ? `The plant is approximately ${d.height} tall.` : ''}
 Setting: a bright, cozy indoor space — windowsill, wooden table, or light marble surface.
 ${d.pot ? `The plant sits in a ${d.pot} decorative or terracotta pot.` : 'The plant is in a charming pot.'}
@@ -664,7 +598,7 @@ High resolution, photorealistic. Great for social media or blog post header.`,
 
   // ── HERB ────────────────────────────────────────
   herb_main: (d) => `A clean, appetizing product photo of a ${d.name} herb plant for an online plant store.
-${d.colors ? `The foliage shows ${d.colors} tones.` : 'The foliage is fresh and vibrant green.'}
+The foliage is fresh and vibrant green.
 ${d.height ? `Plant stands about ${d.height},` : 'A compact, bushy plant,'} ${d.pot ? `in a ${d.pot} nursery pot.` : 'in a small nursery pot.'}
 Style: pure white background, clean e-commerce product photo.
 The herb looks fresh, aromatic, and full — leaves appear lush and healthy.
@@ -674,7 +608,6 @@ High resolution, photorealistic. No props, no text. Crisp focus on leaves.
 Ideal for herb plant listing on a gardening or grocery-style plant shop.`,
 
   herb_tipcare: (d) => `A fresh, kitchen-garden-inspired photograph for a ${d.name} herb care tip post.
-${d.colors ? `Show ${d.colors} colored foliage.` : ''}
 ${d.height ? `Plant size: approximately ${d.height}.` : ''}
 Setting: bright kitchen windowsill or rustic wooden surface with natural light.
 ${d.pot ? `The ${d.name} is in a ${d.pot} terracotta or ceramic pot.` : 'Planted in a charming small pot.'}
@@ -685,14 +618,8 @@ Colors: natural greens, warm neutrals, no heavy filters.
 High resolution, photorealistic. Great for Instagram Reels cover or blog.`
 };
 
-// ── COLOR LABEL MAP ──────────────────────────────────
-const COLOR_LABELS = {
-  red: 'red', orange: 'orange', yellow: 'yellow', pink: 'pink',
-  purple: 'purple', white: 'white', green: 'green', multicolor: 'multicolor'
-};
-
-const NICHE_LABELS = { fruit: 'Cây ăn quả', flower: 'Hoa', herb: 'Herb' };
-const TYPE_LABELS  = { main: 'Ảnh chính', tipcare: 'Tip Care' };
+const NICHE_LABELS = { fruit: 'Ăn quả', flower: 'Hoa', herb: 'Herb' };
+const TYPE_LABELS  = { main: 'Listing', tipcare: 'Tip Care' };
 
 // ── STATE ────────────────────────────────────────────
 let history = [];
@@ -709,8 +636,6 @@ function generatePrompt() {
   const imgtype = document.querySelector('input[name="imgtype"]:checked')?.value;
   const height  = document.getElementById('plant-height').value.trim();
   const pot     = document.getElementById('pot-size').value.trim();
-  const colors  = [...document.querySelectorAll('.chip-input:checked')]
-                    .map(c => COLOR_LABELS[c.value]).join(', ');
 
   let valid = true;
   if (!name) {
@@ -732,7 +657,7 @@ function generatePrompt() {
   const fn  = TEMPLATES[key];
   if (!fn) return;
 
-  const data = { name, colors, height, pot };
+  const data = { name, height, pot };
   const prompt = fn(data).replace(/\n\n+/g, '\n\n').trim();
 
   currentPrompt = prompt;
@@ -754,7 +679,7 @@ function generatePrompt() {
 
   // Char count
   const cc = document.getElementById('char-count');
-  cc.textContent = `${prompt.length} ký tự`;
+  cc.textContent = `Độ dài: ${prompt.length} ký tự`;
   cc.style.display = 'block';
 
   // Save to history
@@ -768,11 +693,11 @@ function copyPrompt() {
     const btn = document.getElementById('btn-copy');
     const lbl = document.getElementById('copy-label');
     btn.classList.add('copied');
-    lbl.textContent = '✓ Đã copy!';
+    lbl.textContent = 'Đã sao chép!';
     setTimeout(() => {
       btn.classList.remove('copied');
-      lbl.textContent = 'Copy Prompt';
-    }, 2200);
+      lbl.textContent = 'Sao chép Prompt';
+    }, 2000);
   });
 }
 
@@ -783,15 +708,14 @@ function resetForm() {
   document.getElementById('pot-size').value = '';
   document.querySelectorAll('input[name="niche"]').forEach(r => r.checked = false);
   document.querySelectorAll('input[name="imgtype"]').forEach(r => r.checked = false);
-  document.querySelectorAll('.chip-input').forEach(c => c.checked = false);
   document.querySelectorAll('.field-error').forEach(e => e.classList.remove('show'));
   document.querySelectorAll('.error').forEach(e => e.classList.remove('error'));
 
-  document.getElementById('output-empty').style.display = '';
+  document.getElementById('output-empty').style.display = 'flex';
   document.getElementById('output-text').classList.remove('visible');
   document.getElementById('output-actions').classList.remove('visible');
-  document.getElementById('badge-niche').textContent = '—';
-  document.getElementById('badge-type').textContent = '—';
+  document.getElementById('badge-niche').textContent = 'NGÁCH';
+  document.getElementById('badge-type').textContent = 'LOẠI ẢNH';
   document.getElementById('badge-niche').classList.remove('active');
   document.getElementById('badge-type').classList.remove('active');
   document.getElementById('char-count').style.display = 'none';
@@ -808,13 +732,13 @@ function addHistory(name, niche, imgtype, prompt) {
 function renderHistory() {
   const list = document.getElementById('history-list');
   if (history.length === 0) {
-    list.innerHTML = '<div class="history-empty">Chưa có prompt nào được tạo</div>';
+    list.innerHTML = '<div class="history-empty">Chưa có prompt nào được tạo.</div>';
     return;
   }
   list.innerHTML = history.map((h, i) => `
     <div class="history-item" onclick="loadHistory(${i})">
-      <div class="h-name">🌿 ${h.name}</div>
-      <div class="h-meta">${NICHE_LABELS[h.niche]} · ${TYPE_LABELS[h.imgtype]} · ${formatTime(h.time)}</div>
+      <div class="h-name">${h.name}</div>
+      <div class="h-meta">${NICHE_LABELS[h.niche]} • ${TYPE_LABELS[h.imgtype]} • ${formatTime(h.time)}</div>
     </div>
   `).join('');
 }
@@ -834,7 +758,7 @@ function loadHistory(i) {
   bn.classList.add('active');
   bt.classList.add('active');
   const cc = document.getElementById('char-count');
-  cc.textContent = `${h.prompt.length} ký tự`;
+  cc.textContent = `Độ dài: ${h.prompt.length} ký tự`;
   cc.style.display = 'block';
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
