@@ -3,764 +3,1069 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>TankEcom Prompt</title>
+<title>PlantPrompt Studio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
 :root {
-  --green-deep:  #2d4a35;
-  --green-mid:   #4a7c59;
-  --green-soft:  #6a9e7a;
-  --green-pale:  #e8f2eb;
-  --green-mist:  #f2f7f3;
-  --amber:       #d97706;
-  --amber-pale:  #fef3c7;
-  --amber-border:#fde68a;
-  --earth:       #8b6f47;
-  --earth-pale:  #f5f0e8;
-  --cream:       #faf8f4;
-  --ink:         #1c2e22;
-  --ink-soft:    #3d5245;
-  --muted:       #7a9080;
-  --border:      #d0e0d4;
-  --white:       #ffffff;
-  --red-err:     #c0392b;
-  --radius:      14px;
-  --radius-sm:   9px;
-  --shadow:      0 4px 28px rgba(45,74,53,0.10);
-  --shadow-lg:   0 8px 48px rgba(45,74,53,0.15);
+  --black:   #0a0a0a;
+  --black2:  #111111;
+  --gray900: #1a1a1a;
+  --gray700: #333333;
+  --gray500: #666666;
+  --gray300: #999999;
+  --gray100: #e8e8e8;
+  --gray50:  #f5f5f5;
+  --white:   #ffffff;
+  --accent:  #2d5a3d;
+  --accent2: #c8a84b;
+  --red:     #c0392b;
+  --r: 6px;
+  --r-lg: 14px;
 }
+
 html { scroll-behavior: smooth; }
-body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--ink); min-height: 100vh; }
 
-/* ── HEADER ── */
-header { background: var(--green-deep); padding: 0 40px; display: flex; align-items: center; justify-content: space-between; height: 64px; position: sticky; top: 0; z-index: 100; }
-.logo { display: flex; align-items: center; gap: 12px; }
-.logo-mark { width: 34px; height: 34px; background: rgba(255,255,255,0.12); border-radius: 10px 3px 10px 3px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
-.logo h1 { font-family: 'Lora', serif; font-size: 18px; color: #fff; font-weight: 600; }
-.logo h1 span { font-size: 12px; color: rgba(255,255,255,0.4); font-weight: 400; margin-left: 6px; }
-.ver-badge { font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.45); background: rgba(255,255,255,0.08); padding: 4px 12px; border-radius: 100px; }
+body {
+  font-family: 'Syne', sans-serif;
+  background: var(--white);
+  color: var(--black);
+  min-height: 100vh;
+  font-size: 16px;
+  line-height: 1.5;
+}
 
-/* ── MAIN LAYOUT ── */
-main { max-width: 1100px; margin: 0 auto; padding: 36px 24px 80px; display: grid; grid-template-columns: 470px 1fr; gap: 28px; align-items: start; }
-@media (max-width: 880px) { main { grid-template-columns: 1fr; } header { padding: 0 20px; } }
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--gray50); }
+::-webkit-scrollbar-thumb { background: var(--gray300); border-radius: 2px; }
 
-/* ── CARD ── */
-.card { background: var(--white); border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); overflow: hidden; }
-.card-head { padding: 22px 28px 18px; border-bottom: 1px solid var(--border); background: var(--green-mist); }
-.card-head h2 { font-family: 'Lora', serif; font-size: 19px; color: var(--ink); font-weight: 600; margin-bottom: 3px; }
-.card-head p { font-size: 12px; color: var(--muted); line-height: 1.5; }
-.card-body { padding: 26px 28px; }
+/* ─── HEADER ─── */
+header {
+  position: sticky; top: 0; z-index: 200;
+  background: var(--white);
+  border-bottom: 1.5px solid var(--black);
+  padding: 0 48px;
+  height: 68px;
+  display: flex; align-items: center; justify-content: space-between;
+  animation: slideDown 0.4s ease;
+}
+@keyframes slideDown { from { transform: translateY(-100%); opacity:0; } to { transform: translateY(0); opacity:1; } }
 
-/* ── SECTION LABEL ── */
-.section-lbl { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+.logo-area { display: flex; align-items: baseline; gap: 10px; }
+.logo-word {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px; font-weight: 900;
+  color: var(--black); letter-spacing: -0.02em;
+}
+.logo-word em { font-style: italic; color: var(--accent); }
+.logo-version {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 400;
+  color: var(--gray300);
+  border: 1px solid var(--gray100);
+  padding: 2px 8px; border-radius: 100px;
+}
+.header-meta {
+  display: flex; align-items: center; gap: 20px;
+}
+.header-pill {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; color: var(--gray500);
+  letter-spacing: 0.06em;
+}
+.header-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 0 3px rgba(34,197,94,0.2);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%,100%{box-shadow:0 0 0 3px rgba(34,197,94,0.2)} 50%{box-shadow:0 0 0 6px rgba(34,197,94,0.1)} }
 
-/* ── NICHE PICKER ── */
-.niche-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 6px; }
+/* ─── LAYOUT ─── */
+.page-wrap {
+  max-width: 1280px; margin: 0 auto;
+  padding: 0 48px 100px;
+  display: grid;
+  grid-template-columns: 520px 1fr;
+  gap: 0;
+  align-items: start;
+}
+@media (max-width: 960px) {
+  .page-wrap { grid-template-columns: 1fr; padding: 0 24px 80px; }
+  header { padding: 0 24px; }
+}
+
+/* ─── LEFT COLUMN ─── */
+.left-col {
+  padding: 48px 48px 48px 0;
+  border-right: 1.5px solid var(--black);
+  min-height: calc(100vh - 68px);
+  animation: fadeUp 0.5s ease 0.1s both;
+}
+@keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+
+/* ─── PAGE TITLE AREA ─── */
+.page-title-block { margin-bottom: 44px; padding-top: 40px; }
+.page-eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 500;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--gray400);
+  margin-bottom: 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.page-eyebrow::before { content:''; display:inline-block; width:24px; height:1px; background:var(--gray300); }
+.page-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 42px; font-weight: 900;
+  color: var(--black);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+.page-title em { font-style: italic; color: var(--accent); }
+.page-sub {
+  margin-top: 14px;
+  font-size: 15px; color: var(--gray500);
+  font-weight: 400; line-height: 1.6;
+}
+
+/* ─── STEP BLOCKS ─── */
+.step-block { margin-bottom: 36px; }
+.step-label {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 14px;
+}
+.step-num {
+  width: 26px; height: 26px;
+  border: 1.5px solid var(--black);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 500;
+  color: var(--black); flex-shrink: 0;
+  transition: all 0.2s;
+}
+.step-num.done { background: var(--black); color: var(--white); }
+.step-title {
+  font-size: 13px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--black);
+}
+
+/* ─── NICHE SELECTOR ─── */
+.niche-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
 .niche-opt input { display: none; }
-.niche-btn { display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 14px 6px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; transition: all 0.18s; background: var(--cream); text-align: center; }
-.niche-btn .icon { font-size: 24px; line-height: 1; }
-.niche-btn .lbl { font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: 0.05em; }
-.niche-btn .sub { font-size: 10px; color: var(--muted); font-weight: 400; }
-.niche-opt input:checked + .niche-btn { border-color: var(--green-mid); background: var(--green-pale); }
-.niche-opt input:checked + .niche-btn .lbl { color: var(--green-deep); }
-.niche-btn:hover { border-color: var(--green-soft); }
+.niche-card {
+  border: 1.5px solid var(--gray100);
+  border-radius: var(--r-lg);
+  padding: 18px 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--white);
+  text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+}
+.niche-card:hover { border-color: var(--black); transform: translateY(-2px); }
+.niche-icon { font-size: 28px; line-height: 1; }
+.niche-name {
+  font-size: 13px; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--gray500);
+}
+.niche-sub { font-size: 11px; color: var(--gray300); font-weight: 400; }
+.niche-opt input:checked + .niche-card {
+  border-color: var(--black);
+  border-width: 2px;
+  background: var(--black);
+}
+.niche-opt input:checked + .niche-card .niche-name { color: var(--white); }
+.niche-opt input:checked + .niche-card .niche-sub { color: var(--gray300); }
 
-/* ── IMAGE TYPE ── */
-.type-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 6px; }
+/* ─── TYPE SELECTOR ─── */
+.type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .type-opt input { display: none; }
-.type-btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 11px 12px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; transition: all 0.18s; background: var(--cream); font-size: 13px; font-weight: 500; color: var(--muted); }
-.type-btn .t-icon { font-size: 15px; }
-#t-main:checked + .type-btn { border-color: var(--green-mid); background: var(--green-pale); color: var(--green-deep); }
-#t-tip:checked  + .type-btn { border-color: var(--amber);     background: var(--amber-pale); color: var(--amber); }
-.type-btn:hover { border-color: var(--green-soft); }
+.type-card {
+  border: 1.5px solid var(--gray100);
+  border-radius: var(--r-lg);
+  padding: 16px 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex; align-items: center; gap: 12px;
+}
+.type-card:hover { border-color: var(--black); }
+.type-icon-wrap {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: var(--gray50);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px; flex-shrink: 0;
+  transition: background 0.2s;
+}
+.type-info .t-name { font-size: 14px; font-weight: 700; color: var(--black); }
+.type-info .t-desc { font-size: 11px; color: var(--gray400); margin-top: 2px; }
+#tm:checked + .type-card { border-color: var(--accent); border-width: 2px; background: #f0f7f2; }
+#tm:checked + .type-card .type-icon-wrap { background: var(--accent); }
+#tt:checked + .type-card { border-color: var(--accent2); border-width: 2px; background: #fdf8ee; }
+#tt:checked + .type-card .type-icon-wrap { background: var(--accent2); }
 
-/* ── PRESENTATION (Soil Plug / Potted) ── */
-.pres-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 6px; }
+/* ─── PRESENTATION SELECTOR ─── */
+.pres-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .pres-opt input { display: none; }
-.pres-btn {
-  display: flex; flex-direction: column; align-items: center; gap: 5px;
-  padding: 13px 8px;
-  border: 1.5px solid var(--border); border-radius: var(--radius-sm);
-  cursor: pointer; transition: all 0.18s; background: var(--cream); text-align: center;
+.pres-card {
+  border: 1.5px solid var(--gray100);
+  border-radius: var(--r-lg);
+  padding: 16px 18px;
+  cursor: pointer; transition: all 0.2s;
+  display: flex; align-items: flex-start; gap: 12px;
 }
-.pres-btn .p-icon { font-size: 22px; line-height: 1; }
-.pres-btn .p-lbl { font-size: 12px; font-weight: 600; color: var(--muted); }
-.pres-btn .p-sub { font-size: 10px; color: var(--muted); line-height: 1.4; }
-.pres-opt input:checked + .pres-btn { border-color: var(--earth); background: var(--earth-pale); }
-.pres-opt input:checked + .pres-btn .p-lbl { color: #5a3e1b; }
-.pres-btn:hover { border-color: var(--earth); }
+.pres-card:hover { border-color: var(--black); }
+.pres-icon { font-size: 22px; line-height: 1; margin-top: 2px; flex-shrink:0; }
+.pres-info .p-name { font-size: 14px; font-weight: 700; color: var(--black); }
+.pres-info .p-desc { font-size: 11px; color: var(--gray400); margin-top: 3px; line-height: 1.4; }
+.pres-opt input:checked + .pres-card { border-color: var(--black); border-width: 2px; background: var(--gray50); }
 
-/* Pot size field — chỉ hiện khi chọn Potted */
-.pot-extra { display: none; }
-.pot-extra.show { display: block; }
+/* ─── POT EXTRA ─── */
+.pot-extra { display: none; margin-top: 12px; }
+.pot-extra.show { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; animation: fadeUp 0.25s ease; }
 
-/* ── FIELDS ── */
-.field { margin-bottom: 16px; }
-.field > label { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--ink-soft); margin-bottom: 7px; }
-.req { color: var(--green-mid); font-size: 16px; line-height: 1; }
-.opt-tag { font-size: 10px; font-weight: 400; color: var(--muted); background: #f0ece3; padding: 2px 8px; border-radius: 100px; }
-input[type="text"], input[type="number"], select {
-  width: 100%; padding: 10px 14px;
-  border: 1.5px solid var(--border); border-radius: var(--radius-sm);
-  font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--ink);
-  background: var(--cream); outline: none;
+/* ─── FIELD ─── */
+.field { margin-bottom: 20px; }
+.field-label {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; font-weight: 700;
+  letter-spacing: 0.04em; text-transform: uppercase;
+  color: var(--black); margin-bottom: 9px;
+}
+.req-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); flex-shrink:0; }
+.opt-badge {
+  font-size: 10px; font-weight: 500; letter-spacing: 0.06em;
+  color: var(--gray300); background: var(--gray50);
+  border: 1px solid var(--gray100);
+  padding: 2px 8px; border-radius: 100px; text-transform: uppercase;
+}
+
+input[type="text"], input[type="number"] {
+  width: 100%;
+  padding: 13px 16px;
+  border: 1.5px solid var(--gray100);
+  border-radius: var(--r);
+  font-family: 'Syne', sans-serif;
+  font-size: 16px; font-weight: 500;
+  color: var(--black);
+  background: var(--white);
+  outline: none;
   transition: border-color 0.18s, box-shadow 0.18s;
-  appearance: none;
 }
-select {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a9080' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; cursor: pointer;
+input:focus {
+  border-color: var(--black);
+  box-shadow: 0 0 0 3px rgba(10,10,10,0.06);
 }
-input:focus, select:focus { border-color: var(--green-mid); box-shadow: 0 0 0 3px rgba(74,124,89,0.12); background: var(--white); }
-input::placeholder { color: #b5c4bb; }
-input.err { border-color: var(--red-err) !important; }
-.field-err { font-size: 11px; color: var(--red-err); margin-top: 5px; display: none; }
+input::placeholder { color: var(--gray300); font-weight: 400; }
+input.err { border-color: var(--red) !important; box-shadow: 0 0 0 3px rgba(192,57,43,0.08) !important; }
+
+.height-row { display: flex; gap: 8px; }
+.height-row input { flex: 1; }
+.unit-badge {
+  padding: 13px 18px;
+  border: 1.5px solid var(--black);
+  border-radius: var(--r);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 16px; font-weight: 500;
+  color: var(--black); background: var(--black);
+  color: var(--white);
+  display: flex; align-items: center;
+  white-space: nowrap;
+}
+.field-hint {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; color: var(--gray300);
+  margin-top: 6px;
+}
+.field-err { font-size: 12px; color: var(--red); margin-top: 6px; display: none; font-weight: 500; }
 .field-err.show { display: block; }
-.field-hint { font-size: 11px; color: var(--muted); margin-top: 5px; font-style: italic; }
 
-/* Height + unit toggle row */
-.height-wrap { display: flex; gap: 8px; align-items: stretch; }
-.height-wrap input { flex: 1; }
-.unit-display {
-  padding: 10px 16px; background: var(--green-pale);
-  border: 1.5px solid var(--border); border-radius: var(--radius-sm);
-  font-size: 14px; font-weight: 600; color: var(--green-mid);
-  display: flex; align-items: center; white-space: nowrap;
-  min-width: 56px; justify-content: center;
+/* ─── TIP NOTICE ─── */
+.tip-extra { display: none; }
+.tip-extra.show { display: block; animation: fadeUp 0.25s ease; }
+.tip-notice {
+  border: 1.5px solid var(--accent2);
+  border-radius: var(--r);
+  padding: 14px 18px;
+  font-size: 13px; color: var(--gray700);
+  line-height: 1.6; margin-bottom: 16px;
+  background: #fdf8ee;
 }
 
-/* ── TIP CARE EXTRA ── */
-.tip-extra { display: none; }
-.tip-extra.show { display: block; }
-.tip-notice { background: var(--amber-pale); border: 1px solid var(--amber-border); border-radius: var(--radius-sm); padding: 12px 16px; font-size: 12px; color: #92400e; line-height: 1.5; margin-bottom: 14px; }
-
-/* ── OPT TOGGLE ── */
-.opt-toggle { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 500; color: var(--muted); cursor: pointer; margin: 4px 0 14px; user-select: none; padding: 8px 12px; border: 1px dashed var(--border); border-radius: var(--radius-sm); transition: all 0.15s; }
-.opt-toggle:hover { color: var(--green-mid); border-color: var(--green-soft); }
-.opt-toggle::before { content: '▸'; transition: transform 0.2s; display: inline-block; }
-.opt-toggle.open::before { transform: rotate(90deg); }
+/* ─── OPT TOGGLE ─── */
+.opt-toggle {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 13px; font-weight: 600;
+  letter-spacing: 0.04em; text-transform: uppercase;
+  color: var(--gray400); cursor: pointer;
+  padding: 12px 0;
+  border-top: 1px dashed var(--gray100);
+  border-bottom: 1px dashed var(--gray100);
+  margin: 8px 0 16px;
+  user-select: none;
+  transition: color 0.15s;
+}
+.opt-toggle:hover { color: var(--black); }
+.opt-arrow { font-size: 10px; transition: transform 0.2s; }
+.opt-toggle.open .opt-arrow { transform: rotate(90deg); }
 .opt-fields { display: none; }
-.opt-fields.open { display: block; }
+.opt-fields.open { display: block; animation: fadeUp 0.25s ease; }
 
-/* ── DIVIDER ── */
-.divider { height: 1px; background: var(--border); margin: 18px 0; }
+/* ─── DIVIDER ─── */
+.divider { height: 1.5px; background: var(--gray100); margin: 32px 0; }
 
-/* ── BUTTONS ── */
-.btn-gen { width: 100%; padding: 13px 24px; background: var(--green-deep); color: var(--white); border: none; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.18s, transform 0.12s; }
-.btn-gen:hover { background: var(--green-mid); }
+/* ─── GENERATE BUTTON ─── */
+.btn-gen {
+  width: 100%;
+  padding: 18px 32px;
+  background: var(--black);
+  color: var(--white);
+  border: 2px solid var(--black);
+  border-radius: var(--r);
+  font-family: 'Syne', sans-serif;
+  font-size: 16px; font-weight: 800;
+  letter-spacing: 0.04em; text-transform: uppercase;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  transition: all 0.2s;
+  position: relative; overflow: hidden;
+}
+.btn-gen::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: var(--white);
+  transform: translateX(-101%);
+  transition: transform 0.3s ease;
+  z-index: 0;
+}
+.btn-gen:hover::after { transform: translateX(0); }
+.btn-gen:hover { color: var(--black); }
+.btn-gen span, .btn-gen svg { position: relative; z-index: 1; }
+.btn-gen.tip-mode { background: var(--accent2); border-color: var(--accent2); }
+.btn-gen.tip-mode:hover { color: var(--accent2); }
 .btn-gen:active { transform: scale(0.98); }
-.btn-gen.tip-mode { background: var(--amber); }
-.btn-gen.tip-mode:hover { background: #b45309; }
-.btn-reset { width: 100%; margin-top: 10px; padding: 10px; background: transparent; color: var(--muted); border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; transition: all 0.15s; }
-.btn-reset:hover { border-color: var(--green-soft); color: var(--green-mid); }
 
-/* ── OUTPUT ── */
-.out-sticky { position: sticky; top: 88px; }
-.out-card { background: var(--green-deep); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-lg); }
-.out-head { padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); }
-.out-label { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.35); }
-.out-tags { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
-.out-tag { font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 100px; background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.35); }
-.out-tag.on-green { background: rgba(106,158,122,0.35); color: #a0d4b0; }
-.out-tag.on-amber { background: rgba(217,119,6,0.35); color: #fcd34d; }
-.out-tag.on-earth { background: rgba(139,111,71,0.35); color: #f5c97a; }
-.out-body { padding: 24px; min-height: 260px; }
-.out-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 36px 20px; text-align: center; color: rgba(255,255,255,0.2); }
-.out-empty svg { opacity: 0.18; }
-.out-empty p { font-size: 13px; line-height: 1.6; }
-.out-text { font-family: 'DM Sans', sans-serif; font-size: 13px; line-height: 1.85; color: #c8dece; white-space: pre-wrap; word-break: break-word; display: none; }
-.out-text.tip-color { color: #fde68a; }
-.out-text.show { display: block; }
-.out-foot { padding: 16px 24px; border-top: 1px solid rgba(255,255,255,0.08); display: none; gap: 10px; }
-.out-foot.show { display: flex; }
-.btn-copy { flex: 1; padding: 11px 16px; background: var(--green-soft); color: white; border: none; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.15s; }
-.btn-copy:hover { background: #7ab88c; }
-.btn-copy.done { background: #2d6a4f; }
-.btn-copy.amber { background: var(--amber); }
-.btn-copy.amber:hover { background: #b45309; }
-.btn-new { padding: 11px 16px; background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.55); border: none; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; transition: all 0.15s; }
-.btn-new:hover { background: rgba(255,255,255,0.13); color: white; }
-.char-bar { padding: 0 24px 14px; display: none; }
-.char-bar.show { display: block; }
-.char-count { font-size: 11px; color: rgba(255,255,255,0.25); }
+.btn-reset {
+  width: 100%; margin-top: 10px;
+  padding: 12px;
+  background: transparent; color: var(--gray400);
+  border: 1.5px solid var(--gray100);
+  border-radius: var(--r);
+  font-family: 'Syne', sans-serif;
+  font-size: 13px; font-weight: 600;
+  letter-spacing: 0.04em; text-transform: uppercase;
+  cursor: pointer; transition: all 0.15s;
+}
+.btn-reset:hover { border-color: var(--black); color: var(--black); }
 
-/* ── TEMPLATE NOTE ── */
-.tpl-note { margin-top: 16px; background: var(--earth-pale); border: 1px solid #e0d5c5; border-radius: var(--radius-sm); padding: 16px 20px; }
-.tpl-note h3 { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--earth); margin-bottom: 10px; }
-.tpl-row { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 6px; font-size: 12px; }
-.tpl-row:last-child { margin-bottom: 0; }
-.tpl-chk { color: var(--green-mid); flex-shrink: 0; }
-.tpl-row span { color: var(--ink-soft); line-height: 1.4; }
+/* ─── RIGHT COLUMN ─── */
+.right-col {
+  padding: 48px 0 48px 48px;
+  position: sticky; top: 68px;
+  animation: fadeUp 0.5s ease 0.2s both;
+}
 
-/* ── HISTORY ── */
-.hist-wrap { margin-top: 18px; }
-.hist-title { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
-.hist-list { display: flex; flex-direction: column; gap: 7px; }
-.hist-item { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 11px 15px; cursor: pointer; transition: border-color 0.15s; display: flex; align-items: center; gap: 10px; }
-.hist-item:hover { border-color: var(--green-soft); }
-.hist-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green-soft); flex-shrink: 0; }
-.hist-dot.amber { background: var(--amber); }
-.hname { font-size: 13px; font-weight: 500; color: var(--ink); }
-.hmeta { font-size: 11px; color: var(--muted); margin-top: 1px; }
-.htime { font-size: 11px; color: var(--muted); margin-left: auto; flex-shrink: 0; }
-.hist-empty { font-size: 12px; color: var(--muted); font-style: italic; text-align: center; padding: 12px 0; }
+/* ─── OUTPUT BOX ─── */
+.output-wrap {
+  background: var(--black);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  min-height: 400px;
+  display: flex; flex-direction: column;
+}
+.output-wrap.tip-theme { background: #1a1505; }
+
+.out-topbar {
+  padding: 16px 24px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.out-topbar-left { display: flex; align-items: center; gap: 10px; }
+.traffic-dots { display: flex; gap: 6px; }
+.td { width: 10px; height: 10px; border-radius: 50%; }
+.td1 { background: #ff5f57; }
+.td2 { background: #febc2e; }
+.td3 { background: #28c840; }
+.out-filename {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; color: rgba(255,255,255,0.35);
+}
+.out-badges { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.obadge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 500;
+  padding: 3px 10px; border-radius: 100px;
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.3);
+  letter-spacing: 0.04em;
+}
+.obadge.g { background: rgba(45,90,61,0.5); color: #86efac; }
+.obadge.a { background: rgba(200,168,75,0.4); color: #fcd34d; }
+.obadge.e { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.7); }
+
+.out-body {
+  flex: 1; padding: 28px;
+  display: flex; flex-direction: column;
+}
+
+/* Empty state */
+.out-empty {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 16px; text-align: center; padding: 40px 20px;
+}
+.empty-graphic {
+  width: 80px; height: 80px;
+  border: 1.5px solid rgba(255,255,255,0.08);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 32px; opacity: 0.3;
+}
+.empty-text {
+  font-family: 'Syne', sans-serif;
+  font-size: 14px; color: rgba(255,255,255,0.2);
+  line-height: 1.7; font-weight: 400;
+}
+
+/* Prompt text */
+.out-prompt {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px; line-height: 1.85;
+  color: #d4e8d4;
+  white-space: pre-wrap; word-break: break-word;
+  display: none; flex: 1;
+}
+.out-prompt.tip-color { color: #fde68a; }
+.out-prompt.show { display: block; }
+
+/* Footer */
+.out-footer {
+  padding: 16px 28px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  display: none; align-items: center; gap: 10px;
+}
+.out-footer.show { display: flex; }
+
+.char-info {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; color: rgba(255,255,255,0.2);
+  margin-right: auto;
+}
+
+.btn-copy {
+  padding: 11px 24px;
+  background: var(--white); color: var(--black);
+  border: none; border-radius: var(--r);
+  font-family: 'Syne', sans-serif;
+  font-size: 13px; font-weight: 700;
+  letter-spacing: 0.04em; text-transform: uppercase;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 7px;
+  transition: all 0.15s;
+}
+.btn-copy:hover { background: var(--gray100); }
+.btn-copy.done { background: #22c55e; color: var(--white); }
+.btn-copy.amber { background: var(--accent2); color: var(--white); }
+.btn-copy.amber:hover { background: #b8912a; }
+
+.btn-renew {
+  padding: 11px 16px;
+  background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.5);
+  border: none; border-radius: var(--r);
+  font-family: 'Syne', sans-serif;
+  font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing:0.04em;
+  cursor: pointer; transition: all 0.15s;
+}
+.btn-renew:hover { background: rgba(255,255,255,0.14); color: white; }
+
+/* ─── TEMPLATE NOTE ─── */
+.tpl-note {
+  margin-top: 20px;
+  border: 1.5px solid var(--gray100);
+  border-radius: var(--r-lg);
+  padding: 20px 22px;
+}
+.tpl-note-title {
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--gray400); margin-bottom: 14px;
+  display: flex; align-items: center; gap: 8px;
+}
+.tpl-note-title::before { content:''; display:block; width:16px; height:1.5px; background:var(--gray300); }
+.tpl-rows { display: flex; flex-direction: column; gap: 8px; }
+.tpl-row { display: flex; gap: 10px; font-size: 13px; color: var(--gray600); line-height: 1.5; }
+.tpl-row .chk { color: var(--accent); font-weight: 700; flex-shrink:0; }
+
+/* ─── HISTORY ─── */
+.hist-section { margin-top: 24px; }
+.hist-head {
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--gray300); margin-bottom: 12px;
+  display: flex; align-items: center; gap: 10px;
+}
+.hist-head::after { content:''; flex:1; height:1px; background:var(--gray100); }
+.hist-list { display: flex; flex-direction: column; gap: 6px; }
+.hist-item {
+  border: 1.5px solid var(--gray100);
+  border-radius: var(--r);
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex; align-items: center; gap: 12px;
+  background: var(--white);
+}
+.hist-item:hover { border-color: var(--black); transform: translateX(3px); }
+.hist-pip { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink:0; }
+.hist-pip.a { background: var(--accent2); }
+.h-name { font-size: 15px; font-weight: 700; color: var(--black); }
+.h-meta { font-size: 11px; color: var(--gray400); margin-top: 1px; font-family:'JetBrains Mono',monospace; }
+.h-time { font-size: 11px; color: var(--gray300); margin-left:auto; flex-shrink:0; font-family:'JetBrains Mono',monospace; }
+.hist-empty { font-size: 13px; color: var(--gray300); text-align:center; padding: 16px 0; }
 </style>
 </head>
 <body>
 
+<!-- ══ HEADER ══ -->
 <header>
-  <div class="logo">
-    <div class="logo-mark">🌿</div>
-    <h1>Plant Prompt Generator <span>/ Nội bộ</span></h1>
+  <div class="logo-area">
+    <span class="logo-word">Plant<em>Prompt</em></span>
+    <span class="logo-version">v5.0</span>
   </div>
-  <span class="ver-badge">Gemini Image · v4.0</span>
+  <div class="header-meta">
+    <span class="header-pill">GEMINI IMAGE GEN</span>
+    <div class="header-dot"></div>
+  </div>
 </header>
 
-<main>
+<div class="page-wrap">
 
-<!-- ════════ LEFT: FORM ════════ -->
-<div>
-  <div class="card">
-    <div class="card-head">
-      <h2>Tạo prompt ảnh sản phẩm</h2>
-      <p>Chọn ngách · loại ảnh · cách trình bày → nhập thông tin → copy vào Gemini</p>
+<!-- ════ LEFT: FORM ════ -->
+<div class="left-col">
+
+  <div class="page-title-block">
+    <div class="page-eyebrow">Công cụ nội bộ</div>
+    <h1 class="page-title">Tạo prompt<br/><em>chuẩn</em> tức thì</h1>
+    <p class="page-sub">Điền thông tin → hệ thống ghép template chuẩn → copy vào Gemini tạo ảnh ngay.</p>
+  </div>
+
+  <!-- ① NGÁCH -->
+  <div class="step-block">
+    <div class="step-label">
+      <div class="step-num" id="sn1">1</div>
+      <span class="step-title">Ngách sản phẩm</span>
     </div>
-    <div class="card-body">
-
-      <!-- ① NGÁCH -->
-      <div class="section-lbl">① Ngách sản phẩm</div>
-      <div class="niche-grid">
-        <div class="niche-opt">
-          <input type="radio" name="niche" id="nf" value="flower"/>
-          <label class="niche-btn" for="nf">
-            ><span class="lbl">FLOWER</span><span class="sub">Cây hoa</span>
-          </label>
-        </div>
-        <div class="niche-opt">
-          <input type="radio" name="niche" id="nfr" value="fruit"/>
-          <label class="niche-btn" for="nfr">
-            <span class="lbl">FRUIT</span><span class="sub">Cây ăn quả</span>
-          </label>
-        </div>
-        <div class="niche-opt">
-          <input type="radio" name="niche" id="nh" value="herb"/>
-          <label class="niche-btn" for="nh">
-           <span class="lbl">HERB</span><span class="sub">Thảo mộc</span>
-          </label>
-        </div>
+    <div class="niche-grid">
+      <div class="niche-opt">
+        <input type="radio" name="niche" id="nf" value="flower"/>
+        <label class="niche-card" for="nf">
+          <span class="niche-icon">🌸</span>
+          <span class="niche-name">Flower</span>
+          <span class="niche-sub">Cây hoa</span>
+        </label>
       </div>
-      <div class="field-err" id="err-niche">Vui lòng chọn ngách sản phẩm</div>
-
-      <div class="divider"></div>
-
-      <!-- ② LOẠI ẢNH -->
-      <div class="section-lbl">② Loại ảnh</div>
-      <div class="type-row">
-        <div class="type-opt">
-          <input type="radio" name="imgtype" id="t-main" value="main"/>
-          <label class="type-btn" for="t-main"><span class="t-icon"></span> Ảnh chính (Main)</label>
-        </div>
-        <div class="type-opt">
-          <input type="radio" name="imgtype" id="t-tip" value="tip"/>
-          <label class="type-btn" for="t-tip"><span class="t-icon"></span> Tip Care</label>
-        </div>
+      <div class="niche-opt">
+        <input type="radio" name="niche" id="nfr" value="fruit"/>
+        <label class="niche-card" for="nfr">
+          <span class="niche-icon">🍋</span>
+          <span class="niche-name">Fruit</span>
+          <span class="niche-sub">Cây ăn quả</span>
+        </label>
       </div>
-      <div class="field-err" id="err-type">Vui lòng chọn loại ảnh</div>
-
-      <div class="divider"></div>
-
-      <!-- ③ CÁCH TRÌNH BÀY -->
-      <div class="section-lbl">③ Cách trình bày cây</div>
-      <div class="pres-row">
-        <div class="pres-opt">
-          <input type="radio" name="pres" id="p-plug" value="plug"/>
-          <label class="pres-btn" for="p-plug">
-            <span class="p-icon">🪨</span>
-            <span class="p-lbl">Soil Plug</span>
-            <span class="p-sub">Bọc đất, không chậu<br/>root ball lộ ra</span>
-          </label>
-        </div>
-        <div class="pres-opt">
-          <input type="radio" name="pres" id="p-pot" value="pot"/>
-          <label class="pres-btn" for="p-pot">
-            <span class="p-icon">🪴</span>
-            <span class="p-lbl">Potted</span>
-            <span class="p-sub">Đựng trong chậu<br/>terracotta / nursery</span>
-          </label>
-        </div>
+      <div class="niche-opt">
+        <input type="radio" name="niche" id="nh" value="herb"/>
+        <label class="niche-card" for="nh">
+          <span class="niche-icon">🌿</span>
+          <span class="niche-name">Herb</span>
+          <span class="niche-sub">Thảo mộc</span>
+        </label>
       </div>
-      <div class="field-err" id="err-pres">Vui lòng chọn cách trình bày</div>
+    </div>
+    <div class="field-err" id="err-niche">↑ Vui lòng chọn ngách sản phẩm</div>
+  </div>
 
-      <!-- Pot size — chỉ hiện khi chọn Potted -->
-      <div class="pot-extra" id="pot-extra">
-        <div class="field" style="margin-top:12px">
-          <label for="pot-size">Kích thước chậu <span class="opt-tag">Tùy chọn</span></label>
-          <select id="pot-size">
-            <option value="">-- Chọn size chậu --</option>
-            <option value="2-inch">2 inch pot</option>
-            <option value="4-inch">4 inch pot</option>
-            <option value="6-inch">6 inch pot</option>
-            <option value="8-inch">8 inch pot</option>
-            <option value="10-inch">10 inch pot</option>
-            <option value="12-inch">12 inch pot</option>
-            <option value="1-gallon">1 gallon pot</option>
-            <option value="2-gallon">2 gallon pot</option>
-            <option value="3-gallon">3 gallon pot</option>
-            <option value="5-gallon">5 gallon pot</option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="pot-style">Kiểu chậu <span class="opt-tag">Tùy chọn</span></label>
-          <select id="pot-style">
-            <option value="">-- Chọn kiểu chậu --</option>
-            <option value="terracotta pot">Terracotta (đất nung)</option>
-            <option value="black nursery pot">Black nursery pot (nhựa đen)</option>
-            <option value="white ceramic pot">White ceramic (sứ trắng)</option>
-            <option value="gray concrete pot">Gray concrete (xi măng)</option>
-            <option value="woven basket planter">Woven basket (giỏ đan)</option>
-          </select>
-        </div>
+  <div class="divider"></div>
+
+  <!-- ② LOẠI ẢNH -->
+  <div class="step-block">
+    <div class="step-label">
+      <div class="step-num" id="sn2">2</div>
+      <span class="step-title">Loại ảnh</span>
+    </div>
+    <div class="type-grid">
+      <div class="type-opt">
+        <input type="radio" name="imgtype" id="tm" value="main"/>
+        <label class="type-card" for="tm">
+          <div class="type-icon-wrap">📸</div>
+          <div class="type-info">
+            <div class="t-name">Ảnh chính</div>
+            <div class="t-desc">Main product photo</div>
+          </div>
+        </label>
       </div>
-
-      <div class="divider"></div>
-
-      <!-- ④ THÔNG TIN CÂY -->
-      <div class="section-lbl">④ Thông tin cây</div>
-
-      <div class="field">
-        <label for="plant-name">Tên cây <span class="req">*</span></label>
-        <input type="text" id="plant-name" placeholder="VD: Rose, Strawberry, Basil, Lavender…" autocomplete="off" spellcheck="false"/>
-        <div class="field-err" id="err-name">Vui lòng nhập tên cây</div>
-        <div class="field-hint">Nhập tên tiếng Anh để Gemini hiểu chính xác nhất</div>
+      <div class="type-opt">
+        <input type="radio" name="imgtype" id="tt" value="tip"/>
+        <label class="type-card" for="tt">
+          <div class="type-icon-wrap">💧</div>
+          <div class="type-info">
+            <div class="t-name">Tip Care</div>
+            <div class="t-desc">Care guide photo</div>
+          </div>
+        </label>
       </div>
+    </div>
+    <div class="field-err" id="err-type">↑ Vui lòng chọn loại ảnh</div>
+  </div>
 
-      <div class="field">
-        <label for="plant-height">Chiều cao cây <span class="req">*</span></label>
-        <div class="height-wrap">
-          <input type="number" id="plant-height" placeholder="VD: 1.5" min="0.1" max="50" step="0.1"/>
-          <div class="unit-display">ft</div>
-        </div>
-        <div class="field-err" id="err-height">Vui lòng nhập chiều cao</div>
-        <div class="field-hint" id="height-convert"></div>
+  <div class="divider"></div>
+
+  <!-- ③ TRÌNH BÀY -->
+  <div class="step-block">
+    <div class="step-label">
+      <div class="step-num" id="sn3">3</div>
+      <span class="step-title">Cách trình bày cây</span>
+    </div>
+    <div class="pres-grid">
+      <div class="pres-opt">
+        <input type="radio" name="pres" id="pp" value="plug"/>
+        <label class="pres-card" for="pp">
+          <span class="pres-icon">🪨</span>
+          <div class="pres-info">
+            <div class="p-name">Soil Plug</div>
+            <div class="p-desc">Bọc đất, root ball lộ ra, không chậu</div>
+          </div>
+        </label>
       </div>
-
-      <!-- TIP CARE: tên mẹo -->
-      <div class="tip-extra" id="tip-extra">
-        <div class="tip-notice">
-          <strong>💡 Tip Care</strong> — nhập tên mẹo để AI tạo đúng hành động. VD: <em>watering, pruning, fertilizing, repotting…</em> Để trống → dùng mẹo mặc định.
-        </div>
-        <div class="field">
-          <label for="tip-name">Tên mẹo chăm sóc <span class="opt-tag">Tùy chọn</span></label>
-          <input type="text" id="tip-name" placeholder="VD: watering, pruning, fertilizing, repotting…"/>
-        </div>
+      <div class="pres-opt">
+        <input type="radio" name="pres" id="ppot" value="pot"/>
+        <label class="pres-card" for="ppot">
+          <span class="pres-icon">🪴</span>
+          <div class="pres-info">
+            <div class="p-name">Potted</div>
+            <div class="p-desc">Đựng trong chậu, tự nhập size & kiểu</div>
+          </div>
+        </label>
       </div>
+    </div>
+    <div class="field-err" id="err-pres">↑ Vui lòng chọn cách trình bày</div>
 
-      <!-- OPT: đặc điểm -->
-      <div class="opt-toggle" id="opt-toggle" onclick="toggleOpt()">
-        &nbsp;Thêm đặc điểm chi tiết (tùy chọn)
+    <!-- Pot fields — hiện khi chọn Potted -->
+    <div class="pot-extra" id="pot-extra">
+      <div class="field" style="margin-bottom:0">
+        <div class="field-label">Kích thước chậu <span class="opt-badge">Tùy chọn</span></div>
+        <input type="text" id="pot-size" placeholder="VD: 4 inch, 6 inch, 1 gallon…"/>
       </div>
-      <div class="opt-fields" id="opt-fields">
-        <div class="field">
-          <label for="leaf-desc">Đặc điểm lá <span class="opt-tag">Tùy chọn</span></label>
-          <input type="text" id="leaf-desc" placeholder="VD: glossy, broad green / soft, deeply veined"/>
-        </div>
-        <div class="field" id="feat-wrap">
-          <label for="feat-desc"><span id="feat-lbl">Đặc điểm hoa / quả</span> <span class="opt-tag">Tùy chọn</span></label>
-          <input type="text" id="feat-desc" placeholder="VD: vibrant red petals with yellow center"/>
-        </div>
-        <div class="field" id="extra-wrap" style="display:none">
-          <label for="extra-desc">Chi tiết bổ sung (Herb) <span class="opt-tag">Tùy chọn</span></label>
-          <input type="text" id="extra-desc" placeholder="VD: The leaves display subtle textural hairs catching the light"/>
-        </div>
+      <div class="field" style="margin-bottom:0">
+        <div class="field-label">Kiểu chậu <span class="opt-badge">Tùy chọn</span></div>
+        <input type="text" id="pot-style" placeholder="VD: terracotta, black nursery pot…"/>
       </div>
-
-      <button class="btn-gen" id="btn-gen" onclick="generate()">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-        <span id="btn-lbl">Tạo Prompt</span>
-      </button>
-      <button class="btn-reset" onclick="resetAll()">↺ Làm mới form</button>
-
     </div>
   </div>
+
+  <div class="divider"></div>
+
+  <!-- ④ THÔNG TIN CÂY -->
+  <div class="step-block">
+    <div class="step-label">
+      <div class="step-num" id="sn4">4</div>
+      <span class="step-title">Thông tin cây</span>
+    </div>
+
+    <div class="field">
+      <div class="field-label"><div class="req-dot"></div> Tên cây</div>
+      <input type="text" id="plant-name" placeholder="VD: Rose, Strawberry, Basil…" autocomplete="off" spellcheck="false"/>
+      <div class="field-err" id="err-name">Vui lòng nhập tên cây</div>
+      <div class="field-hint">// Nhập tên tiếng Anh để Gemini hiểu chính xác</div>
+    </div>
+
+    <div class="field">
+      <div class="field-label"><div class="req-dot"></div> Chiều cao cây</div>
+      <div class="height-row">
+        <input type="number" id="plant-height" placeholder="VD: 1.5" min="0.1" max="50" step="0.1"/>
+        <div class="unit-badge">ft</div>
+      </div>
+      <div class="field-err" id="err-height">Vui lòng nhập chiều cao</div>
+      <div class="field-hint" id="height-hint">// Nhập số thập phân, VD: 1.5 ft ≈ 18 inches</div>
+    </div>
+
+    <!-- Tip Care extra -->
+    <div class="tip-extra" id="tip-extra">
+      <div class="tip-notice">
+        <strong>💡 Tip Care:</strong> Nhập tên mẹo để AI tạo đúng hành động.<br/>
+        VD: <em>watering, pruning, fertilizing, repotting…</em> — để trống dùng mặc định.
+      </div>
+      <div class="field">
+        <div class="field-label">Tên mẹo chăm sóc <span class="opt-badge">Tùy chọn</span></div>
+        <input type="text" id="tip-name" placeholder="VD: watering, pruning, fertilizing…"/>
+      </div>
+    </div>
+
+    <!-- Optional details -->
+    <div class="opt-toggle" id="opt-toggle" onclick="toggleOpt()">
+      <span class="opt-arrow">▸</span>
+      Thêm đặc điểm chi tiết
+      <span class="opt-badge" style="margin-left:4px">Tùy chọn</span>
+    </div>
+    <div class="opt-fields" id="opt-fields">
+      <div class="field">
+        <div class="field-label">Đặc điểm lá <span class="opt-badge">Tùy chọn</span></div>
+        <input type="text" id="leaf-desc" placeholder="VD: glossy, broad green / soft, deeply veined"/>
+      </div>
+      <div class="field" id="feat-wrap">
+        <div class="field-label"><span id="feat-lbl">Đặc điểm hoa / quả</span> <span class="opt-badge">Tùy chọn</span></div>
+        <input type="text" id="feat-desc" placeholder="VD: vibrant red petals with yellow center"/>
+      </div>
+      <div class="field" id="extra-wrap" style="display:none">
+        <div class="field-label">Chi tiết bổ sung (Herb) <span class="opt-badge">Tùy chọn</span></div>
+        <input type="text" id="extra-desc" placeholder="VD: The leaves display subtle textural hairs catching the light"/>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <button class="btn-gen" id="btn-gen" onclick="generate()">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+    <span id="btn-lbl">Generate Prompt</span>
+  </button>
+  <button class="btn-reset" onclick="resetAll()">↺ Reset Form</button>
 
   <div class="tpl-note">
-    <h3>📋 Template v4 — Tính năng mới</h3>
-    <div class="tpl-row"><span class="tpl-chk">✓</span><span>Chiều cao đơn vị <strong>feet (ft)</strong> — hiển thị quy đổi inches tự động</span></div>
-    <div class="tpl-row"><span class="tpl-chk">✓</span><span><strong>Soil Plug</strong>: bọc đất, root ball lộ ra, không chậu — như template gốc</span></div>
-    <div class="tpl-row"><span class="tpl-chk">✓</span><span><strong>Potted</strong>: đựng trong chậu — chọn size và kiểu chậu</span></div>
-    <div class="tpl-row"><span class="tpl-chk">✓</span><span>6 template: 3 ngách × 2 loại ảnh — mỗi loại hỗ trợ cả 2 cách trình bày</span></div>
-  </div>
-
-  <div class="hist-wrap">
-    <div class="hist-title">Lịch sử phiên làm việc</div>
-    <div class="hist-list" id="hist-list">
-      <div class="hist-empty">Chưa có prompt nào được tạo</div>
+    <div class="tpl-note-title">Template Info</div>
+    <div class="tpl-rows">
+      <div class="tpl-row"><span class="chk">✓</span><span><strong>6 templates:</strong> 3 ngách × 2 loại ảnh (Main + Tip Care)</span></div>
+      <div class="tpl-row"><span class="chk">✓</span><span><strong>Soil Plug</strong>: root ball + peat soil, không chậu, white BG 8K 1:1</span></div>
+      <div class="tpl-row"><span class="chk">✓</span><span><strong>Potted</strong>: tự nhập size & kiểu chậu bất kỳ</span></div>
+      <div class="tpl-row"><span class="chk">✓</span><span>Chiều cao đơn vị <strong>feet</strong>, tự động hiển thị inches</span></div>
     </div>
   </div>
+
+  <div class="hist-section">
+    <div class="hist-head">Session History</div>
+    <div class="hist-list" id="hist-list">
+      <div class="hist-empty">No prompts generated yet</div>
+    </div>
+  </div>
+
 </div>
 
-<!-- ════════ RIGHT: OUTPUT ════════ -->
-<div class="out-sticky">
-  <div class="out-card" id="out-card">
-    <div class="out-head">
-      <span class="out-label">Prompt · Gemini Image</span>
-      <div class="out-tags">
-        <span class="out-tag" id="tag-niche">—</span>
-        <span class="out-tag" id="tag-type">—</span>
-        <span class="out-tag" id="tag-pres">—</span>
+<!-- ════ RIGHT: OUTPUT ════ -->
+<div class="right-col">
+  <div class="output-wrap" id="out-wrap">
+
+    <div class="out-topbar">
+      <div class="out-topbar-left">
+        <div class="traffic-dots">
+          <div class="td td1"></div>
+          <div class="td td2"></div>
+          <div class="td td3"></div>
+        </div>
+        <span class="out-filename">prompt_output.txt</span>
+      </div>
+      <div class="out-badges">
+        <span class="obadge" id="ob-niche">—</span>
+        <span class="obadge" id="ob-type">—</span>
+        <span class="obadge" id="ob-pres">—</span>
       </div>
     </div>
+
     <div class="out-body">
       <div class="out-empty" id="out-empty">
-        <svg width="60" height="60" viewBox="0 0 64 64" fill="none">
-          <path d="M32 56V28" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
-          <path d="M32 40C32 40 20 36 18 24C26 22 34 28 34 36" fill="white" opacity="0.5"/>
-          <path d="M32 34C32 34 44 28 46 16C38 14 30 22 30 32" fill="white" opacity="0.35"/>
-        </svg>
-        <p>Chọn ngách · loại ảnh · cách trình bày<br/>nhập tên cây → nhấn <strong style="color:rgba(255,255,255,0.4)">Tạo Prompt</strong></p>
+        <div class="empty-graphic">🌱</div>
+        <div class="empty-text">
+          Hoàn thành 4 bước bên trái<br/>
+          và nhấn <strong>Generate Prompt</strong>
+        </div>
       </div>
-      <pre class="out-text" id="out-text"></pre>
+      <pre class="out-prompt" id="out-prompt"></pre>
     </div>
-    <div class="char-bar" id="char-bar">
-      <span class="char-count" id="char-count"></span>
-    </div>
-    <div class="out-foot" id="out-foot">
+
+    <div class="out-footer" id="out-footer">
+      <span class="char-info" id="char-info"></span>
       <button class="btn-copy" id="btn-copy" onclick="copyPrompt()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-        <span id="copy-lbl">Copy Prompt</span>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+        <span id="copy-lbl">Copy</span>
       </button>
-      <button class="btn-new" onclick="resetAll()">Làm mới</button>
+      <button class="btn-renew" onclick="resetAll()">Reset</button>
     </div>
+
   </div>
 </div>
 
-</main>
+</div><!-- /page-wrap -->
 
 <script>
-// ══════════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════
 //  HELPERS
-// ══════════════════════════════════════════════════════════════════
-
+// ══════════════════════════════════════════════════════════
 function feetToDisplay(ft) {
-  const whole = Math.floor(ft);
-  const inches = Math.round((ft - whole) * 12);
-  if (whole === 0) return `${inches} inches`;
-  if (inches === 0) return `${whole} ft`;
-  return `${whole} ft ${inches} in`;
+  const w = Math.floor(ft), i = Math.round((ft-w)*12);
+  if (w===0) return `${i} inches`;
+  if (i===0) return `${w} ft`;
+  return `${w} ft ${i} in`;
 }
-
-// ── PRESENTATION PHRASE BUILDERS ──────────────────────────────
-
 function plugPhrase() {
   return `It is presented strictly as a well-developed soil plug (root ball only) standing freely and upright, completely without a pot. The perfectly proportioned cylindrical base reveals dark, moist peat soil firmly bound by a dense, healthy network of intricate fine white roots.`;
 }
-
-function pottedPhrase(potSize, potStyle) {
-  const style = potStyle || 'terracotta pot';
-  const size  = potSize  ? `a ${potSize} ` : 'a ';
+function pottedPhrase(sz, st) {
+  const style = st||'terracotta pot';
+  const size  = sz ? `a ${sz} ` : 'a ';
   return `It is presented potted in ${size}${style}, sitting upright and well-centered. The pot is clean and proportional to the plant, showcasing the plant's healthy root system and vibrant growth.`;
 }
-
-// ── TIP CARE helpers ──────────────────────────────────────────
-
 function tipAction(tip) {
-  const t = (tip||'').toLowerCase();
-  if (t.includes('water'))   return 'carefully watering';
-  if (t.includes('prun'))    return 'precisely pruning';
-  if (t.includes('fertil'))  return 'gently applying fertilizer to';
-  if (t.includes('repot'))   return 'carefully repotting';
-  if (t.includes('harvest')) return 'harvesting fresh leaves from';
-  if (t.includes('mist'))    return 'misting';
-  if (t.includes('trim'))    return 'trimming';
-  if (t.includes('check')||t.includes('inspect')) return 'inspecting the roots and soil of';
-  return `performing ${tip} care on`;
+  const t=(tip||'').toLowerCase();
+  if(t.includes('water'))   return 'carefully watering';
+  if(t.includes('prun'))    return 'precisely pruning';
+  if(t.includes('fertil'))  return 'gently applying fertilizer to';
+  if(t.includes('repot'))   return 'carefully repotting';
+  if(t.includes('harvest')) return 'harvesting fresh leaves from';
+  if(t.includes('mist'))    return 'misting';
+  if(t.includes('trim'))    return 'trimming';
+  return `performing ${tip||'care'} on`;
 }
-
 function tipProp(tip) {
-  const t = (tip||'').toLowerCase();
-  if (t.includes('water'))   return 'small copper watering can';
-  if (t.includes('prun')||t.includes('trim')) return 'pair of clean pruning scissors';
-  if (t.includes('fertil'))  return 'small bottle of liquid fertilizer';
-  if (t.includes('repot'))   return 'bag of fresh potting soil';
-  if (t.includes('harvest')) return 'small wooden cutting board';
-  if (t.includes('mist'))    return 'glass spray bottle';
+  const t=(tip||'').toLowerCase();
+  if(t.includes('water'))   return 'small copper watering can';
+  if(t.includes('prun')||t.includes('trim')) return 'pair of clean pruning scissors';
+  if(t.includes('fertil'))  return 'small bottle of liquid fertilizer';
+  if(t.includes('repot'))   return 'bag of fresh potting soil';
+  if(t.includes('harvest')) return 'small wooden cutting board';
+  if(t.includes('mist'))    return 'glass spray bottle';
   return 'small gardening tool';
 }
-
-function tipContainerPhrase(pres, potSize, potStyle) {
-  if (pres === 'plug') return `The plant's root ball is wrapped neatly in dark moist peat soil, held without a pot.`;
-  const style = potStyle || 'terracotta pot';
-  const size  = potSize  ? `a ${potSize} ` : 'a ';
+function tipContainerPhrase(pres, sz, st) {
+  if(pres==='plug') return `The plant's root ball is wrapped neatly in dark moist peat soil, held without a pot.`;
+  const style=st||'terracotta pot', size=sz?`a ${sz} `:'a ';
   return `The plant sits in ${size}${style}.`;
 }
 
-// ══════════════════════════════════════════════════════════════════
-//  DEFAULTS
-// ══════════════════════════════════════════════════════════════════
-
-const DEFAULTS = {
-  flower: { leaf: 'textured, dark green', feature: 'vibrant, large velvety petals with a delicate center', tip: 'watering' },
-  fruit:  { leaf: 'glossy, broad green',  feature: 'numerous bright ripe fruits hanging clustered from delicate stems', tip: 'watering' },
-  herb:   { leaf: 'soft, deeply veined, light green', extra: '', tip: 'pruning' }
+// ── DEFAULTS ──────────────────────────────────────────────
+const DEF = {
+  flower:{ leaf:'textured, dark green', feat:'vibrant, large velvety petals with a delicate center', tip:'watering' },
+  fruit: { leaf:'glossy, broad green',  feat:'numerous bright ripe fruits hanging clustered from delicate stems', tip:'watering' },
+  herb:  { leaf:'soft, deeply veined, light green', extra:'', tip:'pruning' }
 };
 
-// ══════════════════════════════════════════════════════════════════
-//  TEMPLATE ENGINE
-// ══════════════════════════════════════════════════════════════════
+// ── TEMPLATE ENGINE ───────────────────────────────────────
+function buildPrompt(niche,imgtype,pres,name,hFt,leaf,feat,extra,tip,potSz,potSt) {
+  const h  = feetToDisplay(parseFloat(hFt));
+  const bg = 'Isolated on a seamless pure white background. Bright, crisp studio lighting. Square aspect ratio (1:1). 8k resolution.';
+  const pl = pres==='plug' ? plugPhrase() : pottedPhrase(potSz,potSt);
 
-function buildPrompt(niche, imgtype, pres, name, heightFt, leaf, feat, extra, tip, potSize, potStyle) {
-  const hDisp    = feetToDisplay(parseFloat(heightFt));
-  const presLine = pres === 'plug' ? plugPhrase() : pottedPhrase(potSize, potStyle);
-  const bg       = 'Isolated on a seamless pure white background. Bright, crisp studio lighting. Square aspect ratio (1:1). 8k resolution.';
-
-  // ── MAIN ──
-  if (imgtype === 'main') {
-    const l = leaf || DEFAULTS[niche].leaf;
-
-    if (niche === 'flower') {
-      const f = feat || DEFAULTS.flower.feature;
-      return `A highly photorealistic, hyper-detailed botanical product photograph of a robust young ${name} starter plant. Standing exactly ${hDisp} tall. The bushy plant is covered in characteristic ${l} leaves and is abundantly in bloom. It features ${f}. ${presLine} ${bg}`;
+  if(imgtype==='main') {
+    const l=leaf||DEF[niche].leaf;
+    if(niche==='flower'){
+      const f=feat||DEF.flower.feat;
+      return `A highly photorealistic, hyper-detailed botanical product photograph of a robust young ${name} starter plant. Standing exactly ${h} tall. The bushy plant is covered in characteristic ${l} leaves and is abundantly in bloom. It features ${f}. ${pl} ${bg}`;
     }
-    if (niche === 'fruit') {
-      const f = feat || DEFAULTS.fruit.feature;
-      return `A highly photorealistic, hyper-detailed botanical product photograph of a robust young ${name} starter plant. Standing exactly ${hDisp} tall. The bushy plant is covered in characteristic ${l} leaves and is actively bearing fruit. It features ${f}. ${presLine} ${bg}`;
+    if(niche==='fruit'){
+      const f=feat||DEF.fruit.feat;
+      return `A highly photorealistic, hyper-detailed botanical product photograph of a robust young ${name} starter plant. Standing exactly ${h} tall. The bushy plant is covered in characteristic ${l} leaves and is actively bearing fruit. It features ${f}. ${pl} ${bg}`;
     }
-    if (niche === 'herb') {
-      const e = extra ? ` ${extra}.` : '';
-      return `A highly photorealistic, hyper-detailed botanical product photograph of a robust young ${name} starter plant. Standing exactly ${hDisp} tall. The lush, bushy plant is covered in characteristic ${l} leaves, showcasing dense, vigorous foliage typical of a healthy herb.${e} ${presLine} ${bg}`;
+    if(niche==='herb'){
+      const e=extra?` ${extra}.`:'';
+      return `A highly photorealistic, hyper-detailed botanical product photograph of a robust young ${name} starter plant. Standing exactly ${h} tall. The lush, bushy plant is covered in characteristic ${l} leaves, showcasing dense, vigorous foliage typical of a healthy herb.${e} ${pl} ${bg}`;
     }
   }
 
-  // ── TIP CARE ──
-  if (imgtype === 'tip') {
-    const t      = tip || DEFAULTS[niche].tip;
-    const act    = tipAction(t);
-    const prop   = tipProp(t);
-    const contPh = tipContainerPhrase(pres, potSize, potStyle);
-    const l      = leaf || DEFAULTS[niche].leaf;
-
-    if (niche === 'flower') {
-      const f = feat || DEFAULTS.flower.feature;
-      return `A highly photorealistic, hyper-detailed lifestyle photograph illustrating a ${t} tip for a ${name} flowering plant. The scene shows a pair of clean, well-kept hands ${act} a healthy ${name} plant (approximately ${hDisp} tall) with ${l} leaves and ${f}. ${contPh} The plant is set on a bright wooden surface or light marble countertop. Natural soft window light from the side. The background is softly blurred (shallow depth of field), creating a warm, editorial botanical atmosphere. Include a subtle prop — a small ${prop} — placed naturally nearby. Square aspect ratio (1:1). Bright, clean, airy tones. 8k resolution. No text overlays.`;
+  if(imgtype==='tip') {
+    const t=tip||DEF[niche].tip, act=tipAction(t), prop=tipProp(t);
+    const ct=tipContainerPhrase(pres,potSz,potSt);
+    const l=leaf||DEF[niche].leaf;
+    if(niche==='flower'){
+      const f=feat||DEF.flower.feat;
+      return `A highly photorealistic, hyper-detailed lifestyle photograph illustrating a ${t} tip for a ${name} flowering plant. The scene shows a pair of clean, well-kept hands ${act} a healthy ${name} plant (approximately ${h} tall) with ${l} leaves and ${f}. ${ct} The plant is set on a bright wooden surface or light marble countertop. Natural soft window light from the side. The background is softly blurred (shallow depth of field), creating a warm, editorial botanical atmosphere. Include a subtle prop — a small ${prop} — placed naturally nearby. Square aspect ratio (1:1). Bright, clean, airy tones. 8k resolution. No text overlays.`;
     }
-    if (niche === 'fruit') {
-      const f = feat || DEFAULTS.fruit.feature;
-      return `A highly photorealistic, hyper-detailed lifestyle photograph illustrating a ${t} tip for a ${name} fruit plant. The scene shows a pair of clean, well-kept hands ${act} a healthy ${name} plant (approximately ${hDisp} tall) with ${l} leaves and ${f}. ${contPh} The plant is placed on a bright wooden table or light stone surface. Natural soft daylight from the side. Background softly blurred, warm and editorial feel. Include a small ${prop} as a natural prop nearby. Square aspect ratio (1:1). Vivid yet natural colors. 8k resolution. No text overlays.`;
+    if(niche==='fruit'){
+      const f=feat||DEF.fruit.feat;
+      return `A highly photorealistic, hyper-detailed lifestyle photograph illustrating a ${t} tip for a ${name} fruit plant. The scene shows a pair of clean, well-kept hands ${act} a healthy ${name} plant (approximately ${h} tall) with ${l} leaves and ${f}. ${ct} The plant is placed on a bright wooden table or light stone surface. Natural soft daylight from the side. Background softly blurred, warm and editorial feel. Include a small ${prop} as a natural prop nearby. Square aspect ratio (1:1). Vivid yet natural colors. 8k resolution. No text overlays.`;
     }
-    if (niche === 'herb') {
-      const e = extra ? ` The herb displays ${extra}.` : '';
-      return `A highly photorealistic, hyper-detailed lifestyle photograph illustrating a ${t} tip for a ${name} herb plant. The scene shows a pair of clean, well-kept hands ${act} a lush ${name} plant (approximately ${hDisp} tall) with ${l} leaves, showcasing dense healthy foliage.${e} ${contPh} The herb is placed on a bright kitchen surface — wooden board or light marble. Warm natural light from a nearby window. Background softly out of focus, fresh and culinary-inspired atmosphere. Small ${prop} placed naturally as a prop. Square aspect ratio (1:1). Clean, fresh tones. 8k resolution. No text overlays.`;
+    if(niche==='herb'){
+      const e=extra?` The herb displays ${extra}.`:'';
+      return `A highly photorealistic, hyper-detailed lifestyle photograph illustrating a ${t} tip for a ${name} herb plant. The scene shows a pair of clean, well-kept hands ${act} a lush ${name} plant (approximately ${h} tall) with ${l} leaves, showcasing dense healthy foliage.${e} ${ct} The herb is placed on a bright kitchen surface — wooden board or light marble. Warm natural light from a nearby window. Background softly out of focus, fresh and culinary-inspired atmosphere. Small ${prop} placed naturally as a prop. Square aspect ratio (1:1). Clean, fresh tones. 8k resolution. No text overlays.`;
     }
   }
 }
 
-// ══════════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════
 //  UI
-// ══════════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════
+const NL={flower:'🌸 FLOWER',fruit:'🍋 FRUIT',herb:'🌿 HERB'};
+const TL={main:'📸 MAIN',tip:'💧 TIP CARE'};
+const PL={plug:'🪨 SOIL PLUG',pot:'🪴 POTTED'};
+let hist=[],curPrompt='';
 
-const NICHE_LBL = { flower:'🌸 FLOWER', fruit:'🍋 FRUIT', herb:'🌿 HERB' };
-const TYPE_LBL  = { main:'📸 Main', tip:'💧 Tip Care' };
-const PRES_LBL  = { plug:'🪨 Soil Plug', pot:'🪴 Potted' };
-let history = [], currentPrompt = '';
-
-// Live height conversion hint
-document.getElementById('plant-height').addEventListener('input', function() {
-  const v = parseFloat(this.value);
-  const el = document.getElementById('height-convert');
-  if (!isNaN(v) && v > 0) {
-    const totalIn = Math.round(v * 12);
-    el.textContent = `≈ ${totalIn} inches`;
-  } else {
-    el.textContent = '';
-  }
+// Height hint
+document.getElementById('plant-height').addEventListener('input',function(){
+  const v=parseFloat(this.value);
+  const el=document.getElementById('height-hint');
+  if(!isNaN(v)&&v>0){ el.textContent=`// ${feetToDisplay(v)} ≈ ${Math.round(v*30.48)} cm`; }
+  else { el.textContent='// Nhập số thập phân, VD: 1.5 ft ≈ 18 inches'; }
 });
 
-// Niche change
-document.querySelectorAll('input[name="niche"]').forEach(r =>
-  r.addEventListener('change', syncNiche));
-
-function syncNiche() {
-  const n = document.querySelector('input[name="niche"]:checked')?.value;
-  if (!n) return;
-  const fl = document.getElementById('feat-lbl');
-  const fw = document.getElementById('feat-wrap');
-  const ew = document.getElementById('extra-wrap');
-  if (n === 'flower') { fl.textContent='Đặc điểm hoa nổi bật'; fw.style.display=''; ew.style.display='none'; }
-  if (n === 'fruit')  { fl.textContent='Đặc điểm quả nổi bật'; fw.style.display=''; ew.style.display='none'; }
-  if (n === 'herb')   { fw.style.display='none'; ew.style.display=''; }
+// Niche
+document.querySelectorAll('input[name="niche"]').forEach(r=>r.addEventListener('change',syncNiche));
+function syncNiche(){
+  const n=document.querySelector('input[name="niche"]:checked')?.value;
+  if(!n)return;
+  document.getElementById('sn1').classList.add('done');
+  const fl=document.getElementById('feat-lbl'),fw=document.getElementById('feat-wrap'),ew=document.getElementById('extra-wrap');
+  if(n==='flower'){fl.textContent='Đặc điểm hoa nổi bật';fw.style.display='';ew.style.display='none';}
+  if(n==='fruit') {fl.textContent='Đặc điểm quả nổi bật';fw.style.display='';ew.style.display='none';}
+  if(n==='herb')  {fw.style.display='none';ew.style.display='';}
 }
 
-// Image type change
-document.querySelectorAll('input[name="imgtype"]').forEach(r =>
-  r.addEventListener('change', syncType));
-
-function syncType() {
-  const t = document.querySelector('input[name="imgtype"]:checked')?.value;
-  const te = document.getElementById('tip-extra');
-  const bg = document.getElementById('btn-gen');
-  const bl = document.getElementById('btn-lbl');
-  if (t === 'tip') { te.classList.add('show'); bg.classList.add('tip-mode'); bl.textContent='Tạo Tip Care Prompt'; }
-  else             { te.classList.remove('show'); bg.classList.remove('tip-mode'); bl.textContent='Tạo Prompt'; }
+// Type
+document.querySelectorAll('input[name="imgtype"]').forEach(r=>r.addEventListener('change',syncType));
+function syncType(){
+  const t=document.querySelector('input[name="imgtype"]:checked')?.value;
+  document.getElementById('sn2').classList.add('done');
+  const te=document.getElementById('tip-extra'),bg=document.getElementById('btn-gen'),bl=document.getElementById('btn-lbl');
+  if(t==='tip'){te.classList.add('show');bg.classList.add('tip-mode');bl.textContent='Generate Tip Care Prompt';}
+  else{te.classList.remove('show');bg.classList.remove('tip-mode');bl.textContent='Generate Prompt';}
 }
 
-// Presentation change — show/hide pot fields
-document.querySelectorAll('input[name="pres"]').forEach(r =>
-  r.addEventListener('change', syncPres));
-
-function syncPres() {
-  const p = document.querySelector('input[name="pres"]:checked')?.value;
-  document.getElementById('pot-extra').classList.toggle('show', p === 'pot');
+// Pres
+document.querySelectorAll('input[name="pres"]').forEach(r=>r.addEventListener('change',syncPres));
+function syncPres(){
+  const p=document.querySelector('input[name="pres"]:checked')?.value;
+  document.getElementById('sn3').classList.add('done');
+  document.getElementById('pot-extra').classList.toggle('show',p==='pot');
 }
 
-function toggleOpt() {
+function toggleOpt(){
   document.getElementById('opt-toggle').classList.toggle('open');
   document.getElementById('opt-fields').classList.toggle('open');
 }
 
-function generate() {
-  // clear errors
-  ['err-niche','err-name','err-height','err-type','err-pres'].forEach(id =>
-    document.getElementById(id).classList.remove('show'));
-  ['plant-name','plant-height'].forEach(id =>
-    document.getElementById(id).classList.remove('err'));
+function generate(){
+  ['err-niche','err-name','err-height','err-type','err-pres'].forEach(id=>document.getElementById(id).classList.remove('show'));
+  ['plant-name','plant-height'].forEach(id=>document.getElementById(id).classList.remove('err'));
 
-  const niche   = document.querySelector('input[name="niche"]:checked')?.value;
-  const imgtype = document.querySelector('input[name="imgtype"]:checked')?.value;
-  const pres    = document.querySelector('input[name="pres"]:checked')?.value;
-  const name    = document.getElementById('plant-name').value.trim();
-  const height  = document.getElementById('plant-height').value.trim();
-  const leaf    = document.getElementById('leaf-desc').value.trim();
-  const feat    = document.getElementById('feat-desc').value.trim();
-  const extra   = document.getElementById('extra-desc').value.trim();
-  const tip     = document.getElementById('tip-name').value.trim();
-  const potSize = document.getElementById('pot-size').value;
-  const potStyle= document.getElementById('pot-style').value;
+  const niche  =document.querySelector('input[name="niche"]:checked')?.value;
+  const imgtype=document.querySelector('input[name="imgtype"]:checked')?.value;
+  const pres   =document.querySelector('input[name="pres"]:checked')?.value;
+  const name   =document.getElementById('plant-name').value.trim();
+  const height =document.getElementById('plant-height').value.trim();
+  const leaf   =document.getElementById('leaf-desc').value.trim();
+  const feat   =document.getElementById('feat-desc').value.trim();
+  const extra  =document.getElementById('extra-desc').value.trim();
+  const tip    =document.getElementById('tip-name').value.trim();
+  const potSz  =document.getElementById('pot-size').value.trim();
+  const potSt  =document.getElementById('pot-style').value.trim();
 
-  let ok = true;
-  if (!niche)   { document.getElementById('err-niche').classList.add('show'); ok=false; }
-  if (!imgtype) { document.getElementById('err-type').classList.add('show');  ok=false; }
-  if (!pres)    { document.getElementById('err-pres').classList.add('show');  ok=false; }
-  if (!name)    { document.getElementById('err-name').classList.add('show');  document.getElementById('plant-name').classList.add('err');   ok=false; }
-  if (!height)  { document.getElementById('err-height').classList.add('show'); document.getElementById('plant-height').classList.add('err'); ok=false; }
-  if (!ok) return;
+  let ok=true;
+  if(!niche)  {document.getElementById('err-niche').classList.add('show');ok=false;}
+  if(!imgtype){document.getElementById('err-type').classList.add('show');ok=false;}
+  if(!pres)   {document.getElementById('err-pres').classList.add('show');ok=false;}
+  if(!name)   {document.getElementById('err-name').classList.add('show');document.getElementById('plant-name').classList.add('err');ok=false;}
+  if(!height) {document.getElementById('err-height').classList.add('show');document.getElementById('plant-height').classList.add('err');ok=false;}
+  if(!ok)return;
 
-  const prompt = buildPrompt(niche, imgtype, pres, name, height, leaf, feat, extra, tip, potSize, potStyle);
-  currentPrompt = prompt;
-  const isTip = imgtype === 'tip';
+  const prompt=buildPrompt(niche,imgtype,pres,name,height,leaf,feat,extra,tip,potSz,potSt);
+  curPrompt=prompt;
+  const isTip=imgtype==='tip';
 
-  document.getElementById('out-empty').style.display = 'none';
-  document.getElementById('out-card').style.background = isTip ? '#2a2010' : '';
-  const el = document.getElementById('out-text');
-  el.textContent = prompt;
-  el.className = 'out-text show' + (isTip ? ' tip-color' : '');
-  document.getElementById('out-foot').classList.add('show');
-  document.getElementById('char-bar').classList.add('show');
-  document.getElementById('char-count').textContent = prompt.length + ' ký tự';
+  document.getElementById('sn4').classList.add('done');
+  document.getElementById('out-empty').style.display='none';
+  document.getElementById('out-wrap').classList.toggle('tip-theme',isTip);
 
-  const tn = document.getElementById('tag-niche');
-  const tt = document.getElementById('tag-type');
-  const tp = document.getElementById('tag-pres');
-  tn.textContent = NICHE_LBL[niche];   tn.className = 'out-tag ' + (isTip?'on-amber':'on-green');
-  tt.textContent = TYPE_LBL[imgtype];  tt.className = 'out-tag ' + (isTip?'on-amber':'on-green');
-  tp.textContent = PRES_LBL[pres];     tp.className = 'out-tag on-earth';
+  const el=document.getElementById('out-prompt');
+  el.textContent=prompt;
+  el.className='out-prompt show'+(isTip?' tip-color':'');
 
-  const bc = document.getElementById('btn-copy');
-  bc.className = 'btn-copy' + (isTip?' amber':'');
+  document.getElementById('out-footer').classList.add('show');
+  document.getElementById('char-info').textContent=prompt.length+' chars';
 
-  addHistory(name, niche, imgtype, pres, prompt);
+  const on=document.getElementById('ob-niche'),ot=document.getElementById('ob-type'),op=document.getElementById('ob-pres');
+  on.textContent=NL[niche]; on.className='obadge '+(isTip?'a':'g');
+  ot.textContent=TL[imgtype]; ot.className='obadge '+(isTip?'a':'g');
+  op.textContent=PL[pres]; op.className='obadge e';
+
+  const bc=document.getElementById('btn-copy');
+  bc.className='btn-copy'+(isTip?' amber':'');
+
+  addHist(name,niche,imgtype,pres,prompt);
 }
 
-function copyPrompt() {
-  if (!currentPrompt) return;
-  navigator.clipboard.writeText(currentPrompt).then(() => {
-    const btn = document.getElementById('btn-copy');
-    const lbl = document.getElementById('copy-lbl');
-    const wasAmber = btn.classList.contains('amber');
-    btn.classList.add('done');
-    lbl.textContent = '✓ Đã copy!';
-    setTimeout(() => {
-      btn.classList.remove('done');
-      if (wasAmber) btn.classList.add('amber');
-      lbl.textContent = 'Copy Prompt';
-    }, 2500);
+function copyPrompt(){
+  if(!curPrompt)return;
+  navigator.clipboard.writeText(curPrompt).then(()=>{
+    const btn=document.getElementById('btn-copy'),lbl=document.getElementById('copy-lbl');
+    const wasAmber=btn.classList.contains('amber');
+    btn.classList.add('done'); lbl.textContent='Copied ✓';
+    setTimeout(()=>{btn.classList.remove('done');if(wasAmber)btn.classList.add('amber');lbl.textContent='Copy';},2200);
   });
 }
 
-function resetAll() {
-  ['plant-name','leaf-desc','feat-desc','extra-desc','tip-name'].forEach(id =>
-    document.getElementById(id).value='');
+function resetAll(){
+  ['plant-name','leaf-desc','feat-desc','extra-desc','tip-name','pot-size','pot-style'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('plant-height').value='';
-  document.getElementById('pot-size').value='';
-  document.getElementById('pot-style').value='';
-  document.getElementById('height-convert').textContent='';
-  document.querySelectorAll('input[name="niche"],input[name="imgtype"],input[name="pres"]')
-    .forEach(r => r.checked=false);
-  ['err-niche','err-name','err-height','err-type','err-pres'].forEach(id =>
-    document.getElementById(id).classList.remove('show'));
-  ['plant-name','plant-height'].forEach(id =>
-    document.getElementById(id).classList.remove('err'));
+  document.getElementById('height-hint').textContent='// Nhập số thập phân, VD: 1.5 ft ≈ 18 inches';
+  document.querySelectorAll('input[name="niche"],input[name="imgtype"],input[name="pres"]').forEach(r=>r.checked=false);
+  ['err-niche','err-name','err-height','err-type','err-pres'].forEach(id=>document.getElementById(id).classList.remove('show'));
+  ['plant-name','plant-height'].forEach(id=>document.getElementById(id).classList.remove('err'));
+  ['sn1','sn2','sn3','sn4'].forEach(id=>document.getElementById(id).classList.remove('done'));
   document.getElementById('tip-extra').classList.remove('show');
   document.getElementById('pot-extra').classList.remove('show');
   document.getElementById('out-empty').style.display='';
-  document.getElementById('out-card').style.background='';
-  document.getElementById('out-text').className='out-text';
-  document.getElementById('out-foot').classList.remove('show');
-  document.getElementById('char-bar').classList.remove('show');
-  ['tag-niche','tag-type','tag-pres'].forEach(id => {
-    document.getElementById(id).textContent='—';
-    document.getElementById(id).className='out-tag';
-  });
+  document.getElementById('out-wrap').classList.remove('tip-theme');
+  const el=document.getElementById('out-prompt'); el.className='out-prompt';
+  document.getElementById('out-footer').classList.remove('show');
+  ['ob-niche','ob-type','ob-pres'].forEach(id=>{const e=document.getElementById(id);e.textContent='—';e.className='obadge';});
   document.getElementById('btn-gen').classList.remove('tip-mode');
-  document.getElementById('btn-lbl').textContent='Tạo Prompt';
+  document.getElementById('btn-lbl').textContent='Generate Prompt';
+  document.getElementById('btn-copy').className='btn-copy';
   document.getElementById('opt-toggle').classList.remove('open');
   document.getElementById('opt-fields').classList.remove('open');
-  document.getElementById('btn-copy').className='btn-copy';
-  currentPrompt='';
+  curPrompt='';
 }
 
-function addHistory(name, niche, imgtype, pres, prompt) {
-  history.unshift({ name, niche, imgtype, pres, prompt, time: new Date() });
-  if (history.length > 10) history.pop();
-  renderHistory();
+function addHist(name,niche,imgtype,pres,prompt){
+  hist.unshift({name,niche,imgtype,pres,prompt,time:new Date()});
+  if(hist.length>10)hist.pop();
+  renderHist();
 }
-function renderHistory() {
-  const list = document.getElementById('hist-list');
-  if (!history.length) { list.innerHTML='<div class="hist-empty">Chưa có prompt nào được tạo</div>'; return; }
-  list.innerHTML = history.map((h,i) => `
+function renderHist(){
+  const list=document.getElementById('hist-list');
+  if(!hist.length){list.innerHTML='<div class="hist-empty">No prompts generated yet</div>';return;}
+  list.innerHTML=hist.map((h,i)=>`
     <div class="hist-item" onclick="loadHist(${i})">
-      <div class="hist-dot${h.imgtype==='tip'?' amber':''}"></div>
+      <div class="hist-pip${h.imgtype==='tip'?' a':''}"></div>
       <div>
-        <div class="hname">${h.name}</div>
-        <div class="hmeta">${NICHE_LBL[h.niche]} · ${TYPE_LBL[h.imgtype]} · ${PRES_LBL[h.pres]}</div>
+        <div class="h-name">${h.name}</div>
+        <div class="h-meta">${NL[h.niche]} · ${TL[h.imgtype]} · ${PL[h.pres]}</div>
       </div>
-      <span class="htime">${fmt(h.time)}</span>
+      <span class="h-time">${fmt(h.time)}</span>
     </div>`).join('');
 }
-function loadHist(i) {
-  const h = history[i];
-  currentPrompt = h.prompt;
-  const isTip = h.imgtype==='tip';
+function loadHist(i){
+  const h=hist[i]; curPrompt=h.prompt;
+  const isTip=h.imgtype==='tip';
   document.getElementById('out-empty').style.display='none';
-  document.getElementById('out-card').style.background=isTip?'#2a2010':'';
-  const el=document.getElementById('out-text');
-  el.textContent=h.prompt; el.className='out-text show'+(isTip?' tip-color':'');
-  document.getElementById('out-foot').classList.add('show');
-  document.getElementById('char-bar').classList.add('show');
-  document.getElementById('char-count').textContent=h.prompt.length+' ký tự';
-  const tn=document.getElementById('tag-niche'), tt=document.getElementById('tag-type'), tp=document.getElementById('tag-pres');
-  tn.textContent=NICHE_LBL[h.niche]; tn.className='out-tag '+(isTip?'on-amber':'on-green');
-  tt.textContent=TYPE_LBL[h.imgtype]; tt.className='out-tag '+(isTip?'on-amber':'on-green');
-  tp.textContent=PRES_LBL[h.pres]; tp.className='out-tag on-earth';
+  document.getElementById('out-wrap').classList.toggle('tip-theme',isTip);
+  const el=document.getElementById('out-prompt');
+  el.textContent=h.prompt; el.className='out-prompt show'+(isTip?' tip-color':'');
+  document.getElementById('out-footer').classList.add('show');
+  document.getElementById('char-info').textContent=h.prompt.length+' chars';
+  const on=document.getElementById('ob-niche'),ot=document.getElementById('ob-type'),op=document.getElementById('ob-pres');
+  on.textContent=NL[h.niche]; on.className='obadge '+(isTip?'a':'g');
+  ot.textContent=TL[h.imgtype]; ot.className='obadge '+(isTip?'a':'g');
+  op.textContent=PL[h.pres]; op.className='obadge e';
   document.getElementById('btn-copy').className='btn-copy'+(isTip?' amber':'');
   window.scrollTo({top:0,behavior:'smooth'});
 }
-function fmt(d) { return d.toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}); }
+function fmt(d){return d.toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'});}
 
-document.getElementById('plant-name').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('plant-height').focus(); });
-document.getElementById('plant-height').addEventListener('keydown', e => { if(e.key==='Enter') generate(); });
+document.getElementById('plant-name').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('plant-height').focus();});
+document.getElementById('plant-height').addEventListener('keydown',e=>{if(e.key==='Enter')generate();});
 </script>
 </body>
 </html>
