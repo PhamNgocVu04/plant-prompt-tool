@@ -3,420 +3,298 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Tank Ecom | Prompt Studio</title>
+<title>Plant Prompt Generator</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
-  :root {
-    --bg-app: #f8fafc;
-    --bg-card: #ffffff;
-    --bg-output: #0f172a;
-    --border: #e2e8f0;
-    --border-hover: #cbd5e1;
-    --text-main: #0f172a;
-    --text-muted: #64748b;
-    --text-light: #94a3b8;
-    
-    /* Brand Colors - Indigo/Tech Blue */
-    --brand: #4f46e5;
-    --brand-hover: #4338ca;
-    --brand-light: #e0e7ff;
-    --brand-text: #3730a3;
-    
-    --success: #10b981;
-    --error: #ef4444;
-    
-    --radius-lg: 12px;
-    --radius-md: 8px;
-    --radius-sm: 6px;
-    
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    
-    --font-sans: 'Inter', sans-serif;
-    --font-mono: 'JetBrains Mono', monospace;
-  }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --green-deep:  #2d4a35;
+  --green-mid:   #4a7c59;
+  --green-soft:  #6a9e7a;
+  --green-pale:  #e8f2eb;
+  --green-mist:  #f2f7f3;
+  --earth:       #8b6f47;
+  --earth-pale:  #f5f0e8;
+  --cream:       #faf8f4;
+  --ink:         #1c2e22;
+  --ink-soft:    #3d5245;
+  --muted:       #7a9080;
+  --border:      #d0e0d4;
+  --white:       #ffffff;
+  --red-err:     #c0392b;
+  --radius:      14px;
+  --radius-sm:   9px;
+  --shadow:      0 4px 28px rgba(45,74,53,0.10);
+  --shadow-lg:   0 8px 48px rgba(45,74,53,0.15);
+}
+html { scroll-behavior: smooth; }
+body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--ink); min-height: 100vh; }
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  
-  body {
-    font-family: var(--font-sans);
-    background-color: var(--bg-app);
-    color: var(--text-main);
-    line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
-    min-height: 100vh;
-  }
+/* HEADER */
+header {
+  background: var(--green-deep); padding: 0 40px;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 64px; position: sticky; top: 0; z-index: 100;
+}
+.logo { display: flex; align-items: center; gap: 12px; }
+.logo-mark { width: 34px; height: 34px; background: rgba(255,255,255,0.12); border-radius: 10px 3px 10px 3px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+.logo h1 { font-family: 'Lora', serif; font-size: 18px; color: #fff; font-weight: 600; }
+.logo h1 span { font-size: 12px; color: rgba(255,255,255,0.4); font-weight: 400; margin-left: 6px; }
+.ver-badge { font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.45); background: rgba(255,255,255,0.08); padding: 4px 12px; border-radius: 100px; }
 
-  /* ── HEADER ── */
-  header {
-    background: var(--bg-card);
-    border-bottom: 1px solid var(--border);
-    padding: 16px 32px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 50;
-  }
-  .logo-wrap { display: flex; align-items: center; gap: 12px; }
-  .logo-icon {
-    width: 32px; height: 32px;
-    background: var(--brand);
-    color: white;
-    border-radius: var(--radius-sm);
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 700; font-size: 16px; letter-spacing: -1px;
-  }
-  .logo-text h1 { font-size: 16px; font-weight: 600; letter-spacing: -0.02em; }
-  .logo-text p { font-size: 12px; color: var(--text-muted); }
-  .header-badge {
-    font-size: 12px; font-weight: 500;
-    color: var(--brand-text);
-    background: var(--brand-light);
-    padding: 4px 12px; border-radius: 99px;
-  }
+/* MAIN */
+main { max-width: 1080px; margin: 0 auto; padding: 36px 24px 80px; display: grid; grid-template-columns: 440px 1fr; gap: 28px; align-items: start; }
+@media (max-width: 820px) { main { grid-template-columns: 1fr; } header { padding: 0 20px; } }
 
-  /* ── LAYOUT ── */
-  main {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 32px 24px 80px;
-    display: grid;
-    grid-template-columns: 1fr 480px;
-    gap: 32px;
-    align-items: start;
-  }
-  @media (max-width: 960px) {
-    main { grid-template-columns: 1fr; }
-    header { padding: 16px 20px; }
-  }
+/* CARD */
+.card { background: var(--white); border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); overflow: hidden; }
+.card-head { padding: 24px 28px 20px; border-bottom: 1px solid var(--border); background: var(--green-mist); }
+.card-head h2 { font-family: 'Lora', serif; font-size: 20px; color: var(--ink); font-weight: 600; margin-bottom: 4px; }
+.card-head p { font-size: 13px; color: var(--muted); line-height: 1.5; }
+.card-body { padding: 28px; }
 
-  /* ── PANELS ── */
-  .panel {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-sm);
-  }
-  .panel-header {
-    padding: 24px 32px 20px;
-    border-bottom: 1px solid var(--border);
-  }
-  .panel-header h2 { font-size: 18px; font-weight: 600; letter-spacing: -0.02em; }
-  .panel-header p { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
-  .panel-body { padding: 32px; }
+/* NICHE PICKER */
+.niche-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 26px; }
+.niche-opt input { display: none; }
+.niche-btn { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 16px 8px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; transition: all 0.18s; background: var(--cream); text-align: center; }
+.niche-btn .icon { font-size: 26px; line-height: 1; }
+.niche-btn .label { font-size: 12px; font-weight: 600; color: var(--muted); letter-spacing: 0.04em; }
+.niche-btn .sub { font-size: 10px; color: var(--muted); font-weight: 400; }
+.niche-opt input:checked + .niche-btn { border-color: var(--green-mid); background: var(--green-pale); }
+.niche-opt input:checked + .niche-btn .label { color: var(--green-deep); }
+.niche-btn:hover { border-color: var(--green-soft); }
 
-  /* ── FORM ELEMENTS ── */
-  .field { margin-bottom: 24px; }
-  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  
-  label {
-    display: flex; align-items: center; gap: 6px;
-    font-size: 13px; font-weight: 500; color: var(--text-main);
-    margin-bottom: 8px;
-  }
-  .req { color: var(--error); }
-  .opt-badge {
-    font-size: 11px; font-weight: 400; color: var(--text-muted);
-    background: var(--bg-app); border: 1px solid var(--border);
-    padding: 2px 6px; border-radius: 4px;
-  }
+/* FIELDS */
+.field { margin-bottom: 18px; }
+.field > label { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--ink-soft); margin-bottom: 7px; }
+.req { color: var(--green-mid); font-size: 16px; line-height: 1; }
+.opt-tag { font-size: 10px; font-weight: 400; color: var(--muted); background: #f0ece3; padding: 2px 8px; border-radius: 100px; }
+input[type="text"], input[type="number"] { width: 100%; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--ink); background: var(--cream); outline: none; transition: border-color 0.18s, box-shadow 0.18s; }
+input:focus { border-color: var(--green-mid); box-shadow: 0 0 0 3px rgba(74,124,89,0.12); background: var(--white); }
+input::placeholder { color: #b5c4bb; }
+input.err { border-color: var(--red-err) !important; }
+.field-err { font-size: 11px; color: var(--red-err); margin-top: 5px; display: none; }
+.field-err.show { display: block; }
+.field-hint { font-size: 11px; color: var(--muted); margin-top: 5px; font-style: italic; }
+.height-row { display: flex; gap: 8px; }
+.height-row input { flex: 1; }
+.unit-box { padding: 10px 14px; background: var(--green-pale); border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; color: var(--green-mid); display: flex; align-items: center; }
 
-  input[type="text"], input[type="number"] {
-    width: 100%; padding: 10px 12px;
-    font-family: var(--font-sans); font-size: 14px;
-    color: var(--text-main); background: var(--bg-card);
-    border: 1px solid var(--border); border-radius: var(--radius-md);
-    transition: all 0.2s; outline: none;
-  }
-  input::placeholder { color: var(--text-light); }
-  input:hover { border-color: var(--border-hover); }
-  input:focus {
-    border-color: var(--brand);
-    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
-  }
-  input.err { border-color: var(--error) !important; }
+/* OPT SECTION */
+.opt-toggle { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 500; color: var(--muted); cursor: pointer; margin: 0 0 14px; user-select: none; padding: 8px 12px; border: 1px dashed var(--border); border-radius: var(--radius-sm); transition: all 0.15s; }
+.opt-toggle:hover { color: var(--green-mid); border-color: var(--green-soft); }
+.opt-toggle::before { content: '▸'; transition: transform 0.2s; display: inline-block; }
+.opt-toggle.open::before { transform: rotate(90deg); }
+.opt-fields { display: none; }
+.opt-fields.open { display: block; }
 
-  .input-group { display: flex; align-items: center; }
-  .input-group input { border-top-right-radius: 0; border-bottom-right-radius: 0; border-right: 0; }
-  .input-addon {
-    padding: 10px 14px; font-size: 13px; font-weight: 500;
-    color: var(--text-muted); background: var(--bg-app);
-    border: 1px solid var(--border); border-top-right-radius: var(--radius-md); border-bottom-right-radius: var(--radius-md);
-  }
+.divider { height: 1px; background: var(--border); margin: 20px 0; }
 
-  .field-err { font-size: 12px; color: var(--error); margin-top: 6px; display: none; }
-  .field-err.show { display: block; }
-  .field-hint { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+/* BUTTONS */
+.btn-gen { width: 100%; padding: 13px 24px; background: var(--green-deep); color: var(--white); border: none; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.18s, transform 0.12s; letter-spacing: 0.02em; }
+.btn-gen:hover { background: var(--green-mid); }
+.btn-gen:active { transform: scale(0.98); }
+.btn-reset { width: 100%; margin-top: 10px; padding: 10px; background: transparent; color: var(--muted); border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; transition: all 0.15s; }
+.btn-reset:hover { border-color: var(--green-soft); color: var(--green-mid); }
 
-  /* ── NICHE CARDS ── */
-  .niche-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-  .niche-opt input { display: none; }
-  .niche-btn {
-    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
-    padding: 16px; border: 1px solid var(--border); border-radius: var(--radius-md);
-    cursor: pointer; transition: all 0.2s; background: var(--bg-card); user-select: none;
-  }
-  .niche-btn .icon { font-size: 24px; }
-  .niche-btn .label { font-size: 13px; font-weight: 500; color: var(--text-muted); }
-  .niche-opt input:checked + .niche-btn {
-    border-color: var(--brand); background: var(--brand-light);
-  }
-  .niche-opt input:checked + .niche-btn .label { color: var(--brand-text); font-weight: 600; }
-  .niche-btn:hover { border-color: var(--border-hover); }
+/* OUTPUT */
+.out-sticky { position: sticky; top: 88px; }
+.out-card { background: var(--green-deep); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-lg); }
+.out-head { padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); }
+.out-label { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.35); }
+.out-tags { display: flex; gap: 6px; }
+.out-tag { font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 100px; background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.35); }
+.out-tag.on { background: rgba(106,158,122,0.35); color: #a0d4b0; }
+.out-body { padding: 24px; min-height: 260px; }
+.out-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 36px 20px; text-align: center; color: rgba(255,255,255,0.2); }
+.out-empty svg { opacity: 0.18; }
+.out-empty p { font-size: 13px; line-height: 1.6; }
+.out-text { font-family: 'DM Sans', sans-serif; font-size: 13px; line-height: 1.8; color: #c8dece; white-space: pre-wrap; word-break: break-word; display: none; }
+.out-text.show { display: block; }
+.out-foot { padding: 16px 24px; border-top: 1px solid rgba(255,255,255,0.08); display: none; gap: 10px; }
+.out-foot.show { display: flex; }
+.btn-copy { flex: 1; padding: 11px 16px; background: var(--green-soft); color: white; border: none; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.15s; }
+.btn-copy:hover { background: #7ab88c; }
+.btn-copy.done { background: #2d6a4f; }
+.btn-new { padding: 11px 16px; background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.55); border: none; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; transition: all 0.15s; }
+.btn-new:hover { background: rgba(255,255,255,0.13); color: white; }
+.char-bar { padding: 0 24px 14px; display: none; }
+.char-bar.show { display: block; }
+.char-count { font-size: 11px; color: rgba(255,255,255,0.25); }
 
-  /* ── ACCORDION (TÙY CHỌN) ── */
-  .accordion-trigger {
-    display: flex; align-items: center; gap: 8px;
-    font-size: 13px; font-weight: 500; color: var(--text-muted);
-    cursor: pointer; padding: 12px; border: 1px dashed var(--border);
-    border-radius: var(--radius-md); transition: all 0.2s; margin-bottom: 24px;
-    user-select: none; background: var(--bg-app);
-  }
-  .accordion-trigger:hover { border-color: var(--brand); color: var(--brand); }
-  .accordion-trigger svg { transition: transform 0.2s; }
-  .accordion-trigger.open svg { transform: rotate(180deg); }
-  .accordion-content { display: none; margin-bottom: 24px; padding-left: 12px; border-left: 2px solid var(--border); }
-  .accordion-content.open { display: block; }
+/* TEMPLATE PREVIEW */
+.tpl-note { margin-top: 16px; background: var(--earth-pale); border: 1px solid #e0d5c5; border-radius: var(--radius-sm); padding: 16px 20px; }
+.tpl-note h3 { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--earth); margin-bottom: 10px; }
+.tpl-row { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 6px; font-size: 12px; }
+.tpl-row:last-child { margin-bottom: 0; }
+.tpl-chk { color: var(--green-mid); flex-shrink: 0; }
+.tpl-row span { color: var(--ink-soft); line-height: 1.4; }
 
-  /* ── BUTTONS ── */
-  .btn-primary {
-    width: 100%; padding: 12px 24px;
-    background: var(--brand); color: white;
-    border: none; border-radius: var(--radius-md);
-    font-family: var(--font-sans); font-size: 14px; font-weight: 500;
-    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
-    transition: all 0.2s; box-shadow: var(--shadow-sm);
-  }
-  .btn-primary:hover { background: var(--brand-hover); box-shadow: var(--shadow-md); }
-  .btn-primary:active { transform: translateY(1px); }
-  
-  .btn-outline {
-    width: 100%; padding: 10px 24px; margin-top: 12px;
-    background: transparent; color: var(--text-muted);
-    border: 1px solid var(--border); border-radius: var(--radius-md);
-    font-family: var(--font-sans); font-size: 13px; font-weight: 500;
-    cursor: pointer; transition: all 0.2s;
-  }
-  .btn-outline:hover { background: var(--bg-app); color: var(--text-main); }
-
-  .divider { height: 1px; background: var(--border); margin: 32px 0; }
-
-  /* ── OUTPUT PANEL ── */
-  .output-wrapper { position: sticky; top: 88px; }
-  .output-card {
-    background: var(--bg-output); border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-lg); overflow: hidden; display: flex; flex-direction: column;
-  }
-  .output-header {
-    padding: 16px 24px; border-bottom: 1px solid rgba(255,255,255,0.1);
-    display: flex; align-items: center; justify-content: space-between;
-  }
-  .output-title { font-size: 12px; font-weight: 600; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.05em; }
-  .output-badge {
-    font-size: 11px; font-weight: 500; padding: 4px 8px; border-radius: 4px;
-    background: rgba(255,255,255,0.1); color: var(--text-light);
-  }
-  .output-badge.active { background: rgba(79, 70, 229, 0.3); color: #818cf8; border: 1px solid rgba(79, 70, 229, 0.5); }
-  
-  .output-body { padding: 24px; min-height: 280px; display: flex; flex-direction: column; }
-  .output-empty {
-    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-    color: #475569; text-align: center; gap: 16px;
-  }
-  .output-text {
-    font-family: var(--font-mono); font-size: 13px; line-height: 1.7;
-    color: #e2e8f0; white-space: pre-wrap; word-break: break-word; display: none;
-  }
-  .output-text.show { display: block; }
-  
-  .output-footer {
-    padding: 16px 24px; background: rgba(0,0,0,0.2);
-    border-top: 1px solid rgba(255,255,255,0.05);
-    display: none; align-items: center; gap: 12px;
-  }
-  .output-footer.show { display: flex; }
-  
-  .btn-copy {
-    flex: 1; padding: 10px 16px; background: var(--brand); color: white;
-    border: none; border-radius: var(--radius-md); font-family: var(--font-sans);
-    font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
-    transition: background 0.2s;
-  }
-  .btn-copy:hover { background: var(--brand-hover); }
-  .btn-copy.done { background: var(--success); }
-  .char-count { font-size: 12px; color: #64748b; font-family: var(--font-mono); }
-
-  /* ── EXTRA INFO & HISTORY ── */
-  .info-box {
-    margin-top: 24px; padding: 16px 20px;
-    background: var(--bg-app); border: 1px solid var(--border); border-radius: var(--radius-md);
-  }
-  .info-box h3 { font-size: 12px; font-weight: 600; color: var(--text-main); margin-bottom: 12px; text-transform: uppercase; }
-  .info-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-  .info-list li { font-size: 13px; color: var(--text-muted); display: flex; gap: 8px; align-items: flex-start; }
-  .info-list li::before { content: '✓'; color: var(--brand); font-weight: bold; }
-
-  .history-sec { margin-top: 32px; }
-  .history-sec h3 { font-size: 13px; font-weight: 600; color: var(--text-main); margin-bottom: 12px; }
-  .history-list { display: flex; flex-direction: column; gap: 8px; }
-  .history-item {
-    padding: 12px 16px; background: var(--bg-card); border: 1px solid var(--border);
-    border-radius: var(--radius-md); cursor: pointer; transition: all 0.2s;
-    display: flex; justify-content: space-between; align-items: center;
-  }
-  .history-item:hover { border-color: var(--brand); box-shadow: var(--shadow-sm); }
-  .h-main { display: flex; flex-direction: column; gap: 4px; }
-  .h-name { font-size: 14px; font-weight: 500; color: var(--text-main); }
-  .h-meta { font-size: 12px; color: var(--text-muted); }
-  .h-time { font-size: 11px; color: var(--text-light); }
-  .history-empty { font-size: 13px; color: var(--text-muted); text-align: center; padding: 24px; border: 1px dashed var(--border); border-radius: var(--radius-md); }
-
+/* HISTORY */
+.hist-wrap { margin-top: 18px; }
+.hist-title { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+.hist-list { display: flex; flex-direction: column; gap: 7px; }
+.hist-item { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 11px 15px; cursor: pointer; transition: border-color 0.15s; display: flex; align-items: center; gap: 10px; }
+.hist-item:hover { border-color: var(--green-soft); }
+.hist-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green-soft); flex-shrink: 0; }
+.hname { font-size: 13px; font-weight: 500; color: var(--ink); }
+.hmeta { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.htime { font-size: 11px; color: var(--muted); margin-left: auto; flex-shrink: 0; }
+.hist-empty { font-size: 12px; color: var(--muted); font-style: italic; text-align: center; padding: 12px 0; }
 </style>
 </head>
 <body>
 
 <header>
-  <div class="logo-wrap">
-    <div class="logo-icon">TE</div>
-    <div class="logo-text">
-      <h1>Tank Ecom</h1>
-      <p>Prompt Generation Studio</p>
-    </div>
+  <div class="logo">
+    <div class="logo-mark">🌿</div>
+    <h1>Plant Prompt Generator <span>/ Nội bộ</span></h1>
   </div>
-  <span class="header-badge">Internal System</span>
+  <span class="ver-badge">Gemini Image · v2.0</span>
 </header>
 
 <main>
+<!-- ══ LEFT FORM ══ -->
 <div>
-  <div class="panel">
-    <div class="panel-header">
-      <h2>Thiết lập cấu hình Prompt</h2>
-      <p>Tối ưu hóa đầu vào cho mô hình Gemini Image (Quy chuẩn Soil Plug).</p>
+  <div class="card">
+    <div class="card-head">
+      <h2>Tạo prompt ảnh sản phẩm</h2>
+      <p>Chọn ngách → nhập tên cây + chiều cao → copy vào Gemini</p>
     </div>
-    
-    <div class="panel-body">
+    <div class="card-body">
+
+      <!-- NGÁCH -->
       <div class="field">
-        <label>Phân loại Ngách <span class="req">*</span></label>
+        <label>Ngách sản phẩm <span class="req">*</span></label>
         <div class="niche-grid">
           <div class="niche-opt">
             <input type="radio" name="niche" id="nf" value="flower"/>
             <label class="niche-btn" for="nf">
               <span class="icon">🌸</span>
-              <span class="label">Flower</span>
+              <span class="label">FLOWER</span>
+              <span class="sub">Cây hoa</span>
             </label>
           </div>
           <div class="niche-opt">
             <input type="radio" name="niche" id="nfr" value="fruit"/>
             <label class="niche-btn" for="nfr">
               <span class="icon">🍋</span>
-              <span class="label">Fruit</span>
+              <span class="label">FRUIT</span>
+              <span class="sub">Cây ăn quả</span>
             </label>
           </div>
           <div class="niche-opt">
             <input type="radio" name="niche" id="nh" value="herb"/>
             <label class="niche-btn" for="nh">
               <span class="icon">🌿</span>
-              <span class="label">Herb</span>
+              <span class="label">HERB</span>
+              <span class="sub">Thảo mộc</span>
             </label>
           </div>
         </div>
-        <div class="field-err" id="err-niche">⚠ Vui lòng chọn phân loại ngách.</div>
+        <div class="field-err" id="err-niche">Vui lòng chọn ngách sản phẩm</div>
       </div>
 
-      <div class="field-row">
-        <div class="field">
-          <label for="plant-name">Tên cây <span class="req">*</span></label>
-          <input type="text" id="plant-name" placeholder="Ex: Lavender, Strawberry..." autocomplete="off" spellcheck="false"/>
-          <div class="field-err" id="err-name">⚠ Bắt buộc nhập.</div>
-        </div>
+      <!-- TÊN CÂY -->
+      <div class="field">
+        <label for="plant-name">Tên cây <span class="req">*</span></label>
+        <input type="text" id="plant-name" placeholder="VD: Rose, Strawberry, Basil, Lavender…" autocomplete="off" spellcheck="false"/>
+        <div class="field-err" id="err-name">Vui lòng nhập tên cây</div>
+        <div class="field-hint">Nhập tên tiếng Anh để Gemini hiểu chính xác nhất</div>
+      </div>
 
-        <div class="field">
-          <label for="plant-height">Chiều cao <span class="req">*</span></label>
-          <div class="input-group">
-            <input type="number" id="plant-height" placeholder="Ex: 25" min="1" max="500"/>
-            <div class="input-addon">cm</div>
-          </div>
-          <div class="field-err" id="err-height">⚠ Bắt buộc nhập.</div>
+      <!-- CHIỀU CAO -->
+      <div class="field">
+        <label for="plant-height">Chiều cao cây <span class="req">*</span></label>
+        <div class="height-row">
+          <input type="number" id="plant-height" placeholder="VD: 25" min="1" max="500"/>
+          <div class="unit-box">cm</div>
         </div>
+        <div class="field-err" id="err-height">Vui lòng nhập chiều cao</div>
       </div>
 
       <div class="divider"></div>
 
-      <div class="accordion-trigger" id="opt-toggle" onclick="toggleOpt()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
-        Tùy chỉnh đặc điểm (Mở rộng)
+      <!-- TÙY CHỌN -->
+      <div class="opt-toggle" id="opt-toggle" onclick="toggleOpt()">
+        &nbsp;Thêm đặc điểm chi tiết (tùy chọn — để trống dùng mô tả mặc định)
       </div>
-      
-      <div class="accordion-content" id="opt-fields">
+      <div class="opt-fields" id="opt-fields">
         <div class="field">
-          <label for="leaf-desc">Đặc điểm hình thái Lá <span class="opt-badge">Tùy chọn</span></label>
-          <input type="text" id="leaf-desc" placeholder="Ex: glossy, broad green..."/>
+          <label for="leaf-desc">Đặc điểm lá <span class="opt-tag">Tùy chọn</span></label>
+          <input type="text" id="leaf-desc" placeholder="VD: glossy, broad green / soft, deeply veined, light green"/>
         </div>
         <div class="field" id="feat-wrap">
-          <label for="feat-desc"><span id="feat-lbl">Đặc điểm Hoa / Quả</span> <span class="opt-badge">Tùy chọn</span></label>
-          <input type="text" id="feat-desc" placeholder="Ex: vibrant red petals..."/>
+          <label for="feat-desc"><span id="feat-lbl">Đặc điểm hoa / quả nổi bật</span> <span class="opt-tag">Tùy chọn</span></label>
+          <input type="text" id="feat-desc" placeholder="VD: vibrant red petals with yellow center"/>
         </div>
         <div class="field" id="extra-wrap" style="display:none">
-          <label for="extra-desc">Thuộc tính bổ sung <span class="opt-badge">Tùy chọn</span></label>
-          <input type="text" id="extra-desc" placeholder="Ex: The leaves display subtle textural hairs..."/>
+          <label for="extra-desc">Chi tiết bổ sung (Herb) <span class="opt-tag">Tùy chọn</span></label>
+          <input type="text" id="extra-desc" placeholder="VD: The leaves display subtle textural hairs catching the light"/>
         </div>
-        <div class="field-hint">Nếu bỏ trống, hệ thống sẽ tự động sử dụng từ vựng chuyên ngành mặc định theo ngách.</div>
       </div>
 
-      <button class="btn-primary" onclick="generate()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-        Xử lý & Xuất Prompt
+      <button class="btn-gen" onclick="generate()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Tạo Prompt
       </button>
-      <button class="btn-outline" onclick="resetAll()">Làm mới biểu mẫu</button>
+      <button class="btn-reset" onclick="resetAll()">↺ Làm mới form</button>
+
     </div>
   </div>
 
-  <div class="info-box">
-    <h3>Quy chuẩn Hệ thống</h3>
-    <ul class="info-list">
-      <li><strong>Format mặc định:</strong> Soil plug (bầu rễ), không chậu.</li>
-      <li><strong>Chất lượng:</strong> Nền trắng vô cực, tỷ lệ 1:1, độ phân giải 8K, ánh sáng Studio.</li>
-      <li><strong>Xử lý ngôn ngữ:</strong> Nội suy thông minh từ vựng tự nhiên nếu thiếu dữ liệu đầu vào.</li>
-    </ul>
+  <div class="tpl-note">
+    <h3>📋 Template chuẩn đang áp dụng</h3>
+    <div class="tpl-row"><span class="tpl-chk">✓</span><span>Soil plug — <strong>không pot</strong>, root ball + peat soil, fine white roots</span></div>
+    <div class="tpl-row"><span class="tpl-chk">✓</span><span>White background · <strong>8K · 1:1</strong> · Studio lighting</span></div>
+    <div class="tpl-row"><span class="tpl-chk">✓</span><span>3 ngách riêng: <strong>Flower / Fruit / Herb</strong> — mỗi ngách 1 template</span></div>
+    <div class="tpl-row"><span class="tpl-chk">✓</span><span>Tên cây + chiều cao ghép <strong>chính xác</strong> vào prompt</span></div>
+    <div class="tpl-row"><span class="tpl-chk">✓</span><span>Để trống đặc điểm → hệ thống tự điền mô tả <strong>mặc định hợp lý</strong></span></div>
   </div>
 
-  <div class="history-sec">
-    <h3>Lịch sử Session</h3>
-    <div class="history-list" id="hist-list">
-      <div class="history-empty">Chưa có dữ liệu giao dịch trong phiên này.</div>
+  <div class="hist-wrap">
+    <div class="hist-title">Lịch sử phiên làm việc</div>
+    <div class="hist-list" id="hist-list">
+      <div class="hist-empty">Chưa có prompt nào được tạo</div>
     </div>
   </div>
 </div>
 
-<div class="output-wrapper">
-  <div class="output-card">
-    <div class="output-header">
-      <span class="output-title">Console Output</span>
-      <div style="display:flex; gap:8px;">
-        <span class="output-badge" id="tag-niche">NICHE</span>
-        <span class="output-badge" id="tag-type">SOIL PLUG</span>
+<!-- ══ RIGHT OUTPUT ══ -->
+<div class="out-sticky">
+  <div class="out-card">
+    <div class="out-head">
+      <span class="out-label">Prompt · Gemini Image</span>
+      <div class="out-tags">
+        <span class="out-tag" id="tag-niche">—</span>
+        <span class="out-tag" id="tag-type">Main · Soil Plug</span>
       </div>
     </div>
 
-    <div class="output-body">
-      <div class="output-empty" id="out-empty">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
-        <p style="font-size: 13px;">Chờ dữ liệu đầu vào để tiến hành biên dịch...</p>
+    <div class="out-body">
+      <div class="out-empty" id="out-empty">
+        <svg width="60" height="60" viewBox="0 0 64 64" fill="none">
+          <path d="M32 56V28" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M32 40C32 40 20 36 18 24C26 22 34 28 34 36" fill="white" opacity="0.5"/>
+          <path d="M32 34C32 34 44 28 46 16C38 14 30 22 30 32" fill="white" opacity="0.35"/>
+        </svg>
+        <p>Chọn ngách, nhập tên cây<br/>và chiều cao rồi nhấn <strong style="color:rgba(255,255,255,0.4)">Tạo Prompt</strong></p>
       </div>
-      <div class="output-text" id="out-text"></div>
+      <pre class="out-text" id="out-text"></pre>
     </div>
 
-    <div class="output-footer" id="out-foot">
+    <div class="char-bar" id="char-bar">
+      <span class="char-count" id="char-count"></span>
+    </div>
+
+    <div class="out-foot" id="out-foot">
       <button class="btn-copy" id="btn-copy" onclick="copyPrompt()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-        <span id="copy-lbl">Sao chép Code</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+        <span id="copy-lbl">Copy Prompt</span>
       </button>
-      <span class="char-count" id="char-count">0 chars</span>
+      <button class="btn-new" onclick="resetAll()">Làm mới</button>
     </div>
   </div>
 </div>
@@ -424,23 +302,36 @@
 
 <script>
 // ══════════════════════════════════════════════════════════════
-//  LOGIC & TEMPLATE ENGINE
+//  TEMPLATE ENGINE — theo đúng template chuẩn của chủ shop
 // ══════════════════════════════════════════════════════════════
 
 const DEFAULTS = {
-  flower: { leaf: 'textured, dark green', feature: 'vibrant, large velvety petals with a delicate center' },
-  fruit:  { leaf: 'glossy, broad green', feature: 'numerous bright ripe fruits hanging clustered from delicate stems' },
-  herb:   { leaf: 'soft, deeply veined, light green', extra: '' }
+  flower: {
+    leaf:    'textured, dark green',
+    feature: 'vibrant, large velvety petals with a delicate center'
+  },
+  fruit: {
+    leaf:    'glossy, broad green',
+    feature: 'numerous bright ripe fruits hanging clustered from delicate stems'
+  },
+  herb: {
+    leaf:  'soft, deeply veined, light green',
+    extra: ''
+  }
 };
 
 function buildPrompt(niche, name, heightCm, leafIn, featIn, extraIn) {
   const h    = heightCm + ' cm';
   const leaf = leafIn || DEFAULTS[niche].leaf;
 
-  if (niche === 'flower' || niche === 'fruit') {
+  if (niche === 'flower') {
     const feat = featIn || DEFAULTS[niche].feature;
-    const action = niche === 'flower' ? 'is abundantly in bloom' : 'is actively bearing fruit';
-    return `A highly photorealistic, hyper-detailed botanical product photograph of a robust young ${name} starter plant. Standing exactly ${h} tall. The bushy plant is covered in characteristic ${leaf} leaves and ${action}. It features ${feat}. It is presented strictly as a well-developed soil plug (root ball only) standing freely and upright, completely without a pot. The perfectly proportioned cylindrical base reveals dark, moist peat soil firmly bound by a dense, healthy network of intricate fine white roots. Isolated on a seamless pure white background. Bright, crisp studio lighting. Square aspect ratio (1:1). 8k resolution.`;
+    return `A highly photorealistic, hyper-detailed botanical product photograph of a robust young ${name} starter plant. Standing exactly ${h} tall. The bushy plant is covered in characteristic ${leaf} leaves and is abundantly in bloom. It features ${feat}. It is presented strictly as a well-developed soil plug (root ball only) standing freely and upright, completely without a pot. The perfectly proportioned cylindrical base reveals dark, moist peat soil firmly bound by a dense, healthy network of intricate fine white roots. Isolated on a seamless pure white background. Bright, crisp studio lighting. Square aspect ratio (1:1). 8k resolution.`;
+  }
+
+  if (niche === 'fruit') {
+    const feat = featIn || DEFAULTS[niche].feature;
+    return `A highly photorealistic, hyper-detailed botanical product photograph of a robust young ${name} starter plant. Standing exactly ${h} tall. The bushy plant is covered in characteristic ${leaf} leaves and is actively bearing fruit. It features ${feat}. It is presented strictly as a well-developed soil plug (root ball only) standing freely and upright, completely without a pot. The perfectly proportioned cylindrical base reveals dark, moist peat soil firmly bound by a dense, healthy network of intricate fine white roots. Isolated on a seamless pure white background. Bright, crisp studio lighting. Square aspect ratio (1:1). 8k resolution.`;
   }
 
   if (niche === 'herb') {
@@ -449,11 +340,10 @@ function buildPrompt(niche, name, heightCm, leafIn, featIn, extraIn) {
   }
 }
 
-// ══ UI CONTROLLERS ════════════════════════════════════════════
-const NICHE_LBL = { flower: 'FLOWER', fruit: 'FRUIT', herb: 'HERB' };
+// ══ UI ══════════════════════════════════════════════════════
+const NICHE_LBL = { flower:'🌸 FLOWER', fruit:'🍋 FRUIT', herb:'🌿 HERB' };
 let history = [], currentPrompt = '';
 
-// Sync Labels dynamically based on Niche
 document.querySelectorAll('input[name="niche"]').forEach(r =>
   r.addEventListener('change', syncFieldLabels));
 
@@ -463,8 +353,8 @@ function syncFieldLabels() {
   const fw  = document.getElementById('feat-wrap');
   const ew  = document.getElementById('extra-wrap');
   if (!n) return;
-  if (n === 'flower') { lbl.textContent='Đặc điểm Hoa'; fw.style.display=''; ew.style.display='none'; }
-  if (n === 'fruit')  { lbl.textContent='Đặc điểm Quả'; fw.style.display=''; ew.style.display='none'; }
+  if (n === 'flower') { lbl.textContent='Đặc điểm hoa nổi bật'; fw.style.display=''; ew.style.display='none'; }
+  if (n === 'fruit')  { lbl.textContent='Đặc điểm quả nổi bật'; fw.style.display=''; ew.style.display='none'; }
   if (n === 'herb')   { fw.style.display='none'; ew.style.display=''; }
 }
 
@@ -474,7 +364,6 @@ function toggleOpt() {
 }
 
 function generate() {
-  // Reset errors
   ['err-niche','err-name','err-height'].forEach(id => document.getElementById(id).classList.remove('show'));
   ['plant-name','plant-height'].forEach(id => document.getElementById(id).classList.remove('err'));
 
@@ -494,18 +383,17 @@ function generate() {
   const prompt = buildPrompt(niche, name, height, leaf, feat, extra);
   currentPrompt = prompt;
 
-  // Render Output
   document.getElementById('out-empty').style.display = 'none';
   const el = document.getElementById('out-text');
   el.textContent = prompt;
   el.classList.add('show');
   document.getElementById('out-foot').classList.add('show');
-  document.getElementById('char-count').textContent = prompt.length + ' chars';
+  document.getElementById('char-bar').classList.add('show');
+  document.getElementById('char-count').textContent = prompt.length + ' ký tự';
 
-  // Badges
   const tn = document.getElementById('tag-niche');
-  tn.textContent = NICHE_LBL[niche]; tn.classList.add('active');
-  document.getElementById('tag-type').classList.add('active');
+  tn.textContent = NICHE_LBL[niche]; tn.classList.add('on');
+  document.getElementById('tag-type').classList.add('on');
 
   addHistory(name, niche, prompt);
 }
@@ -513,31 +401,27 @@ function generate() {
 function copyPrompt() {
   if (!currentPrompt) return;
   navigator.clipboard.writeText(currentPrompt).then(() => {
-    const btn = document.getElementById('btn-copy');
-    const lbl = document.getElementById('copy-lbl');
-    btn.classList.add('done');
-    lbl.textContent = 'Đã sao chép';
+    document.getElementById('btn-copy').classList.add('done');
+    document.getElementById('copy-lbl').textContent = '✓ Đã copy!';
     setTimeout(() => {
-      btn.classList.remove('done');
-      lbl.textContent = 'Sao chép Code';
-    }, 2000);
+      document.getElementById('btn-copy').classList.remove('done');
+      document.getElementById('copy-lbl').textContent = 'Copy Prompt';
+    }, 2500);
   });
 }
 
 function resetAll() {
-  ['plant-name','leaf-desc','feat-desc','extra-desc','plant-height'].forEach(id => document.getElementById(id).value='');
+  ['plant-name','leaf-desc','feat-desc','extra-desc'].forEach(id => document.getElementById(id).value='');
+  document.getElementById('plant-height').value='';
   document.querySelectorAll('input[name="niche"]').forEach(r => r.checked=false);
-  
   ['err-niche','err-name','err-height'].forEach(id => document.getElementById(id).classList.remove('show'));
   ['plant-name','plant-height'].forEach(id => document.getElementById(id).classList.remove('err'));
-  
-  document.getElementById('out-empty').style.display='flex';
+  document.getElementById('out-empty').style.display='';
   document.getElementById('out-text').classList.remove('show');
   document.getElementById('out-foot').classList.remove('show');
-  
-  document.getElementById('tag-niche').textContent='NICHE'; document.getElementById('tag-niche').classList.remove('active');
-  document.getElementById('tag-type').classList.remove('active');
-  
+  document.getElementById('char-bar').classList.remove('show');
+  document.getElementById('tag-niche').textContent='—'; document.getElementById('tag-niche').classList.remove('on');
+  document.getElementById('tag-type').classList.remove('on');
   document.getElementById('opt-toggle').classList.remove('open');
   document.getElementById('opt-fields').classList.remove('open');
   currentPrompt='';
@@ -545,46 +429,35 @@ function resetAll() {
 
 function addHistory(name, niche, prompt) {
   history.unshift({ name, niche, prompt, time: new Date() });
-  if (history.length > 8) history.pop();
+  if (history.length > 10) history.pop();
   renderHistory();
 }
-
 function renderHistory() {
   const list = document.getElementById('hist-list');
-  if (!history.length) { 
-    list.innerHTML='<div class="history-empty">Chưa có dữ liệu giao dịch trong phiên này.</div>'; 
-    return; 
-  }
+  if (!history.length) { list.innerHTML='<div class="hist-empty">Chưa có prompt nào được tạo</div>'; return; }
   list.innerHTML = history.map((h,i) => `
-    <div class="history-item" onclick="loadHist(${i})">
-      <div class="h-main">
-        <span class="h-name">${h.name}</span>
-        <span class="h-meta">${NICHE_LBL[h.niche]} • Soil Plug</span>
-      </div>
-      <span class="h-time">${fmt(h.time)}</span>
+    <div class="hist-item" onclick="loadHist(${i})">
+      <div class="hist-dot"></div>
+      <div><div class="hname">${h.name}</div><div class="hmeta">${NICHE_LBL[h.niche]} · Main · Soil Plug</div></div>
+      <span class="htime">${fmt(h.time)}</span>
     </div>`).join('');
 }
-
 function loadHist(i) {
   const h = history[i];
   currentPrompt = h.prompt;
-  
   document.getElementById('out-empty').style.display='none';
   const el = document.getElementById('out-text');
   el.textContent = h.prompt; el.classList.add('show');
   document.getElementById('out-foot').classList.add('show');
-  document.getElementById('char-count').textContent = h.prompt.length+' chars';
-  
+  document.getElementById('char-bar').classList.add('show');
+  document.getElementById('char-count').textContent = h.prompt.length+' ký tự';
   const tn = document.getElementById('tag-niche');
-  tn.textContent = NICHE_LBL[h.niche]; tn.classList.add('active');
-  document.getElementById('tag-type').classList.add('active');
-  
-  window.scrollTo({top: 0, behavior: 'smooth'});
+  tn.textContent = NICHE_LBL[h.niche]; tn.classList.add('on');
+  document.getElementById('tag-type').classList.add('on');
+  window.scrollTo({top:0,behavior:'smooth'});
 }
-
 function fmt(d) { return d.toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}); }
 
-// Keyboard shortcuts
 document.getElementById('plant-name').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('plant-height').focus(); });
 document.getElementById('plant-height').addEventListener('keydown', e => { if(e.key==='Enter') generate(); });
 </script>
