@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Plant Prompt Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --sage: #4a7c59;
+    --sage-light: #6a9e7a;
+    --sage-pale: #e8f0ea;
+    --sage-soft: #c8dece;
+    --earth: #8b6f47;
+    --earth-light: #c4a882;
+    --cream: #faf8f3;
+    --cream-dark: #f0ece1;
+    --ink: #1a2e1f;
+    --ink-soft: #3d5248;
+    --muted: #7a9080;
+    --white: #ffffff;
+    --red: #c0392b;
+    --border: #d4e2d8;
+    --shadow: 0 4px 24px rgba(74,124,89,0.10);
+    --shadow-sm: 0 2px 8px rgba(74,124,89,0.08);
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* Decorative background */
+  body::before {
+    content: '';
+    position: fixed;
+    top: -200px; right: -200px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(74,124,89,0.07) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    bottom: -150px; left: -150px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(139,111,71,0.06) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+
+  /* ── HEADER ── */
+  header {
+    position: relative; z-index: 10;
+    padding: 28px 40px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    background: rgba(250,248,243,0.85);
+    backdrop-filter: blur(8px);
+  }
+  .logo {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .logo-leaf {
+    width: 36px; height: 36px;
+    background: var(--sage);
+    border-radius: 50% 10px 50% 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+  .logo-text h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px; color: var(--ink); line-height: 1;
+  }
+  .logo-text p {
+    font-size: 12px; color: var(--muted); margin-top: 2px;
+  }
+  .header-badge {
+    background: var(--sage-pale);
+    color: var(--sage);
+    font-size: 12px; font-weight: 500;
+    padding: 6px 14px;
+    border-radius: 100px;
+    border: 1px solid var(--sage-soft);
+  }
+
+  /* ── MAIN LAYOUT ── */
+  main {
+    position: relative; z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+    display: grid;
+    grid-template-columns: 1fr 420px;
+    gap: 32px;
+    align-items: start;
+  }
+
+  @media (max-width: 860px) {
+    main { grid-template-columns: 1fr; }
+    header { padding: 20px 20px 16px; }
+    .header-badge { display: none; }
+  }
+
+  /* ── SECTION TITLE ── */
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .form-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    padding: 32px;
+    box-shadow: var(--shadow);
+  }
+  .form-card h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px; color: var(--ink);
+    margin-bottom: 6px;
+  }
+  .form-card .subtitle {
+    font-size: 13px; color: var(--muted);
+    margin-bottom: 28px; line-height: 1.5;
+  }
+
+  /* ── FORM FIELDS ── */
+  .field { margin-bottom: 22px; }
+  .field label {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500;
+    color: var(--ink-soft);
+    margin-bottom: 8px;
+  }
+  .field label .req {
+    color: var(--sage); font-size: 15px; line-height: 1;
+  }
+  .field label .opt-tag {
+    font-size: 10px; font-weight: 400;
+    color: var(--muted);
+    background: var(--cream-dark);
+    padding: 2px 8px; border-radius: 100px;
+  }
+
+  input[type="text"], input[type="number"], select, textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    background: var(--cream);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    appearance: none;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--sage);
+    box-shadow: 0 0 0 3px rgba(74,124,89,0.12);
+    background: var(--white);
+  }
+  input::placeholder { color: #b0bcb5; }
+
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a9080' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+    cursor: pointer;
+  }
+
+  /* Two-column grid for small fields */
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  /* ── SEGMENT CONTROL (Ngách & Loại ảnh) ── */
+  .seg-group {
+    display: flex;
+    gap: 0;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background: var(--cream);
+  }
+  .seg-group input[type="radio"] { display: none; }
+  .seg-group label {
+    flex: 1;
+    padding: 9px 6px;
+    text-align: center;
+    font-size: 13px; font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    border-right: 1px solid var(--border);
+    transition: background 0.18s, color 0.18s;
+    margin: 0;
+    display: block;
+  }
+  .seg-group label:last-child { border-right: none; }
+  .seg-group input[type="radio"]:checked + label {
+    background: var(--sage);
+    color: var(--white);
+  }
+
+  /* ── COLOR CHIPS ── */
+  .color-chips {
+    display: flex; flex-wrap: wrap; gap: 8px;
+  }
+  .chip-input { display: none; }
+  .chip-label {
+    padding: 6px 14px;
+    border-radius: 100px;
+    border: 1.5px solid var(--border);
+    font-size: 12px; font-weight: 500;
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: all 0.15s;
+    background: var(--cream);
+    white-space: nowrap;
+  }
+  .chip-input:checked + .chip-label {
+    background: var(--sage);
+    border-color: var(--sage);
+    color: var(--white);
+  }
+  .chip-label:hover { border-color: var(--sage-light); }
+
+  /* ── GENERATE BUTTON ── */
+  .btn-generate {
+    width: 100%;
+    padding: 14px 24px;
+    background: var(--sage);
+    color: var(--white);
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px; font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: background 0.2s, transform 0.15s;
+    letter-spacing: 0.02em;
+  }
+  .btn-generate:hover { background: var(--sage-light); }
+  .btn-generate:active { transform: scale(0.98); }
+  .btn-generate svg { flex-shrink: 0; }
+
+  .btn-reset {
+    width: 100%;
+    padding: 10px 24px;
+    background: transparent;
+    color: var(--muted);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px; font-weight: 500;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: all 0.15s;
+  }
+  .btn-reset:hover { border-color: var(--sage); color: var(--sage); }
+
+  /* ── RIGHT PANEL: OUTPUT ── */
+  .output-panel {
+    position: sticky;
+    top: 24px;
+  }
+
+  .output-card {
+    background: var(--ink);
+    border-radius: var(--radius);
+    padding: 28px;
+    box-shadow: 0 8px 40px rgba(26,46,31,0.18);
+    min-height: 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .output-header {
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .output-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+  }
+  .output-badges {
+    display: flex; gap: 6px;
+  }
+  .badge {
+    font-size: 10px; font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 100px;
+    background: rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.5);
+  }
+  .badge.active {
+    background: rgba(106,158,122,0.3);
+    color: #a8d5b5;
+  }
+
+  .output-empty {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: rgba(255,255,255,0.2);
+    text-align: center;
+    padding: 20px 0;
+  }
+  .output-empty .empty-icon {
+    font-size: 40px; opacity: 0.4;
+  }
+  .output-empty p { font-size: 13px; line-height: 1.6; }
+
+  .output-text {
+    flex: 1;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    line-height: 1.75;
+    color: #d4e8da;
+    word-break: break-word;
+    white-space: pre-wrap;
+    display: none;
+  }
+  .output-text.visible { display: block; }
+
+  .output-actions {
+    display: flex; gap: 10px;
+    display: none;
+  }
+  .output-actions.visible { display: flex; }
+
+  .btn-copy {
+    flex: 1;
+    padding: 11px 16px;
+    background: var(--sage);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px; font-weight: 600;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    transition: all 0.15s;
+  }
+  .btn-copy:hover { background: var(--sage-light); }
+  .btn-copy.copied {
+    background: #2d6a4f;
+  }
+
+  .btn-new {
+    padding: 11px 16px;
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.6);
+    border: none;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px; font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-new:hover { background: rgba(255,255,255,0.13); color: white; }
+
+  /* ── TEMPLATE INFO ── */
+  .template-info {
+    background: var(--sage-pale);
+    border: 1px solid var(--sage-soft);
+    border-radius: var(--radius-sm);
+    padding: 16px 20px;
+    margin-top: 16px;
+  }
+  .template-info h3 {
+    font-size: 12px; font-weight: 600;
+    color: var(--sage); margin-bottom: 8px;
+    text-transform: uppercase; letter-spacing: 0.08em;
+  }
+  .template-info ul {
+    list-style: none; display: flex; flex-direction: column; gap: 4px;
+  }
+  .template-info ul li {
+    font-size: 12px; color: var(--ink-soft);
+    display: flex; align-items: flex-start; gap: 6px;
+  }
+  .template-info ul li::before { content: '✓'; color: var(--sage); flex-shrink: 0; }
+
+  /* ── HISTORY ── */
+  .history-section { margin-top: 24px; }
+  .history-section h3 {
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 12px;
+  }
+  .history-list { display: flex; flex-direction: column; gap: 8px; }
+  .history-item {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+  .history-item:hover { border-color: var(--sage); }
+  .history-item .h-name {
+    font-size: 13px; font-weight: 500; color: var(--ink);
+  }
+  .history-item .h-meta {
+    font-size: 11px; color: var(--muted); margin-top: 2px;
+  }
+  .history-empty {
+    font-size: 12px; color: var(--muted);
+    text-align: center; padding: 16px 0;
+    font-style: italic;
+  }
+
+  /* ── VALIDATION ── */
+  .field-error {
+    font-size: 11px; color: var(--red);
+    margin-top: 5px; display: none;
+  }
+  .field-error.show { display: block; }
+  input.error, select.error { border-color: var(--red) !important; }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px; background: var(--border);
+    margin: 24px 0;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-leaf">🌿</div>
+    <div class="logo-text">
+      <h1>Plant Prompt Generator</h1>
+      <p>Tạo prompt ảnh chuẩn cho Gemini AI</p>
+    </div>
+  </div>
+  <span class="header-badge">Nội bộ — 20 nhân viên</span>
+</header>
+
+<main>
+  <!-- ── LEFT: FORM ── -->
+  <div>
+    <div class="form-card">
+      <div class="section-label">Thông tin sản phẩm</div>
+      <h2>Tạo prompt ảnh</h2>
+      <p class="subtitle">Điền thông tin bên dưới, hệ thống sẽ ghép thành prompt chuẩn để dán vào Gemini.</p>
+
+      <!-- Tên cây -->
+      <div class="field">
+        <label>
+          <span>Tên cây / sản phẩm</span>
+          <span class="req">*</span>
+        </label>
+        <input type="text" id="plant-name" placeholder="VD: Mango, Lavender, Basil…" autocomplete="off"/>
+        <div class="field-error" id="err-name">Vui lòng nhập tên cây</div>
+      </div>
+
+      <!-- Ngách -->
+      <div class="field">
+        <label>Ngách sản phẩm <span class="req">*</span></label>
+        <div class="seg-group">
+          <input type="radio" name="niche" id="n1" value="fruit"/>
+          <label for="n1">🍋 Cây ăn quả</label>
+          <input type="radio" name="niche" id="n2" value="flower"/>
+          <label for="n2">🌸 Hoa</label>
+          <input type="radio" name="niche" id="n3" value="herb"/>
+          <label for="n3">🌿 Herb</label>
+        </div>
+        <div class="field-error" id="err-niche">Vui lòng chọn ngách</div>
+      </div>
+
+      <!-- Loại ảnh -->
+      <div class="field">
+        <label>Loại ảnh cần tạo <span class="req">*</span></label>
+        <div class="seg-group">
+          <input type="radio" name="imgtype" id="t1" value="main"/>
+          <label for="t1">📸 Ảnh chính (Main)</label>
+          <input type="radio" name="imgtype" id="t2" value="tipcare"/>
+          <label for="t2">💧 Tip Care</label>
+        </div>
+        <div class="field-error" id="err-type">Vui lòng chọn loại ảnh</div>
+      </div>
+
+      <!-- Màu sắc -->
+      <div class="field">
+        <label>Màu hoa / quả <span class="opt-tag">Tùy chọn</span></label>
+        <div class="color-chips">
+          <input type="checkbox" class="chip-input" id="c-red" value="red"/>
+          <label class="chip-label" for="c-red">🔴 Đỏ</label>
+          <input type="checkbox" class="chip-input" id="c-orange" value="orange"/>
+          <label class="chip-label" for="c-orange">🟠 Cam</label>
+          <input type="checkbox" class="chip-input" id="c-yellow" value="yellow"/>
+          <label class="chip-label" for="c-yellow">🟡 Vàng</label>
+          <input type="checkbox" class="chip-input" id="c-pink" value="pink"/>
+          <label class="chip-label" for="c-pink">🩷 Hồng</label>
+          <input type="checkbox" class="chip-input" id="c-purple" value="purple"/>
+          <label class="chip-label" for="c-purple">🟣 Tím</label>
+          <input type="checkbox" class="chip-input" id="c-white" value="white"/>
+          <label class="chip-label" for="c-white">⚪ Trắng</label>
+          <input type="checkbox" class="chip-input" id="c-green" value="green"/>
+          <label class="chip-label" for="c-green">🟢 Xanh</label>
+          <input type="checkbox" class="chip-input" id="c-multi" value="multicolor"/>
+          <label class="chip-label" for="c-multi">🌈 Nhiều màu</label>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Thông tin cây -->
+      <div class="section-label">Chi tiết cây</div>
+      <div class="field-row">
+        <div class="field" style="margin-bottom:0">
+          <label>Chiều cao cây <span class="opt-tag">Tùy chọn</span></label>
+          <input type="text" id="plant-height" placeholder="VD: 12 inches, 2 ft…"/>
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <label>Kích thước pot <span class="opt-tag">Tùy chọn</span></label>
+          <input type="text" id="pot-size" placeholder="VD: 4 inch, 6 inch…"/>
+        </div>
+      </div>
+
+      <br/>
+
+      <!-- Buttons -->
+      <button class="btn-generate" onclick="generatePrompt()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+        </svg>
+        Tạo Prompt
+      </button>
+      <button class="btn-reset" onclick="resetForm()">↺ Làm mới form</button>
+    </div>
+
+    <!-- Template info -->
+    <div class="template-info">
+      <h3>📋 Template đang dùng</h3>
+      <ul>
+        <li>6 template chuẩn: 3 ngách × 2 loại ảnh</li>
+        <li>Tối ưu cho Gemini image generation</li>
+        <li>Tự động ghép tên cây, màu sắc, kích thước</li>
+        <li>Copy 1 click — dán thẳng vào Gemini</li>
+      </ul>
+    </div>
+
+    <!-- History -->
+    <div class="history-section">
+      <h3>Lịch sử tạo prompt (phiên này)</h3>
+      <div class="history-list" id="history-list">
+        <div class="history-empty">Chưa có prompt nào được tạo</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── RIGHT: OUTPUT ── -->
+  <div class="output-panel">
+    <div class="output-card">
+      <div class="output-header">
+        <span class="output-title">Prompt đã tạo</span>
+        <div class="output-badges">
+          <span class="badge" id="badge-niche">—</span>
+          <span class="badge" id="badge-type">—</span>
+        </div>
+      </div>
+
+      <div class="output-empty" id="output-empty">
+        <div class="empty-icon">🌱</div>
+        <p>Điền thông tin bên trái<br/>và nhấn <strong style="color:rgba(255,255,255,0.4)">"Tạo Prompt"</strong></p>
+      </div>
+
+      <pre class="output-text" id="output-text"></pre>
+
+      <div class="output-actions" id="output-actions">
+        <button class="btn-copy" id="btn-copy" onclick="copyPrompt()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+          </svg>
+          <span id="copy-label">Copy Prompt</span>
+        </button>
+        <button class="btn-new" onclick="resetForm()">Tạo mới</button>
+      </div>
+    </div>
+
+    <!-- Char count -->
+    <div style="text-align:right; margin-top:8px; font-size:11px; color:var(--muted); display:none" id="char-count"></div>
+  </div>
+</main>
+
+<script>
+// ═══════════════════════════════════════════════════
+// TEMPLATE LIBRARY — chỉnh sửa tại đây khi cần
+// ═══════════════════════════════════════════════════
+const TEMPLATES = {
+
+  // ── CÂY ĂN QUẢ ──────────────────────────────────
+  fruit_main: (d) => `A stunning product photograph of a ${d.name} plant for an online plant shop.
+${d.colors ? `The fruit features beautiful ${d.colors} tones.` : ''}
+${d.height ? `The plant stands approximately ${d.height} tall,` : 'A healthy, well-grown specimen,'} ${d.pot ? `potted in a ${d.pot} nursery pot.` : 'in a clean nursery pot.'}
+Style: bright, airy studio photography on a pure white background. 
+Sharp focus on leaves and fruit with vibrant, natural colors. 
+The plant looks lush, healthy, and full — ideal for e-commerce. 
+Lighting: soft natural daylight from the left. No shadows. No props. 
+Camera: top-angle slightly from the front, showing the full plant. 
+High resolution, photorealistic, clean background. Shot for a premium plant retail website.`,
+
+  fruit_tipcare: (d) => `A clean, editorial-style infographic photograph for a plant care tip post.
+Subject: ${d.name} plant care — watering & sunlight guide.
+${d.colors ? `The plant has ${d.colors} fruit.` : ''}
+${d.height ? `Plant shown is approximately ${d.height}.` : ''}
+Style: flat lay or overhead shot on a soft cream or light sage background.
+Show the ${d.name} plant ${d.pot ? `in a ${d.pot} pot` : 'in a small pot'} alongside minimal care props: a small watering can, a sun icon card, or soil.
+Mood: calm, educational, modern botanical aesthetic.
+Typography space: leave clean area on the right or bottom for text overlay.
+Lighting: soft even light, no harsh shadows. Pastel tones, airy feel.
+Photorealistic, high resolution. Suitable for Instagram or e-commerce product page.`,
+
+  // ── HOA ─────────────────────────────────────────
+  flower_main: (d) => `A professional product photograph of a ${d.name} flowering plant for an online plant nursery.
+${d.colors ? `The blooms display gorgeous ${d.colors} colors.` : 'The flowers are in full, beautiful bloom.'}
+${d.height ? `Plant height: approximately ${d.height}.` : ''} ${d.pot ? `Presented in a ${d.pot} grower pot.` : 'In a clean grower pot.'}
+Style: bright white studio background, pure and clean.
+The plant is full of blooms and lush green foliage — showcasing peak health.
+Lighting: soft diffused daylight, no harsh shadows, colors look vivid and true.
+Camera angle: slightly elevated front view, showing full plant shape.
+High resolution, photorealistic. No props. No text.
+Perfect for e-commerce listing photo.`,
+
+  flower_tipcare: (d) => `A beautiful lifestyle-style photograph for a ${d.name} flower care tip.
+${d.colors ? `Feature ${d.colors} blooms prominently.` : ''}
+${d.height ? `The plant is approximately ${d.height} tall.` : ''}
+Setting: a bright, cozy indoor space — windowsill, wooden table, or light marble surface.
+${d.pot ? `The plant sits in a ${d.pot} decorative or terracotta pot.` : 'The plant is in a charming pot.'}
+Props: small watering vessel, pebbles, or a care tag card — minimal and elegant.
+Mood: warm, inviting, botanical magazine style. Natural morning light.
+Leave visual breathing room for text overlay on one side.
+Colors: soft, natural, slightly warm tones. No heavy filters.
+High resolution, photorealistic. Great for social media or blog post header.`,
+
+  // ── HERB ────────────────────────────────────────
+  herb_main: (d) => `A clean, appetizing product photo of a ${d.name} herb plant for an online plant store.
+${d.colors ? `The foliage shows ${d.colors} tones.` : 'The foliage is fresh and vibrant green.'}
+${d.height ? `Plant stands about ${d.height},` : 'A compact, bushy plant,'} ${d.pot ? `in a ${d.pot} nursery pot.` : 'in a small nursery pot.'}
+Style: pure white background, clean e-commerce product photo.
+The herb looks fresh, aromatic, and full — leaves appear lush and healthy.
+Lighting: bright, even studio light. No shadows. True-to-life colors.
+Camera: straight-on or slight elevated angle, showing full plant.
+High resolution, photorealistic. No props, no text. Crisp focus on leaves.
+Ideal for herb plant listing on a gardening or grocery-style plant shop.`,
+
+  herb_tipcare: (d) => `A fresh, kitchen-garden-inspired photograph for a ${d.name} herb care tip post.
+${d.colors ? `Show ${d.colors} colored foliage.` : ''}
+${d.height ? `Plant size: approximately ${d.height}.` : ''}
+Setting: bright kitchen windowsill or rustic wooden surface with natural light.
+${d.pot ? `The ${d.name} is in a ${d.pot} terracotta or ceramic pot.` : 'Planted in a charming small pot.'}
+Props: a small pair of scissors, spritzer bottle, or herb label marker — minimal.
+Mood: fresh, culinary, everyday-beautiful. Natural, soft morning light.
+Leave a clean area on the right or bottom for text overlay.
+Colors: natural greens, warm neutrals, no heavy filters.
+High resolution, photorealistic. Great for Instagram Reels cover or blog.`
+};
+
+// ── COLOR LABEL MAP ──────────────────────────────────
+const COLOR_LABELS = {
+  red: 'red', orange: 'orange', yellow: 'yellow', pink: 'pink',
+  purple: 'purple', white: 'white', green: 'green', multicolor: 'multicolor'
+};
+
+const NICHE_LABELS = { fruit: 'Cây ăn quả', flower: 'Hoa', herb: 'Herb' };
+const TYPE_LABELS  = { main: 'Ảnh chính', tipcare: 'Tip Care' };
+
+// ── STATE ────────────────────────────────────────────
+let history = [];
+let currentPrompt = '';
+
+// ── GENERATE ────────────────────────────────────────
+function generatePrompt() {
+  // Clear errors
+  document.querySelectorAll('.field-error').forEach(e => e.classList.remove('show'));
+  document.querySelectorAll('.error').forEach(e => e.classList.remove('error'));
+
+  const name    = document.getElementById('plant-name').value.trim();
+  const niche   = document.querySelector('input[name="niche"]:checked')?.value;
+  const imgtype = document.querySelector('input[name="imgtype"]:checked')?.value;
+  const height  = document.getElementById('plant-height').value.trim();
+  const pot     = document.getElementById('pot-size').value.trim();
+  const colors  = [...document.querySelectorAll('.chip-input:checked')]
+                    .map(c => COLOR_LABELS[c.value]).join(', ');
+
+  let valid = true;
+  if (!name) {
+    document.getElementById('err-name').classList.add('show');
+    document.getElementById('plant-name').classList.add('error');
+    valid = false;
+  }
+  if (!niche) {
+    document.getElementById('err-niche').classList.add('show');
+    valid = false;
+  }
+  if (!imgtype) {
+    document.getElementById('err-type').classList.add('show');
+    valid = false;
+  }
+  if (!valid) return;
+
+  const key = `${niche}_${imgtype}`;
+  const fn  = TEMPLATES[key];
+  if (!fn) return;
+
+  const data = { name, colors, height, pot };
+  const prompt = fn(data).replace(/\n\n+/g, '\n\n').trim();
+
+  currentPrompt = prompt;
+
+  // Show output
+  document.getElementById('output-empty').style.display = 'none';
+  const txt = document.getElementById('output-text');
+  txt.textContent = prompt;
+  txt.classList.add('visible');
+  document.getElementById('output-actions').classList.add('visible');
+
+  // Badges
+  const bn = document.getElementById('badge-niche');
+  const bt = document.getElementById('badge-type');
+  bn.textContent = NICHE_LABELS[niche];
+  bt.textContent = TYPE_LABELS[imgtype];
+  bn.classList.add('active');
+  bt.classList.add('active');
+
+  // Char count
+  const cc = document.getElementById('char-count');
+  cc.textContent = `${prompt.length} ký tự`;
+  cc.style.display = 'block';
+
+  // Save to history
+  addHistory(name, niche, imgtype, prompt);
+}
+
+// ── COPY ────────────────────────────────────────────
+function copyPrompt() {
+  if (!currentPrompt) return;
+  navigator.clipboard.writeText(currentPrompt).then(() => {
+    const btn = document.getElementById('btn-copy');
+    const lbl = document.getElementById('copy-label');
+    btn.classList.add('copied');
+    lbl.textContent = '✓ Đã copy!';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      lbl.textContent = 'Copy Prompt';
+    }, 2200);
+  });
+}
+
+// ── RESET ───────────────────────────────────────────
+function resetForm() {
+  document.getElementById('plant-name').value = '';
+  document.getElementById('plant-height').value = '';
+  document.getElementById('pot-size').value = '';
+  document.querySelectorAll('input[name="niche"]').forEach(r => r.checked = false);
+  document.querySelectorAll('input[name="imgtype"]').forEach(r => r.checked = false);
+  document.querySelectorAll('.chip-input').forEach(c => c.checked = false);
+  document.querySelectorAll('.field-error').forEach(e => e.classList.remove('show'));
+  document.querySelectorAll('.error').forEach(e => e.classList.remove('error'));
+
+  document.getElementById('output-empty').style.display = '';
+  document.getElementById('output-text').classList.remove('visible');
+  document.getElementById('output-actions').classList.remove('visible');
+  document.getElementById('badge-niche').textContent = '—';
+  document.getElementById('badge-type').textContent = '—';
+  document.getElementById('badge-niche').classList.remove('active');
+  document.getElementById('badge-type').classList.remove('active');
+  document.getElementById('char-count').style.display = 'none';
+  currentPrompt = '';
+}
+
+// ── HISTORY ─────────────────────────────────────────
+function addHistory(name, niche, imgtype, prompt) {
+  history.unshift({ name, niche, imgtype, prompt, time: new Date() });
+  if (history.length > 8) history.pop();
+  renderHistory();
+}
+
+function renderHistory() {
+  const list = document.getElementById('history-list');
+  if (history.length === 0) {
+    list.innerHTML = '<div class="history-empty">Chưa có prompt nào được tạo</div>';
+    return;
+  }
+  list.innerHTML = history.map((h, i) => `
+    <div class="history-item" onclick="loadHistory(${i})">
+      <div class="h-name">🌿 ${h.name}</div>
+      <div class="h-meta">${NICHE_LABELS[h.niche]} · ${TYPE_LABELS[h.imgtype]} · ${formatTime(h.time)}</div>
+    </div>
+  `).join('');
+}
+
+function loadHistory(i) {
+  const h = history[i];
+  currentPrompt = h.prompt;
+  document.getElementById('output-empty').style.display = 'none';
+  const txt = document.getElementById('output-text');
+  txt.textContent = h.prompt;
+  txt.classList.add('visible');
+  document.getElementById('output-actions').classList.add('visible');
+  const bn = document.getElementById('badge-niche');
+  const bt = document.getElementById('badge-type');
+  bn.textContent = NICHE_LABELS[h.niche];
+  bt.textContent = TYPE_LABELS[h.imgtype];
+  bn.classList.add('active');
+  bt.classList.add('active');
+  const cc = document.getElementById('char-count');
+  cc.textContent = `${h.prompt.length} ký tự`;
+  cc.style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function formatTime(d) {
+  return d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+}
+
+// Enter key on plant name field
+document.getElementById('plant-name').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') generatePrompt();
+});
+</script>
+</body>
+</html>
