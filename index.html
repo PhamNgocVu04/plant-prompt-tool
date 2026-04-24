@@ -9,7 +9,29 @@
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-113-4661168-2370646
+:root {
+  --green-deep:  #2d4a35;
+  --green-mid:   #4a7c59;
+  --green-soft:  #6a9e7a;
+  --green-pale:  #e8f2eb;
+  --green-mist:  #f2f7f3;
+  --earth:       #8b6f47;
+  --earth-pale:  #f5f0e8;
+  --cream:       #faf8f4;
+  --ink:         #1c2e22;
+  --ink-soft:    #3d5245;
+  --muted:       #7a9080;
+  --border:      #d0e0d4;
+  --white:       #ffffff;
+  --red-err:     #c0392b;
+  --radius:      14px;
+  --radius-sm:   9px;
+  --shadow:      0 4px 28px rgba(45,74,53,0.10);
+  --shadow-lg:   0 8px 48px rgba(45,74,53,0.15);
+}
+html { scroll-behavior: smooth; }
+body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--ink); min-height: 100vh; }
+
 /* HEADER */
 header {
   background: var(--green-deep); padding: 0 40px;
