@@ -457,8 +457,8 @@ input.err-input { border-color: var(--red) !important; }
   <div class="imagen-card">
     <div class="imagen-head">
       <div class="imagen-head-left">
-        <span class="imagen-title">Gemini Flash Image</span>
-        <span class="imagen-model">gemini-2.0-flash-exp</span>
+        <span class="imagen-title">Gemini Image</span>
+        <span class="imagen-model">gemini-3.1-flash-image</span>
       </div>
       <div class="status-row">
         <div class="sdot" id="sdot"></div>
@@ -840,7 +840,8 @@ async function genImage(){
 
   try {
     // Gọi thẳng Gemini 2.0 Flash Image — không cần proxy
-    const MODEL = 'gemini-2.0-flash-exp-image-generation';
+    // Model image generation đúng nhất hiện tại
+    const MODEL = 'gemini-3.1-flash-image-preview';
     const URL   = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${apiKey}`;
 
     const res = await fetch(URL, {
@@ -851,8 +852,7 @@ async function genImage(){
           parts: [{ text: currentPrompt.trim() }]
         }],
         generationConfig: {
-          responseModalities: ['TEXT', 'IMAGE'],
-          responseMimeType:   'text/plain'
+          responseModalities: ['IMAGE', 'TEXT']
         }
       })
     });
