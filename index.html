@@ -457,8 +457,8 @@ input.err-input { border-color: var(--red) !important; }
   <div class="imagen-card">
     <div class="imagen-head">
       <div class="imagen-head-left">
-        <span class="imagen-title">Gemini Image</span>
-        <span class="imagen-model">gemini-3.1-flash-image</span>
+        <span class="imagen-title">Imagen 4 Fast</span>
+        <span class="imagen-model">imagen-4.0-fast-generate-001</span>
       </div>
       <div class="status-row">
         <div class="sdot" id="sdot"></div>
@@ -494,7 +494,7 @@ input.err-input { border-color: var(--red) !important; }
     <!-- Generate btn -->
     <div class="btn-imagen-wrap">
       <button class="btn-imagen" id="btn-imagen" onclick="genImage()" disabled>
-        🖼 TẠO ẢNH NGAY
+        🖼 TẠO ẢNH VỚI IMAGEN 4
       </button>
     </div>
 
@@ -834,25 +834,26 @@ async function genImage(){
   btn.textContent = '⏳ Đang tạo ảnh…';
   setStatus('loading','Đang xử lý…');
 
-  const msgs = ['Đang gửi tới Gemini…','AI đang vẽ ảnh của bạn…','Sắp xong rồi…'];
+  const msgs = ['Đang gửi tới Imagen 4 Fast…','AI đang vẽ ảnh của bạn…','Sắp xong rồi…'];
   let mi = 0;
   const tick = setInterval(()=>{ loadTxt.textContent = msgs[Math.min(mi++, msgs.length-1)]; }, 3000);
 
   try {
     // Gọi thẳng Gemini 2.0 Flash Image — không cần proxy
-    // Model image generation đúng nhất hiện tại
-    const MODEL = 'gemini-3.1-flash-image-preview';
-    const URL   = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${apiKey}`;
+    // Imagen 4 Fast — endpoint :predict
+    const MODEL = 'imagen-4.0-fast-generate-001';
+    const URL   = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:predict?key=${apiKey}`;
 
     const res = await fetch(URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        contents: [{
-          parts: [{ text: currentPrompt.trim() }]
-        }],
-        generationConfig: {
-          responseModalities: ['IMAGE', 'TEXT']
+        instances: [{ prompt: currentPrompt.trim() }],
+        parameters: {
+          sampleCount:       Math.min(imgCount, 4),
+          aspectRatio:       aspectRatio,
+          safetyFilterLevel: 'block_some',
+          personGeneration:  'allow_adult'
         }
       })
     });
@@ -874,18 +875,15 @@ async function genImage(){
       throw new Error(errMsg || `Lỗi HTTP ${code}`);
     }
 
-    // Extract ảnh từ response
-    const parts = data?.candidates?.[0]?.content?.parts || [];
-    const imgs  = parts
-      .filter(p => p.inlineData?.mimeType?.startsWith('image/'))
-      .map(p => ({ base64: p.inlineData.data, mimeType: p.inlineData.mimeType }));
+    // Parse response Imagen 4 — format: predictions[].bytesBase64Encoded
+    const preds = data?.predictions || [];
+    const imgs  = preds.map(p => ({
+      base64:   p.bytesBase64Encoded,
+      mimeType: p.mimeType || 'image/png'
+    })).filter(p => p.base64);
 
     if (!imgs.length) {
-      // Kiểm tra text response để debug
-      const textParts = parts.filter(p => p.text).map(p => p.text).join(' ');
-      throw new Error(textParts
-        ? `Gemini không trả về ảnh: ${textParts.slice(0,100)}`
-        : 'Không nhận được ảnh. Thử lại hoặc chỉnh prompt.');
+      throw new Error('Không nhận được ảnh. Thử lại hoặc chỉnh prompt.');
     }
 
     // Hiển thị ảnh
@@ -916,7 +914,7 @@ async function genImage(){
     clearInterval(tick);
     loading.classList.remove('show');
     btn.disabled   = false;
-    btn.textContent = '🖼 TẠO ẢNH NGAY';
+    btn.textContent = '🖼 TẠO ẢNH VỚI IMAGEN 4';
   }
 }
 
