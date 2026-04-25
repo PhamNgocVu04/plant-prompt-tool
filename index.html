@@ -457,8 +457,8 @@ input.err-input { border-color: var(--red) !important; }
   <div class="imagen-card">
     <div class="imagen-head">
       <div class="imagen-head-left">
-        <span class="imagen-title">Imagen 4 Fast</span>
-        <span class="imagen-model">imagen-4.0-fast</span>
+        <span class="imagen-title">Gemini Flash Image</span>
+        <span class="imagen-model">gemini-2.0-flash-exp</span>
       </div>
       <div class="status-row">
         <div class="sdot" id="sdot"></div>
@@ -471,14 +471,6 @@ input.err-input { border-color: var(--red) !important; }
       <input type="text" id="api-key-input" placeholder="Dán API Key vào đây (AIzaSy...)" autocomplete="off" spellcheck="false" style="font-family:monospace;font-size:12px;color:#333;"/>
       <button class="btn-save" onclick="saveKey()">Lưu Key</button>
       <span class="saved-txt" id="saved-txt">✓ Đã lưu</span>
-    </div>
-
-    <!-- Proxy status + instructions -->
-    <div id="proxy-banner" style="margin:0;padding:10px 16px;background:#fffbeb;border-bottom:1px solid #fde68a;font-size:13px;color:#78350f;display:none;">
-      ⚠ <strong>Proxy chưa chạy</strong> — mở terminal, chạy: <code style="background:#fef3c7;padding:2px 6px;border-radius:3px;">python proxy.py</code>
-    </div>
-    <div id="proxy-ok" style="margin:0;padding:8px 16px;background:#f0fdf4;border-bottom:1px solid #bbf7d0;font-size:13px;color:#166534;display:none;">
-      ✅ Proxy đang chạy — nhập API Key bên dưới rồi nhấn <strong>Lưu Key</strong>
     </div>
 
     <!-- Config -->
@@ -502,7 +494,7 @@ input.err-input { border-color: var(--red) !important; }
     <!-- Generate btn -->
     <div class="btn-imagen-wrap">
       <button class="btn-imagen" id="btn-imagen" onclick="genImage()" disabled>
-        🖼 TẠO ẢNH VỚI IMAGEN 4
+        🖼 TẠO ẢNH NGAY
       </button>
     </div>
 
@@ -546,15 +538,9 @@ const PL = { plug:'🪨 SOIL PLUG', pot:'🪴 POTTED' };
 })();
 
 async function checkProxy(){
-  try{
-    // Gửi OPTIONS request để test proxy
-    await fetch('http://localhost:8765/generate',{method:'OPTIONS',signal:AbortSignal.timeout(2000)});
-    document.getElementById('proxy-ok').style.display='block';
-    document.getElementById('proxy-banner').style.display='none';
-  }catch{
-    document.getElementById('proxy-banner').style.display='block';
-    document.getElementById('proxy-ok').style.display='none';
-  }
+  // Không cần proxy nữa — gọi thẳng Gemini API
+  document.getElementById('proxy-banner') && (document.getElementById('proxy-banner').style.display='none');
+  document.getElementById('proxy-ok')     && (document.getElementById('proxy-ok').style.display='none');
 }
 
 // ══════════════════════════════════════════════════
@@ -835,84 +821,102 @@ async function genImage(){
   if(!currentPrompt){alert('Hãy tạo prompt trước!');return;}
   if(!apiKey){alert('Hãy nhập API Key và nhấn Lưu Key!');return;}
 
-  const btn=document.getElementById('btn-imagen');
-  const loading=document.getElementById('img-loading');
-  const loadTxt=document.getElementById('load-txt');
-  const results=document.getElementById('img-results');
-  const errEl=document.getElementById('img-error');
+  const btn     = document.getElementById('btn-imagen');
+  const loading = document.getElementById('img-loading');
+  const loadTxt = document.getElementById('load-txt');
+  const results = document.getElementById('img-results');
+  const errEl   = document.getElementById('img-error');
 
   results.classList.remove('show');
   errEl.classList.remove('show');
   loading.classList.add('show');
-  btn.disabled=true;
-  btn.textContent='⏳ Đang tạo ảnh…';
+  btn.disabled = true;
+  btn.textContent = '⏳ Đang tạo ảnh…';
   setStatus('loading','Đang xử lý…');
 
-  const msgs=['Đang gửi prompt tới Imagen 4 Fast…','AI đang vẽ ảnh của bạn…','Sắp xong rồi…'];
-  let mi=0;
-  const tick=setInterval(()=>{loadTxt.textContent=msgs[Math.min(mi++,msgs.length-1)];},3000);
+  const msgs = ['Đang gửi tới Gemini…','AI đang vẽ ảnh của bạn…','Sắp xong rồi…'];
+  let mi = 0;
+  const tick = setInterval(()=>{ loadTxt.textContent = msgs[Math.min(mi++, msgs.length-1)]; }, 3000);
 
-  try{
-    // Gọi qua proxy local — tránh lỗi CORS
-    const PROXY = 'http://localhost:8765/generate';
-    const res = await fetch(PROXY, {
+  try {
+    // Gọi thẳng Gemini 2.0 Flash Image — không cần proxy
+    const MODEL = 'gemini-2.0-flash-exp-image-generation';
+    const URL   = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${apiKey}`;
+
+    const res = await fetch(URL, {
       method: 'POST',
-      headers: {'Content-Type':'application/json'},
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        prompt:      currentPrompt.trim(),
-        aspectRatio: aspectRatio,
-        sampleCount: Math.min(imgCount,4),
-        apiKey:      apiKey   // proxy nhận key, gọi Google, không bị CORS
+        contents: [{
+          parts: [{ text: currentPrompt.trim() }]
+        }],
+        generationConfig: {
+          responseModalities: ['TEXT', 'IMAGE'],
+          responseMimeType:   'text/plain'
+        }
       })
     });
 
-    let data;
-    try{ data = await res.json(); }
-    catch{ throw new Error('Proxy không phản hồi — hãy chắc chắn đã chạy proxy.py'); }
+    const data = await res.json();
 
-    if(!res.ok){
-      const msg = data?.error || '';
-      if(msg.includes('API key not valid') || res.status===401 || res.status===403)
-        throw new Error('API Key không hợp lệ hoặc chưa kích hoạt Imagen 4. Kiểm tra lại tại aistudio.google.com');
-      if(res.status===429)
-        throw new Error('Đã đạt giới hạn request — thử lại sau vài giây');
-      if(msg.includes('safety'))
-        throw new Error('Prompt bị safety filter chặn — hãy thử chỉnh prompt');
-      if(res.status===404)
-        throw new Error('Model Imagen 4 chưa được kích hoạt cho API key này');
-      throw new Error(msg || `Lỗi HTTP ${res.status}`);
+    // Xử lý lỗi từ Google
+    if (!res.ok || data.error) {
+      const errMsg = data?.error?.message || data?.error || '';
+      const code   = data?.error?.code || res.status;
+      if (code === 400 && errMsg.toLowerCase().includes('api key'))
+        throw new Error('API Key không đúng. Vào aistudio.google.com → Get API key → tạo key mới.');
+      if (code === 401 || code === 403)
+        throw new Error('API Key không có quyền. Kiểm tra billing tại aistudio.google.com → Billing.');
+      if (code === 429)
+        throw new Error('Quá nhiều request — thử lại sau 10 giây.');
+      if (errMsg.toLowerCase().includes('safety'))
+        throw new Error('Prompt bị safety filter — thử chỉnh prompt.');
+      throw new Error(errMsg || `Lỗi HTTP ${code}`);
     }
 
-    const imgs = data.images || [];
-    if(!imgs.length) throw new Error('Không nhận được ảnh — prompt có thể bị chặn bởi safety filter');
+    // Extract ảnh từ response
+    const parts = data?.candidates?.[0]?.content?.parts || [];
+    const imgs  = parts
+      .filter(p => p.inlineData?.mimeType?.startsWith('image/'))
+      .map(p => ({ base64: p.inlineData.data, mimeType: p.inlineData.mimeType }));
 
-    const grid=document.getElementById('img-grid');
-    grid.className=`img-grid c${imgs.length}`;
-    grid.innerHTML='';
-    imgs.forEach((img,i)=>{
-      const src=`data:${img.mimeType};base64,${img.base64}`;
-      const div=document.createElement('div');
-      div.className='img-item';
-      div.innerHTML=`<img src="${src}" alt="Plant ${i+1}"/>
-        <div class="img-overlay"><button class="dl-btn" onclick="dlImg('${src}',${i+1})">⬇ Tải</button></div>`;
+    if (!imgs.length) {
+      // Kiểm tra text response để debug
+      const textParts = parts.filter(p => p.text).map(p => p.text).join(' ');
+      throw new Error(textParts
+        ? `Gemini không trả về ảnh: ${textParts.slice(0,100)}`
+        : 'Không nhận được ảnh. Thử lại hoặc chỉnh prompt.');
+    }
+
+    // Hiển thị ảnh
+    const grid = document.getElementById('img-grid');
+    grid.className = `img-grid c${imgs.length}`;
+    grid.innerHTML = '';
+    imgs.forEach((img, i) => {
+      const src = `data:${img.mimeType};base64,${img.base64}`;
+      const div = document.createElement('div');
+      div.className = 'img-item';
+      div.innerHTML = `
+        <img src="${src}" alt="Plant ${i+1}"/>
+        <div class="img-overlay">
+          <button class="dl-btn" onclick="dlImg('${src}',${i+1})">⬇ Tải</button>
+        </div>`;
       grid.appendChild(div);
     });
-    results.classList.add('show');
-    setStatus('ready',`✓ ${imgs.length} ảnh · ${aspectRatio}`);
 
-  }catch(err){
-    // Lỗi kết nối proxy
-    const msg = err.message.includes('fetch') || err.message.includes('NetworkError') || err.message.includes('Failed to fetch')
-      ? '⚠ Không kết nối được proxy — hãy chạy file proxy.py trước! (xem hướng dẫn bên dưới)'
-      : err.message;
-    errEl.innerHTML = msg.startsWith('⚠') ? msg : '⚠ ' + msg;
+    results.classList.add('show');
+    setStatus('ready', `✓ ${imgs.length} ảnh xong!`);
+
+  } catch(err) {
+    errEl.innerHTML = '⚠ ' + err.message;
     errEl.classList.add('show');
-    setStatus('error','Lỗi — xem chi tiết bên dưới');
-  }finally{
+    setStatus('error', 'Lỗi');
+    console.error('[GenImage]', err);
+  } finally {
     clearInterval(tick);
     loading.classList.remove('show');
-    btn.disabled=false;
-    btn.textContent='🖼 TẠO ẢNH VỚI IMAGEN 4';
+    btn.disabled   = false;
+    btn.textContent = '🖼 TẠO ẢNH NGAY';
   }
 }
 
