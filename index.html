@@ -1,1981 +1,935 @@
 <!DOCTYPE html>
 <html lang="vi">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PlantPrompt Studio</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
-      rel="stylesheet"
-    />
-    <style>
-      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-      :root {
-        --black:   #0a0a0a;
-        --black2:  #111111;
-        --gray900: #1a1a1a;
-        --gray700: #333333;
-        --gray500: #666666;
-        --gray300: #999999;
-        --gray100: #e8e8e8;
-        --gray50:  #f5f5f5;
-        --white:   #ffffff;
-        --accent:  #2d5a3d;113-3929352-4405855
-        --accent2: #c8a84b;
-        --red:     #c0392b;
-        --r: 6px;
-        --r-lg: 14px;
-      }
-
-      html { scroll-behavior: smooth; }
-
-      body {
-        font-family: 'Syne', sans-serif;
-        background: var(--white);
-        color: var(--black);
-        min-height: 100vh;
-        font-size: 16px;
-        line-height: 1.5;
-      }
-
-      /* ─── SCROLLBAR ─── */
-      ::-webkit-scrollbar { width: 4px; }
-      ::-webkit-scrollbar-track { background: var(--gray50); }
-      ::-webkit-scrollbar-thumb { background: var(--gray300); border-radius: 2px; }
-
-      /* ─── HEADER ─── */
-      header {
-        position: sticky; top: 0; z-index: 200;
-        background: var(--white);
-        border-bottom: 1.5px solid var(--black);
-        padding: 0 48px;
-        height: 68px;
-        display: flex; align-items: center; justify-content: space-between;
-        animation: slideDown 0.4s ease;
-      }
-      @keyframes slideDown { from { transform: translateY(-100%); opacity:0; } to { transform: translateY(0); opacity:1; } }
-
-      .logo-area { display: flex; align-items: baseline; gap: 10px; }
-      .logo-word {
-        font-family: 'Playfair Display', serif;
-        font-size: 22px; font-weight: 900;
-        color: var(--black); letter-spacing: -0.02em;
-      }
-      .logo-word em { font-style: italic; color: var(--accent); }
-      .logo-version {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 11px; font-weight: 400;
-        color: var(--gray300);
-        border: 1px solid var(--gray100);
-        padding: 2px 8px; border-radius: 100px;
-      }
-      .header-meta {
-        display: flex; align-items: center; gap: 20px;
-      }
-      .header-pill {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 11px; color: var(--gray500);
-        letter-spacing: 0.06em;
-      }
-      .header-dot {
-        width: 7px; height: 7px; border-radius: 50%;
-        background: #22c55e;
-        box-shadow: 0 0 0 3px rgba(34,197,94,0.2);
-        animation: pulse 2s infinite;
-      }
-      @keyframes pulse { 0%,100%{box-shadow:0 0 0 3px rgba(34,197,94,0.2)} 50%{box-shadow:0 0 0 6px rgba(34,197,94,0.1)} }
-
-      /* ─── LAYOUT ─── */
-      .page-wrap {
-        max-width: 1280px; margin: 0 auto;
-        padding: 0 48px 100px;
-        display: grid;
-        grid-template-columns: 520px 1fr;
-        gap: 0;
-        align-items: start;
-      }
-      @media (max-width: 960px) {
-        .page-wrap { grid-template-columns: 1fr; padding: 0 24px 80px; }
-        header { padding: 0 24px; }
-      }
-
-      /* ─── LEFT COLUMN ─── */
-      .left-col {
-        padding: 48px 48px 48px 0;
-        border-right: 1.5px solid var(--black);
-        min-height: calc(100vh - 68px);
-        animation: fadeUp 0.5s ease 0.1s both;
-      }
-      @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
-
-      /* ─── PAGE TITLE AREA ─── */
-      .page-title-block { margin-bottom: 44px; padding-top: 40px; }
-      .page-eyebrow {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 11px; font-weight: 500;
-        letter-spacing: 0.15em; text-transform: uppercase;
-        color: var(--gray400);
-        margin-bottom: 12px;
-        display: flex; align-items: center; gap: 8px;
-      }
-      .page-eyebrow::before { content:''; display:inline-block; width:24px; height:1px; background:var(--gray300); }
-      .page-title {
-        font-family: 'Playfair Display', serif;
-        font-size: 42px; font-weight: 900;
-        color: var(--black);
-        line-height: 1.05;
-        letter-spacing: -0.03em;
-      }
-      .page-title em { font-style: italic; color: var(--accent); }
-      .page-sub {
-        margin-top: 14px;
-        font-size: 15px; color: var(--gray500);
-        font-weight: 400; line-height: 1.6;
-      }
-
-      /* ─── STEP BLOCKS ─── */
-      .step-block { margin-bottom: 36px; }
-      .step-label {
-        display: flex; align-items: center; gap: 10px;
-        margin-bottom: 14px;
-      }
-      .step-num {
-        width: 26px; height: 26px;
-        border: 1.5px solid var(--black);
-        border-radius: 50%;
-        display: flex; align-items: center; justify-content: center;
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 11px; font-weight: 500;
-        color: var(--black); flex-shrink: 0;
-        transition: all 0.2s;
-      }
-      .step-num.done { background: var(--black); color: var(--white); }
-      .step-title {
-        font-size: 13px; font-weight: 700;
-        letter-spacing: 0.08em; text-transform: uppercase;
-        color: var(--black);
-      }
-
-      /* ─── NICHE SELECTOR ─── */
-      .niche-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
-      .niche-opt input { display: none; }
-      .niche-card {
-        border: 1.5px solid var(--gray100);
-        border-radius: var(--r-lg);
-        padding: 18px 12px;
-        cursor: pointer;
-        transition: all 0.2s;
-        background: var(--white);
-        text-align: center;
-        display: flex; flex-direction: column; align-items: center; gap: 8px;
-      }
-      .niche-card:hover { border-color: var(--black); transform: translateY(-2px); }
-      .niche-icon { font-size: 28px; line-height: 1; }
-      .niche-name {
-        font-size: 13px; font-weight: 700;
-        letter-spacing: 0.06em; text-transform: uppercase;
-        color: var(--gray500);
-      }
-      .niche-sub { font-size: 11px; color: var(--gray300); font-weight: 400; }
-      .niche-opt input:checked + .niche-card {
-        border-color: var(--black);
-        border-width: 2px;
-        background: var(--black);
-      }
-      .niche-opt input:checked + .niche-card .niche-name { color: var(--white); }
-      .niche-opt input:checked + .niche-card .niche-sub { color: var(--gray300); }
-
-      /* ─── TYPE SELECTOR ─── */
-      .type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-      .type-opt input { display: none; }
-      .type-card {
-        border: 1.5px solid var(--gray100);
-        border-radius: var(--r-lg);
-        padding: 16px 20px;
-        cursor: pointer;
-        transition: all 0.2s;
-        display: flex; align-items: center; gap: 12px;
-      }
-      .type-card:hover { border-color: var(--black); }
-      .type-icon-wrap {
-        width: 36px; height: 36px; border-radius: 10px;
-        background: var(--gray50);
-        display: flex; align-items: center; justify-content: center;
-        font-size: 17px; flex-shrink: 0;
-        transition: background 0.2s;
-      }
-      .type-info .t-name { font-size: 14px; font-weight: 700; color: var(--black); }
-      .type-info .t-desc { font-size: 11px; color: var(--gray400); margin-top: 2px; }
-      #tm:checked + .type-card { border-color: var(--accent); border-width: 2px; background: #f0f7f2; }
-      #tm:checked + .type-card .type-icon-wrap { background: var(--accent); }
-      #tt:checked + .type-card { border-color: var(--accent2); border-width: 2px; background: #fdf8ee; }
-      #tt:checked + .type-card .type-icon-wrap { background: var(--accent2); }
-
-      /* ─── PRESENTATION SELECTOR ─── */
-      .pres-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-      .pres-opt input { display: none; }
-      .pres-card {
-        border: 1.5px solid var(--gray100);
-        border-radius: var(--r-lg);
-        padding: 16px 18px;
-        cursor: pointer; transition: all 0.2s;
-        display: flex; align-items: flex-start; gap: 12px;
-      }
-      .pres-card:hover { border-color: var(--black); }
-      .pres-icon { font-size: 22px; line-height: 1; margin-top: 2px; flex-shrink:0; }
-      .pres-info .p-name { font-size: 14px; font-weight: 700; color: var(--black); }
-      .pres-info .p-desc { font-size: 11px; color: var(--gray400); margin-top: 3px; line-height: 1.4; }
-      .pres-opt input:checked + .pres-card { border-color: var(--black); border-width: 2px; background: var(--gray50); }
-
-      /* ─── POT EXTRA ─── */
-      .pot-extra { display: none; margin-top: 12px; }
-      .pot-extra.show { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; animation: fadeUp 0.25s ease; }
-
-      /* ─── FIELD ─── */
-      .field { margin-bottom: 20px; }
-      .field-label {
-        display: flex; align-items: center; gap: 8px;
-        font-size: 13px; font-weight: 700;
-        letter-spacing: 0.04em; text-transform: uppercase;
-        color: var(--black); margin-bottom: 9px;
-      }
-      .req-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); flex-shrink:0; }
-      .opt-badge {
-        font-size: 10px; font-weight: 500; letter-spacing: 0.06em;
-        color: var(--gray300); background: var(--gray50);
-        border: 1px solid var(--gray100);
-        padding: 2px 8px; border-radius: 100px; text-transform: uppercase;
-      }
-
-      input[type="text"], input[type="number"] {
-        width: 100%;
-        padding: 13px 16px;
-        border: 1.5px solid var(--gray100);
-        border-radius: var(--r);
-        font-family: 'Syne', sans-serif;
-        font-size: 16px; font-weight: 500;
-        color: var(--black);
-        background: var(--white);
-        outline: none;
-        transition: border-color 0.18s, box-shadow 0.18s;
-      }
-      input:focus {
-        border-color: var(--black);
-        box-shadow: 0 0 0 3px rgba(10,10,10,0.06);
-      }
-      input::placeholder { color: var(--gray300); font-weight: 400; }
-      input.err { border-color: var(--red) !important; box-shadow: 0 0 0 3px rgba(192,57,43,0.08) !important; }
-
-      .height-row { display: flex; gap: 8px; }
-      .height-row input { flex: 1; }
-      .unit-badge {
-        padding: 13px 18px;
-        border: 1.5px solid var(--black);
-        border-radius: var(--r);
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 16px; font-weight: 500;
-        color: var(--black); background: var(--black);
-        color: var(--white);
-        display: flex; align-items: center;
-        white-space: nowrap;
-      }
-      .field-hint {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 11px; color: var(--gray300);
-        margin-top: 6px;
-      }
-      .field-err { font-size: 12px; color: var(--red); margin-top: 6px; display: none; font-weight: 500; }
-      .field-err.show { display: block; }
-
-      /* ─── TIP NOTICE ─── */
-      .tip-extra { display: none; }
-      .tip-extra.show { display: block; animation: fadeUp 0.25s ease; }
-      .tip-notice {
-        border: 1.5px solid var(--accent2);
-        border-radius: var(--r);
-        padding: 14px 18px;
-        font-size: 13px; color: var(--gray700);
-        line-height: 1.6; margin-bottom: 16px;
-        background: #fdf8ee;
-      }
-
-      /* ─── OPT TOGGLE ─── */
-      .opt-toggle {
-        display: flex; align-items: center; gap: 10px;
-        font-size: 13px; font-weight: 600;
-        letter-spacing: 0.04em; text-transform: uppercase;
-        color: var(--gray400); cursor: pointer;
-        padding: 12px 0;
-        border-top: 1px dashed var(--gray100);
-        border-bottom: 1px dashed var(--gray100);
-        margin: 8px 0 16px;
-        user-select: none;
-        transition: color 0.15s;
-      }
-      .opt-toggle:hover { color: var(--black); }
-      .opt-arrow { font-size: 10px; transition: transform 0.2s; }
-      .opt-toggle.open .opt-arrow { transform: rotate(90deg); }
-      .opt-fields { display: none; }
-      .opt-fields.open { display: block; animation: fadeUp 0.25s ease; }
-
-      /* ─── DIVIDER ─── */
-      .divider { height: 1.5px; background: var(--gray100); margin: 32px 0; }
-
-      /* ─── GENERATE BUTTON ─── */
-      .btn-gen {
-        width: 100%;
-        padding: 18px 32px;
-        background: var(--black);
-        color: var(--white);
-        border: 2px solid var(--black);
-        border-radius: var(--r);
-        font-family: 'Syne', sans-serif;
-        font-size: 16px; font-weight: 800;
-        letter-spacing: 0.04em; text-transform: uppercase;
-        cursor: pointer;
-        display: flex; align-items: center; justify-content: center; gap: 10px;
-        transition: all 0.2s;
-        position: relative; overflow: hidden;
-      }
-      .btn-gen::after {
-        content: '';
-        position: absolute; inset: 0;
-        background: var(--white);
-        transform: translateX(-101%);
-        transition: transform 0.3s ease;
-        z-index: 0;
-      }
-      .btn-gen:hover::after { transform: translateX(0); }
-      .btn-gen:hover { color: var(--black); }
-      .btn-gen span, .btn-gen svg { position: relative; z-index: 1; }
-      .btn-gen.tip-mode { background: var(--accent2); border-color: var(--accent2); }
-      .btn-gen.tip-mode:hover { color: var(--accent2); }
-      .btn-gen:active { transform: scale(0.98); }
-
-      .btn-reset {
-        width: 100%; margin-top: 10px;
-        padding: 12px;
-        background: transparent; color: var(--gray400);
-        border: 1.5px solid var(--gray100);
-        border-radius: var(--r);
-        font-family: 'Syne', sans-serif;
-        font-size: 13px; font-weight: 600;
-        letter-spacing: 0.04em; text-transform: uppercase;
-        cursor: pointer; transition: all 0.15s;
-      }
-      .btn-reset:hover { border-color: var(--black); color: var(--black); }
-
-      /* ─── RIGHT COLUMN ─── */
-      .right-col {
-        padding: 48px 0 48px 48px;
-        position: sticky; top: 68px;
-        animation: fadeUp 0.5s ease 0.2s both;
-      }
-
-      /* ─── OUTPUT BOX ─── */
-      .output-wrap {
-        background: var(--black);
-        border-radius: var(--r-lg);
-        overflow: hidden;
-        min-height: 400px;
-        display: flex; flex-direction: column;
-      }
-      .output-wrap.tip-theme { background: #1a1505; }
-
-      .out-topbar {
-        padding: 16px 24px;
-        border-bottom: 1px solid rgba(255,255,255,0.08);
-        display: flex; align-items: center; justify-content: space-between;
-      }
-      .out-topbar-left { display: flex; align-items: center; gap: 10px; }
-      .traffic-dots { display: flex; gap: 6px; }
-      .td { width: 10px; height: 10px; border-radius: 50%; }
-      .td1 { background: #ff5f57; }
-      .td2 { background: #febc2e; }
-      .td3 { background: #28c840; }
-      .out-filename {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 12px; color: rgba(255,255,255,0.35);
-      }
-      .out-badges { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
-      .obadge {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 10px; font-weight: 500;
-        padding: 3px 10px; border-radius: 100px;
-        background: rgba(255,255,255,0.08);
-        color: rgba(255,255,255,0.3);
-        letter-spacing: 0.04em;
-      }
-      .obadge.g { background: rgba(45,90,61,0.5); color: #86efac; }
-      .obadge.a { background: rgba(200,168,75,0.4); color: #fcd34d; }
-      .obadge.e { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.7); }
-
-      .out-body {
-        flex: 1; padding: 28px;
-        display: flex; flex-direction: column;
-      }
-
-      /* Empty state */
-      .out-empty {
-        flex: 1; display: flex; flex-direction: column;
-        align-items: center; justify-content: center;
-        gap: 16px; text-align: center; padding: 40px 20px;
-      }
-      .empty-graphic {
-        width: 80px; height: 80px;
-        border: 1.5px solid rgba(255,255,255,0.08);
-        border-radius: 50%;
-        display: flex; align-items: center; justify-content: center;
-        font-size: 32px; opacity: 0.3;
-      }
-      .empty-text {
-        font-family: 'Syne', sans-serif;
-        font-size: 14px; color: rgba(255,255,255,0.2);
-        line-height: 1.7; font-weight: 400;
-      }
-
-      /* Prompt text */
-      .out-prompt {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 13px; line-height: 1.85;
-        color: #d4e8d4;
-        white-space: pre-wrap; word-break: break-word;
-        display: none; flex: 1;
-      }
-      .out-prompt.tip-color { color: #fde68a; }
-      .out-prompt.show { display: block; }
-
-      /* Footer */
-      .out-footer {
-        padding: 16px 28px;
-        border-top: 1px solid rgba(255,255,255,0.08);
-        display: none; align-items: center; gap: 10px;
-      }
-      .out-footer.show { display: flex; }
-
-      .char-info {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 11px; color: rgba(255,255,255,0.2);
-        margin-right: auto;
-      }
-
-      .btn-copy {
-        padding: 11px 24px;
-        background: var(--white); color: var(--black);
-        border: none; border-radius: var(--r);
-        font-family: 'Syne', sans-serif;
-        font-size: 13px; font-weight: 700;
-        letter-spacing: 0.04em; text-transform: uppercase;
-        cursor: pointer;
-        display: flex; align-items: center; gap: 7px;
-        transition: all 0.15s;
-      }
-      .btn-copy:hover { background: var(--gray100); }
-      .btn-copy.done { background: #22c55e; color: var(--white); }
-      .btn-copy.amber { background: var(--accent2); color: var(--white); }
-      .btn-copy.amber:hover { background: #b8912a; }
-
-      .btn-renew {
-        padding: 11px 16px;
-        background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.5);
-        border: none; border-radius: var(--r);
-        font-family: 'Syne', sans-serif;
-        font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing:0.04em;
-        cursor: pointer; transition: all 0.15s;
-      }
-      .btn-renew:hover { background: rgba(255,255,255,0.14); color: white; }
-
-      /* ─── GPT LAUNCH BUTTON ─── */
-      .btn-gpt-wrap { padding: 0 24px 22px; display: none; }
-      .btn-gpt-wrap.show { display: block; }
-      .btn-gpt {
-        width: 100%; padding: 16px 24px;
-        background: #10a37f; color: #fff;
-        border: none; border-radius: var(--r);
-        font-family: 'Syne', sans-serif;
-        font-size: 15px; font-weight: 800;
-        letter-spacing: 0.04em; text-transform: uppercase;
-        cursor: pointer;
-        display: flex; align-items: center; justify-content: center; gap: 10px;
-        transition: background 0.18s, transform 0.12s;
-        position: relative; overflow: hidden;
-      }
-      .btn-gpt::before { content:''; position:absolute; inset:0; background:rgba(255,255,255,0.1); transform:translateX(-101%); transition:transform 0.25s ease; }
-      .btn-gpt:hover { background: #0d8f6f; }
-      .btn-gpt:hover::before { transform: translateX(0); }
-      .btn-gpt:active { transform: scale(0.98); }
-      .btn-gpt svg, .btn-gpt span { position: relative; z-index: 1; }
-      .btn-gpt-sub { text-align:center; font-size:11px; color:rgba(255,255,255,0.25); margin-top:8px; font-family:'JetBrains Mono',monospace; letter-spacing:0.04em; }
-
-      /* ─── TEMPLATE NOTE ─── */
-      .tpl-note {
-        margin-top: 20px;
-        border: 1.5px solid var(--gray100);
-        border-radius: var(--r-lg);
-        padding: 20px 22px;
-      }
-      .tpl-note-title {
-        font-size: 11px; font-weight: 700;
-        letter-spacing: 0.1em; text-transform: uppercase;
-        color: var(--gray400); margin-bottom: 14px;
-        display: flex; align-items: center; gap: 8px;
-      }
-      .tpl-note-title::before { content:''; display:block; width:16px; height:1.5px; background:var(--gray300); }
-      .tpl-rows { display: flex; flex-direction: column; gap: 8px; }
-      .tpl-row { display: flex; gap: 10px; font-size: 13px; color: var(--gray600); line-height: 1.5; }
-      .tpl-row .chk { color: var(--accent); font-weight: 700; flex-shrink:0; }
-
-      /* ─── HISTORY ─── */
-      .hist-section { margin-top: 24px; }
-      .hist-head {
-        font-size: 11px; font-weight: 700;
-        letter-spacing: 0.12em; text-transform: uppercase;
-        color: var(--gray300); margin-bottom: 12px;
-        display: flex; align-items: center; gap: 10px;
-      }
-      .hist-head::after { content:''; flex:1; height:1px; background:var(--gray100); }
-      .hist-list { display: flex; flex-direction: column; gap: 6px; }
-      .hist-item {
-        border: 1.5px solid var(--gray100);
-        border-radius: var(--r);
-        padding: 12px 16px;
-        cursor: pointer;
-        transition: all 0.15s;
-        display: flex; align-items: center; gap: 12px;
-        background: var(--white);
-      }
-      .hist-item:hover { border-color: var(--black); transform: translateX(3px); }
-      .hist-pip { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink:0; }
-      .hist-pip.a { background: var(--accent2); }
-      .h-name { font-size: 15px; font-weight: 700; color: var(--black); }
-      .h-meta { font-size: 11px; color: var(--gray400); margin-top: 1px; font-family:'JetBrains Mono',monospace; }
-      .h-time { font-size: 11px; color: var(--gray300); margin-left:auto; flex-shrink:0; font-family:'JetBrains Mono',monospace; }
-      .hist-empty { font-size: 13px; color: var(--gray300); text-align:center; padding: 16px 0; }
-
-      /* ─── IMAGEN PANEL ─── */
-      .imagen-panel {
-        margin-top: 20px;
-        border: 1.5px solid var(--black);
-        border-radius: var(--r-lg);
-        overflow: hidden;
-        background: var(--white);
-      }
-      .imagen-head {
-        background: var(--black);
-        padding: 14px 20px;
-        display: flex; align-items: center; justify-content: space-between;
-      }
-      .imagen-head-left { display: flex; align-items: center; gap: 10px; }
-      .imagen-head-title {
-        font-family: 'Syne', sans-serif;
-        font-size: 12px; font-weight: 700;
-        letter-spacing: 0.1em; text-transform: uppercase;
-        color: var(--white);
-      }
-      .imagen-model-badge {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 10px; padding: 3px 9px;
-        border-radius: 100px;
-        background: rgba(255,255,255,0.12);
-        color: rgba(255,255,255,0.6);
-        letter-spacing: 0.04em;
-      }
-      .imagen-status {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 10px; color: rgba(255,255,255,0.35);
-        display: flex; align-items: center; gap: 6px;
-      }
-      .status-dot {
-        width: 6px; height: 6px; border-radius: 50%;
-        background: var(--gray300);
-        transition: background 0.3s;
-      }
-      .status-dot.ready { background: #22c55e; box-shadow: 0 0 0 3px rgba(34,197,94,0.2); animation: pulse2 2s infinite; }
-      .status-dot.loading { background: #f59e0b; animation: blink 0.8s infinite; }
-      .status-dot.error { background: var(--red); }
-      @keyframes pulse2 { 0%,100%{box-shadow:0 0 0 3px rgba(34,197,94,0.2)} 50%{box-shadow:0 0 0 6px rgba(34,197,94,0.08)} }
-      @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-
-      .imagen-config {
-        padding: 16px 20px;
-        border-bottom: 1px solid var(--gray100);
-        display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
-      }
-      .config-label {
-        font-size: 11px; font-weight: 700;
-        letter-spacing: 0.08em; text-transform: uppercase;
-        color: var(--gray500);
-      }
-      .aspect-btns { display: flex; gap: 6px; }
-      .aspect-btn {
-        padding: 5px 12px;
-        border: 1.5px solid var(--gray100);
-        border-radius: 100px;
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 11px; font-weight: 500;
-        color: var(--gray500);
-        background: var(--white); cursor: pointer;
-        transition: all 0.15s;
-      }
-      .aspect-btn:hover { border-color: var(--black); color: var(--black); }
-      .aspect-btn.active { background: var(--black); border-color: var(--black); color: var(--white); }
-
-      .count-btns { display: flex; gap: 6px; margin-left: auto; align-items: center; }
-      .count-btn {
-        width: 28px; height: 28px;
-        border: 1.5px solid var(--gray100);
-        border-radius: var(--r);
-        font-size: 14px; font-weight: 700;
-        color: var(--gray500);
-        background: var(--white); cursor: pointer;
-        display: flex; align-items: center; justify-content: center;
-        transition: all 0.15s;
-      }
-      .count-btn:hover { border-color: var(--black); color: var(--black); }
-      .count-val {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 13px; font-weight: 700;
-        color: var(--black); min-width: 20px; text-align: center;
-      }
-
-      /* Generate button */
-      .btn-imagen {
-        width: calc(100% - 40px);
-        margin: 16px 20px 0;
-        padding: 15px 24px;
-        background: var(--black); color: var(--white);
-        border: 2px solid var(--black);
-        border-radius: var(--r);
-        font-family: 'Syne', sans-serif;
-        font-size: 14px; font-weight: 800;
-        letter-spacing: 0.05em; text-transform: uppercase;
-        cursor: pointer;
-        display: flex; align-items: center; justify-content: center; gap: 10px;
-        transition: all 0.2s; position: relative; overflow: hidden;
-      }
-      .btn-imagen::after { content:''; position:absolute; inset:0; background:var(--white); transform:translateX(-101%); transition:transform 0.3s ease; }
-      .btn-imagen:hover::after { transform: translateX(0); }
-      .btn-imagen:hover { color: var(--black); }
-      .btn-imagen:disabled { background: var(--gray100); border-color: var(--gray100); color: var(--gray300); cursor: not-allowed; }
-      .btn-imagen:disabled::after { display: none; }
-      .btn-imagen span, .btn-imagen svg { position: relative; z-index: 1; }
-
-      /* Loading spinner */
-      .spinner {
-        width: 16px; height: 16px;
-        border: 2px solid rgba(255,255,255,0.3);
-        border-top-color: white;
-        border-radius: 50%;
-        animation: spin 0.7s linear infinite;
-        flex-shrink: 0;
-      }
-      .spinner.dark { border-color: rgba(0,0,0,0.15); border-top-color: var(--black); }
-      @keyframes spin { to { transform: rotate(360deg); } }
-
-      /* Image results grid */
-      .imagen-results {
-        padding: 16px 20px 20px;
-        display: none;
-      }
-      .imagen-results.show { display: block; }
-      .img-grid { display: grid; gap: 10px; }
-      .img-grid.cols-1 { grid-template-columns: 1fr; }
-      .img-grid.cols-2 { grid-template-columns: 1fr 1fr; }
-      .img-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
-      .img-grid.cols-4 { grid-template-columns: 1fr 1fr; }
-      .img-card {
-        position: relative; border-radius: var(--r);
-        overflow: hidden; background: var(--gray50);
-        aspect-ratio: 1;
-        border: 1px solid var(--gray100);
-      }
-      .img-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
-      .img-card-overlay {
-        position: absolute; inset: 0;
-        background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 50%);
-        opacity: 0; transition: opacity 0.2s;
-        display: flex; align-items: flex-end; justify-content: flex-end;
-        padding: 10px;
-      }
-      .img-card:hover .img-card-overlay { opacity: 1; }
-      .img-dl-btn {
-        background: var(--white); color: var(--black);
-        border: none; border-radius: var(--r);
-        padding: 6px 12px;
-        font-family: 'Syne', sans-serif;
-        font-size: 11px; font-weight: 700;
-        cursor: pointer; display: flex; align-items: center; gap: 5px;
-        transition: background 0.15s;
-      }
-      .img-dl-btn:hover { background: var(--gray50); }
-
-      /* Error & loading states */
-      .imagen-loading {
-        padding: 36px 20px;
-        text-align: center;
-        display: none;
-      }
-      .imagen-loading.show { display: block; }
-      .loading-bar-wrap {
-        height: 3px; background: var(--gray100);
-        border-radius: 100px; overflow: hidden;
-        margin: 16px 0 12px;
-      }
-      .loading-bar {
-        height: 100%; width: 0%;
-        background: var(--black);
-        border-radius: 100px;
-        transition: width 0.4s ease;
-        animation: loadpulse 2s ease-in-out infinite;
-      }
-      @keyframes loadpulse {
-        0% { width: 5%; }
-        50% { width: 80%; }
-        100% { width: 92%; }
-      }
-      .loading-text {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 12px; color: var(--gray400);
-      }
-      .imagen-error {
-        padding: 16px 20px;
-        margin: 0 20px 16px;
-        background: #fef2f2;
-        border: 1px solid #fecaca;
-        border-radius: var(--r);
-        font-size: 13px; color: var(--red);
-        display: none;
-      }
-      .imagen-error.show { display: block; }
-
-      /* Worker URL input */
-      .worker-config {
-        padding: 14px 20px;
-        border-bottom: 1px solid var(--gray100);
-        display: flex; gap: 8px; align-items: center;
-      }
-      .worker-config input {
-        flex: 1; padding: 8px 12px;
-        border: 1.5px solid var(--gray100);
-        border-radius: var(--r);
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 12px; color: var(--black);
-        background: var(--gray50); outline: none;
-        transition: border-color 0.15s;
-      }
-      .worker-config input:focus { border-color: var(--black); background: var(--white); }
-      .worker-config input::placeholder { color: var(--gray300); }
-      .worker-save-btn {
-        padding: 8px 16px;
-        background: var(--black); color: var(--white);
-        border: none; border-radius: var(--r);
-        font-family: 'Syne', sans-serif;
-        font-size: 12px; font-weight: 700; text-transform: uppercase;
-        cursor: pointer; white-space: nowrap;
-        transition: background 0.15s;
-      }
-      .worker-save-btn:hover { background: var(--gray700); }
-      .worker-saved { font-family:'JetBrains Mono',monospace; font-size:11px; color:#22c55e; display:none; margin-left:4px; }
-      .worker-saved.show { display:inline; }
-    </style>
-  </head>
-  <body>
-    <!-- ══ HEADER ══ -->
-    <header>
-      <div class="logo-area">
-        <span class="logo-word">Plant<em>Prompt</em></span>
-        <span class="logo-version">v5.0</span>
-      </div>
-      <div class="header-meta">
-        <span class="header-pill">GEMINI IMAGE GEN</span>
-        <div class="header-dot"></div>
-      </div>
-    </header>
-
-    <div class="page-wrap">
-      <!-- ════ LEFT: FORM ════ -->
-      <div class="left-col">
-        <div class="page-title-block">
-          <div class="page-eyebrow">Công cụ nội bộ</div>
-          <h1 class="page-title">Tạo prompt<br /><em>chuẩn</em> tức thì</h1>
-          <p class="page-sub">
-            Điền thông tin → hệ thống ghép template chuẩn → copy vào Gemini tạo
-            ảnh ngay.
-          </p>
-        </div>
-
-        <!-- ① NGÁCH -->
-        <div class="step-block">
-          <div class="step-label">
-            <div class="step-num" id="sn1">1</div>
-            <span class="step-title">Ngách sản phẩm</span>
-          </div>
-          <div class="niche-grid">
-            <div class="niche-opt">
-              <input type="radio" name="niche" id="nf" value="flower" />
-              <label class="niche-card" for="nf">
-                <span class="niche-icon">🌸</span>
-                <span class="niche-name">Flower</span>
-                <span class="niche-sub">Cây hoa</span>
-              </label>
-            </div>
-            <div class="niche-opt">
-              <input type="radio" name="niche" id="nfr" value="fruit" />
-              <label class="niche-card" for="nfr">
-                <span class="niche-icon">🍋</span>
-                <span class="niche-name">Fruit</span>
-                <span class="niche-sub">Cây ăn quả</span>
-              </label>
-            </div>
-            <div class="niche-opt">
-              <input type="radio" name="niche" id="nh" value="herb" />
-              <label class="niche-card" for="nh">
-                <span class="niche-icon">🌿</span>
-                <span class="niche-name">Herb</span>
-                <span class="niche-sub">Thảo mộc</span>
-              </label>
-            </div>
-          </div>
-          <div class="field-err" id="err-niche">
-            ↑ Vui lòng chọn ngách sản phẩm
-          </div>
-        </div>
-
-        <div class="divider"></div>
-
-        <!-- ② LOẠI ẢNH -->
-        <div class="step-block">
-          <div class="step-label">
-            <div class="step-num" id="sn2">2</div>
-            <span class="step-title">Loại ảnh</span>
-          </div>
-          <div class="type-grid">
-            <div class="type-opt">
-              <input type="radio" name="imgtype" id="tm" value="main" />
-              <label class="type-card" for="tm">
-                <div class="type-icon-wrap">📸</div>
-                <div class="type-info">
-                  <div class="t-name">Ảnh chính</div>
-                  <div class="t-desc">Main product photo</div>
-                </div>
-              </label>
-            </div>
-            <div class="type-opt">
-              <input type="radio" name="imgtype" id="tt" value="tip" />
-              <label class="type-card" for="tt">
-                <div class="type-icon-wrap">💧</div>
-                <div class="type-info">
-                  <div class="t-name">Tip Care</div>
-                  <div class="t-desc">Care guide photo</div>
-                </div>
-              </label>
-            </div>
-          </div>
-          <div class="field-err" id="err-type">↑ Vui lòng chọn loại ảnh</div>
-        </div>
-
-        <div class="divider"></div>
-
-        <!-- ③ TRÌNH BÀY -->
-        <div class="step-block">
-          <div class="step-label">
-            <div class="step-num" id="sn3">3</div>
-            <span class="step-title">Cách trình bày cây</span>
-          </div>
-          <div class="pres-grid">
-            <div class="pres-opt">
-              <input type="radio" name="pres" id="pp" value="plug" />
-              <label class="pres-card" for="pp">
-                <span class="pres-icon">🪨</span>
-                <div class="pres-info">
-                  <div class="p-name">Soil Plug</div>
-                  <div class="p-desc">Bọc đất, root ball lộ ra, không chậu</div>
-                </div>
-              </label>
-            </div>
-            <div class="pres-opt">
-              <input type="radio" name="pres" id="ppot" value="pot" />
-              <label class="pres-card" for="ppot">
-                <span class="pres-icon">🪴</span>
-                <div class="pres-info">
-                  <div class="p-name">Potted</div>
-                  <div class="p-desc">Đựng trong chậu, tự nhập size & kiểu</div>
-                </div>
-              </label>
-            </div>
-          </div>
-          <div class="field-err" id="err-pres">
-            ↑ Vui lòng chọn cách trình bày
-          </div>
-
-          <!-- Pot fields — hiện khi chọn Potted -->
-          <div class="pot-extra" id="pot-extra">
-            <div class="field" style="margin-bottom: 0">
-              <div class="field-label">
-                Kích thước chậu <span class="opt-badge">Tùy chọn</span>
-              </div>
-              <input
-                type="text"
-                id="pot-size"
-                placeholder="VD: 4 inch, 6 inch, 1 gallon…"
-              />
-            </div>
-            <div class="field" style="margin-bottom: 0">
-              <div class="field-label">
-                Kiểu chậu <span class="opt-badge">Tùy chọn</span>
-              </div>
-              <input
-                type="text"
-                id="pot-style"
-                placeholder="VD: terracotta, black nursery pot…"
-              />
-            </div>
-          </div>
-        </div>
-
-        <div class="divider"></div>
-
-        <!-- ④ THÔNG TIN CÂY -->
-        <div class="step-block">
-          <div class="step-label">
-            <div class="step-num" id="sn4">4</div>
-            <span class="step-title">Thông tin cây</span>
-          </div>
-
-          <div class="field">
-            <div class="field-label">
-              <div class="req-dot"></div>
-              Tên cây
-            </div>
-            <input
-              type="text"
-              id="plant-name"
-              placeholder="VD: Rose, Strawberry, Basil…"
-              autocomplete="off"
-              spellcheck="false"
-            />
-            <div class="field-err" id="err-name">Vui lòng nhập tên cây</div>
-            <div class="field-hint">
-              // Nhập tên tiếng Anh để Gemini hiểu chính xác
-            </div>
-          </div>
-
-          <div class="field">
-            <div class="field-label">
-              <div class="req-dot"></div>
-              Chiều cao cây
-            </div>
-            <div class="height-row">
-              <input
-                type="number"
-                id="plant-height"
-                placeholder="VD: 1.5"
-                min="0.1"
-                max="50"
-                step="0.1"
-              />
-              <div class="unit-badge">ft</div>
-            </div>
-            <div class="field-err" id="err-height">Vui lòng nhập chiều cao</div>
-            <div class="field-hint" id="height-hint">
-              // Nhập số thập phân, VD: 1.5 ft ≈ 18 inches
-            </div>
-          </div>
-
-          <!-- Tip Care extra -->
-          <div class="tip-extra" id="tip-extra">
-            <div class="tip-notice">
-              <strong>💡 Tip Care:</strong> Nhập tên mẹo để AI tạo đúng hành
-              động.<br />
-              VD: <em>watering, pruning, fertilizing, repotting…</em> — để trống
-              dùng mặc định.
-            </div>
-            <div class="field">
-              <div class="field-label">
-                Tên mẹo chăm sóc <span class="opt-badge">Tùy chọn</span>
-              </div>
-              <input
-                type="text"
-                id="tip-name"
-                placeholder="VD: watering, pruning, fertilizing…"
-              />
-            </div>
-          </div>
-
-          <!-- Optional details -->
-          <div class="opt-toggle" id="opt-toggle" onclick="toggleOpt()">
-            <span class="opt-arrow">▸</span>
-            Thêm đặc điểm chi tiết
-            <span class="opt-badge" style="margin-left: 4px">Tùy chọn</span>
-          </div>
-          <div class="opt-fields" id="opt-fields">
-            <div class="field">
-              <div class="field-label">
-                Đặc điểm lá <span class="opt-badge">Tùy chọn</span>
-              </div>
-              <input
-                type="text"
-                id="leaf-desc"
-                placeholder="VD: glossy, broad green / soft, deeply veined"
-              />
-            </div>
-            <div class="field" id="feat-wrap">
-              <div class="field-label">
-                <span id="feat-lbl">Đặc điểm hoa / quả</span>
-                <span class="opt-badge">Tùy chọn</span>
-              </div>
-              <input
-                type="text"
-                id="feat-desc"
-                placeholder="VD: vibrant red petals with yellow center"
-              />
-            </div>
-            <div class="field" id="extra-wrap" style="display: none">
-              <div class="field-label">
-                Chi tiết bổ sung (Herb) <span class="opt-badge">Tùy chọn</span>
-              </div>
-              <input
-                type="text"
-                id="extra-desc"
-                placeholder="VD: The leaves display subtle textural hairs catching the light"
-              />
-            </div>
-          </div>
-        </div>
-
-        <div class="divider"></div>
-
-        <button class="btn-gen" id="btn-gen" onclick="generate()">
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <polygon points="5 3 19 12 5 21 5 3" />
-          </svg>
-          <span id="btn-lbl">Generate Prompt</span>
-        </button>
-        <button class="btn-reset" onclick="resetAll()">↺ Reset Form</button>
-
-        <div class="tpl-note">
-          <div class="tpl-note-title">Template Info</div>
-          <div class="tpl-rows">
-            <div class="tpl-row">
-              <span class="chk">✓</span
-              ><span
-                ><strong>6 templates:</strong> 3 ngách × 2 loại ảnh (Main + Tip
-                Care)</span
-              >
-            </div>
-            <div class="tpl-row">
-              <span class="chk">✓</span
-              ><span
-                ><strong>Soil Plug</strong>: root ball + peat soil, không chậu,
-                white BG 8K 1:1</span
-              >
-            </div>
-            <div class="tpl-row">
-              <span class="chk">✓</span
-              ><span
-                ><strong>Potted</strong>: tự nhập size & kiểu chậu bất kỳ</span
-              >
-            </div>
-            <div class="tpl-row">
-              <span class="chk">✓</span
-              ><span
-                >Chiều cao đơn vị <strong>feet</strong>, tự động hiển thị
-                inches</span
-              >
-            </div>
-          </div>
-        </div>
-
-        <div class="hist-section">
-          <div class="hist-head">Session History</div>
-          <div class="hist-list" id="hist-list">
-            <div class="hist-empty">No prompts generated yet</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ════ RIGHT: OUTPUT ════ -->
-      <div class="right-col">
-        <div class="output-wrap" id="out-wrap">
-          <div class="out-topbar">
-            <div class="out-topbar-left">
-              <div class="traffic-dots">
-                <div class="td td1"></div>
-                <div class="td td2"></div>
-                <div class="td td3"></div>
-              </div>
-              <span class="out-filename">prompt_output.txt</span>
-            </div>
-            <div class="out-badges">
-              <span class="obadge" id="ob-niche">—</span>
-              <span class="obadge" id="ob-type">—</span>
-              <span class="obadge" id="ob-pres">—</span>
-            </div>
-          </div>
-
-          <div class="out-body">
-            <div class="out-empty" id="out-empty">
-              <div class="empty-graphic">🌱</div>
-              <div class="empty-text">
-                Hoàn thành 4 bước bên trái<br />
-                và nhấn <strong>Generate Prompt</strong>
-              </div>
-            </div>
-            <pre class="out-prompt" id="out-prompt"></pre>
-          </div>
-
-          <div class="out-footer" id="out-footer">
-            <span class="char-info" id="char-info"></span>
-            <button class="btn-copy" id="btn-copy" onclick="copyPrompt()">
-              <svg
-                width="13"
-                height="13"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <rect x="9" y="9" width="13" height="13" rx="2" />
-                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
-              </svg>
-              <span id="copy-lbl">Copy</span>
-            </button>
-            <button class="btn-renew" onclick="resetAll()">Reset</button>
-          </div>
-
-          <!-- GPT LAUNCH -->
-          <div class="btn-gpt-wrap" id="gpt-wrap">
-            <button class="btn-gpt" onclick="openInGPT()">
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path
-                  d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
-                />
-              </svg>
-              <span>Mở trong ChatGPT → Tạo ảnh ngay</span>
-              <svg
-                width="15"
-                height="15"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path
-                  d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"
-                />
-                <polyline points="15 3 21 3 21 9" />
-                <line x1="10" y1="14" x2="21" y2="3" />
-              </svg>
-            </button>
-            <div class="btn-gpt-sub">
-              Mở tab ChatGPT · TIP CARE SUPER PRO · Prompt đã nhúng sẵn
-            </div>
-          </div>
-        </div>
-
-        <!-- ════ IMAGEN 4 PANEL ════ -->
-        <div class="imagen-panel" id="imagen-panel">
-          <!-- Header -->
-          <div class="imagen-head">
-            <div class="imagen-head-left">
-              <span class="imagen-head-title">Imagen 4 Fast</span>
-              <span class="imagen-model-badge">imagen-4.0-fast</span>
-            </div>
-            <div class="imagen-status">
-              <div class="status-dot" id="status-dot"></div>
-              <span id="status-text">Chưa cấu hình</span>
-            </div>
-          </div>
-
-          <!-- API Key config -->
-          <div class="worker-config">
-            <input
-              type="password"
-              id="worker-url"
-              placeholder="AIzaSyB6FVeca3Mktp53fGZO8VSg61TjCPDi0Fw"
-              spellcheck="false"
-              autocomplete="off"
-            />
-            <button class="worker-save-btn" onclick="saveWorkerUrl()">
-              Lưu
-            </button>
-            <span class="worker-saved" id="worker-saved">✓ Đã lưu</span>
-          </div>
-
-          <!-- Aspect ratio + sample count -->
-          <div class="imagen-config">
-            <span class="config-label">Tỉ lệ</span>
-            <div class="aspect-btns">
-              <button
-                class="aspect-btn active"
-                data-ratio="1:1"
-                onclick="setAspect(this)"
-              >
-                1:1
-              </button>
-              <button
-                class="aspect-btn"
-                data-ratio="4:3"
-                onclick="setAspect(this)"
-              >
-                4:3
-              </button>
-              <button
-                class="aspect-btn"
-                data-ratio="3:4"
-                onclick="setAspect(this)"
-              >
-                3:4
-              </button>
-              <button
-                class="aspect-btn"
-                data-ratio="16:9"
-                onclick="setAspect(this)"
-              >
-                16:9
-              </button>
-              <button
-                class="aspect-btn"
-                data-ratio="9:16"
-                onclick="setAspect(this)"
-              >
-                9:16
-              </button>
-            </div>
-            <div class="count-btns">
-              <button class="count-btn" onclick="changeCount(-1)">−</button>
-              <span class="count-val" id="count-val">1</span>
-              <button class="count-btn" onclick="changeCount(1)">+</button>
-              <span class="config-label" style="margin-left: 4px">ảnh</span>
-            </div>
-          </div>
-
-          <!-- Generate btn -->
-          <button
-            class="btn-imagen"
-            id="btn-imagen"
-            onclick="generateImage()"
-            disabled
-          >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2.2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <rect x="3" y="3" width="18" height="18" rx="2" />
-              <circle cx="8.5" cy="8.5" r="1.5" />
-              <polyline points="21 15 16 10 5 21" />
-            </svg>
-            <span id="btn-imagen-lbl">Tạo ảnh với Imagen 4</span>
-          </button>
-
-          <!-- Loading state -->
-          <div class="imagen-loading" id="imagen-loading">
-            <div class="loading-bar-wrap"><div class="loading-bar"></div></div>
-            <div class="loading-text" id="loading-text">
-              Đang gửi tới Imagen 4 Fast…
-            </div>
-          </div>
-
-          <!-- Error -->
-          <div class="imagen-error" id="imagen-error"></div>
-
-          <!-- Results grid -->
-          <div class="imagen-results" id="imagen-results">
-            <div class="img-grid" id="img-grid"></div>
-          </div>
-        </div>
-        <!-- /imagen-panel -->
-      </div>
-      <!-- /right-col -->
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Plant Prompt Generator</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --green: #1a7a4a;
+  --green-light: #e8f5ee;
+  --green-border: #b2d8c0;
+  --gray: #f4f4f4;
+  --gray2: #e8e8e8;
+  --gray3: #999;
+  --gray4: #555;
+  --black: #111;
+  --white: #fff;
+  --red: #d32f2f;
+  --blue: #1565c0;
+  --border: #ddd;
+  --radius: 6px;
+}
+body { font-family: Arial, sans-serif; font-size: 15px; background: #f0f0f0; color: var(--black); }
+
+/* ── HEADER ── */
+.header {
+  background: var(--green);
+  color: var(--white);
+  padding: 0 24px;
+  height: 52px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+}
+.header-title { font-size: 17px; font-weight: bold; }
+.header-badge { font-size: 12px; background: rgba(255,255,255,0.2); padding: 3px 10px; border-radius: 12px; }
+
+/* ── LAYOUT ── */
+.wrap { max-width: 1100px; margin: 0 auto; padding: 20px 16px 60px; display: grid; grid-template-columns: 440px 1fr; gap: 16px; }
+@media(max-width:800px){ .wrap { grid-template-columns: 1fr; } }
+
+/* ── CARD ── */
+.card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.card-title { font-size: 13px; font-weight: bold; text-transform: uppercase; letter-spacing: .06em; color: var(--gray4); padding: 12px 16px; border-bottom: 1px solid var(--border); background: var(--gray); }
+
+/* ── FORM ── */
+.form-body { padding: 16px; }
+.step-label { font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: .08em; color: var(--gray3); margin-bottom: 8px; margin-top: 16px; }
+.step-label:first-child { margin-top: 0; }
+
+/* Niche grid */
+.niche-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+.niche-opt input { display: none; }
+.niche-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 12px 6px; border: 2px solid var(--border);
+  border-radius: var(--radius); cursor: pointer;
+  background: var(--white); text-align: center; transition: all .15s;
+}
+.niche-btn:hover { border-color: var(--green); }
+.niche-btn .ico { font-size: 22px; }
+.niche-btn .nm { font-size: 12px; font-weight: bold; color: var(--gray4); }
+.niche-btn .sb { font-size: 11px; color: var(--gray3); }
+.niche-opt input:checked + .niche-btn { border-color: var(--green); background: var(--green-light); }
+.niche-opt input:checked + .niche-btn .nm { color: var(--green); }
+
+/* Type grid */
+.type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.type-opt input { display: none; }
+.type-btn {
+  display: flex; align-items: center; gap: 10px;
+  padding: 11px 14px; border: 2px solid var(--border);
+  border-radius: var(--radius); cursor: pointer;
+  background: var(--white); transition: all .15s;
+}
+.type-btn:hover { border-color: var(--green); }
+.type-btn .t-ico { font-size: 20px; }
+.type-btn .t-name { font-size: 14px; font-weight: bold; color: var(--black); }
+.type-btn .t-sub { font-size: 11px; color: var(--gray3); }
+.type-opt input:checked + .type-btn { border-color: var(--green); background: var(--green-light); }
+
+/* Pres grid */
+.pres-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.pres-opt input { display: none; }
+.pres-btn {
+  display: flex; align-items: center; gap: 10px;
+  padding: 11px 14px; border: 2px solid var(--border);
+  border-radius: var(--radius); cursor: pointer;
+  background: var(--white); transition: all .15s;
+}
+.pres-btn:hover { border-color: var(--green); }
+.pres-btn .p-ico { font-size: 20px; }
+.pres-btn .p-name { font-size: 14px; font-weight: bold; color: var(--black); }
+.pres-btn .p-sub { font-size: 11px; color: var(--gray3); }
+.pres-opt input:checked + .pres-btn { border-color: var(--green); background: var(--green-light); }
+
+/* Pot extra */
+.pot-extra { display: none; margin-top: 10px; }
+.pot-extra.show { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+/* Fields */
+.field { margin-top: 12px; }
+.field label { display: block; font-size: 13px; font-weight: bold; color: var(--gray4); margin-bottom: 5px; }
+.req { color: var(--green); }
+.opt-tag { font-size: 11px; font-weight: normal; color: var(--gray3); background: var(--gray); padding: 1px 7px; border-radius: 10px; margin-left: 4px; }
+input[type=text], input[type=number], input[type=password] {
+  width: 100%; padding: 9px 12px;
+  border: 1.5px solid var(--border); border-radius: var(--radius);
+  font-family: Arial, sans-serif; font-size: 14px; color: var(--black);
+  background: var(--white); outline: none; transition: border-color .15s;
+}
+input:focus { border-color: var(--green); }
+input::placeholder { color: #bbb; }
+input.err-input { border-color: var(--red) !important; }
+.height-row { display: flex; gap: 8px; }
+.height-row input { flex: 1; }
+.unit-tag { padding: 9px 14px; background: var(--black); color: var(--white); border-radius: var(--radius); font-size: 14px; font-weight: bold; display: flex; align-items: center; }
+.hint { font-size: 11px; color: var(--gray3); margin-top: 4px; }
+.err { font-size: 12px; color: var(--red); margin-top: 4px; display: none; }
+.err.show { display: block; }
+
+/* Tip notice */
+.tip-extra { display: none; }
+.tip-extra.show { display: block; }
+.tip-notice { background: #fff8e1; border: 1px solid #ffe082; border-radius: var(--radius); padding: 10px 14px; font-size: 13px; color: #5d4037; margin-top: 10px; margin-bottom: 10px; line-height: 1.5; }
+
+/* Opt toggle */
+.opt-toggle { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--gray3); cursor: pointer; padding: 10px 0; border-top: 1px dashed var(--border); margin-top: 12px; user-select: none; }
+.opt-toggle:hover { color: var(--green); }
+.opt-arrow { transition: transform .2s; }
+.opt-toggle.open .opt-arrow { transform: rotate(90deg); }
+.opt-fields { display: none; }
+.opt-fields.open { display: block; }
+
+/* Divider */
+.divider { height: 1px; background: var(--border); margin: 16px 0; }
+
+/* Buttons */
+.btn-gen {
+  width: 100%; margin-top: 16px; padding: 13px;
+  background: var(--green); color: var(--white);
+  border: none; border-radius: var(--radius);
+  font-family: Arial, sans-serif; font-size: 15px; font-weight: bold;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: background .15s;
+}
+.btn-gen:hover { background: #155e38; }
+.btn-gen:active { transform: scale(.98); }
+.btn-gen.tip-mode { background: #d97706; }
+.btn-gen.tip-mode:hover { background: #b45309; }
+
+.btn-reset {
+  width: 100%; margin-top: 8px; padding: 10px;
+  background: var(--white); color: var(--gray4);
+  border: 1.5px solid var(--border); border-radius: var(--radius);
+  font-family: Arial, sans-serif; font-size: 13px; cursor: pointer;
+  transition: all .15s;
+}
+.btn-reset:hover { border-color: var(--green); color: var(--green); }
+
+/* ── RIGHT COLUMN ── */
+.right-col { display: flex; flex-direction: column; gap: 16px; }
+.right-sticky { position: sticky; top: 68px; display: flex; flex-direction: column; gap: 16px; }
+
+/* Output card */
+.out-card { background: #1a1a1a; border-radius: var(--radius); overflow: hidden; }
+.out-topbar { padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,.1); display: flex; align-items: center; justify-content: space-between; }
+.out-dots { display: flex; gap: 5px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; }
+.d1{background:#ff5f57;} .d2{background:#febc2e;} .d3{background:#28c840;}
+.out-fname { font-size: 12px; color: rgba(255,255,255,.3); font-family: monospace; }
+.out-tags { display: flex; gap: 5px; }
+.otag { font-size: 10px; padding: 2px 8px; border-radius: 10px; background: rgba(255,255,255,.1); color: rgba(255,255,255,.3); font-family: monospace; }
+.otag.green { background: rgba(26,122,74,.4); color: #6ee7a8; }
+.otag.amber { background: rgba(217,119,6,.4); color: #fcd34d; }
+.otag.white { background: rgba(255,255,255,.2); color: rgba(255,255,255,.8); }
+
+.out-body { padding: 20px; min-height: 200px; display: flex; flex-direction: column; }
+.out-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; color: rgba(255,255,255,.2); text-align: center; padding: 30px 0; font-size: 14px; }
+.out-empty-icon { font-size: 36px; opacity: .3; }
+
+.out-text { font-family: monospace; font-size: 13px; line-height: 1.8; color: #a8d8b8; white-space: pre-wrap; word-break: break-word; display: none; }
+.out-text.show { display: block; }
+.out-text.tip-color { color: #fde68a; }
+
+.out-foot { padding: 12px 16px; border-top: 1px solid rgba(255,255,255,.1); display: none; align-items: center; gap: 8px; }
+.out-foot.show { display: flex; }
+.chars { font-family: monospace; font-size: 11px; color: rgba(255,255,255,.25); margin-right: auto; }
+
+.btn-copy {
+  padding: 9px 20px; background: var(--white); color: var(--black);
+  border: none; border-radius: var(--radius);
+  font-family: Arial, sans-serif; font-size: 13px; font-weight: bold;
+  cursor: pointer; display: flex; align-items: center; gap: 6px;
+  transition: background .15s;
+}
+.btn-copy:hover { background: #eee; }
+.btn-copy.done { background: #22c55e; color: var(--white); }
+.btn-copy.amber { background: #d97706; color: var(--white); }
+
+.btn-reset2 { padding: 9px 14px; background: rgba(255,255,255,.08); color: rgba(255,255,255,.5); border: none; border-radius: var(--radius); font-family: Arial, sans-serif; font-size: 13px; cursor: pointer; }
+.btn-reset2:hover { background: rgba(255,255,255,.14); color: var(--white); }
+
+/* GPT button */
+.btn-gpt-wrap { display: none; padding: 0 16px 14px; }
+.btn-gpt-wrap.show { display: block; }
+.btn-gpt {
+  width: 100%; padding: 13px; background: #10a37f; color: var(--white);
+  border: none; border-radius: var(--radius);
+  font-family: Arial, sans-serif; font-size: 14px; font-weight: bold;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: background .15s;
+}
+.btn-gpt:hover { background: #0d8f6f; }
+.btn-gpt-note { font-size: 11px; color: rgba(255,255,255,.3); text-align: center; margin-top: 6px; font-family: monospace; }
+
+/* ── IMAGEN PANEL ── */
+.imagen-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.imagen-head { background: var(--black); padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; }
+.imagen-head-left { display: flex; align-items: center; gap: 8px; }
+.imagen-title { font-size: 13px; font-weight: bold; color: var(--white); }
+.imagen-model { font-size: 11px; padding: 2px 9px; background: rgba(255,255,255,.12); color: rgba(255,255,255,.55); border-radius: 10px; font-family: monospace; }
+.status-row { display: flex; align-items: center; gap: 6px; }
+.sdot { width: 7px; height: 7px; border-radius: 50%; background: #666; flex-shrink: 0; }
+.sdot.ready { background: #22c55e; box-shadow: 0 0 0 3px rgba(34,197,94,.2); }
+.sdot.loading { background: #f59e0b; animation: blink .8s infinite; }
+.sdot.error { background: var(--red); }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+.stxt { font-size: 12px; color: rgba(255,255,255,.4); font-family: monospace; }
+
+/* API key row */
+.api-row { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; gap: 8px; align-items: center; background: #fafafa; }
+.api-row input { flex: 1; font-family: monospace; font-size: 13px; }
+.btn-save { padding: 9px 16px; background: var(--black); color: var(--white); border: none; border-radius: var(--radius); font-family: Arial, sans-serif; font-size: 13px; font-weight: bold; cursor: pointer; white-space: nowrap; }
+.btn-save:hover { background: #333; }
+.saved-txt { font-size: 12px; color: var(--green); display: none; font-weight: bold; }
+.saved-txt.show { display: inline; }
+
+/* Config row */
+.config-row { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.cfg-label { font-size: 12px; font-weight: bold; color: var(--gray4); text-transform: uppercase; letter-spacing: .05em; white-space: nowrap; }
+.ratio-btns { display: flex; gap: 5px; }
+.ratio-btn { padding: 5px 11px; border: 1.5px solid var(--border); border-radius: 12px; font-family: Arial, sans-serif; font-size: 12px; font-weight: bold; color: var(--gray4); background: var(--white); cursor: pointer; transition: all .15s; }
+.ratio-btn:hover { border-color: var(--green); color: var(--green); }
+.ratio-btn.active { background: var(--black); border-color: var(--black); color: var(--white); }
+.count-row { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+.cnt-btn { width: 28px; height: 28px; border: 1.5px solid var(--border); border-radius: var(--radius); font-size: 16px; color: var(--gray4); background: var(--white); cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; transition: all .15s; }
+.cnt-btn:hover { border-color: var(--black); color: var(--black); }
+.cnt-val { font-size: 15px; font-weight: bold; min-width: 18px; text-align: center; }
+
+/* Generate imagen btn */
+.btn-imagen-wrap { padding: 14px 16px 0; }
+.btn-imagen {
+  width: 100%; padding: 13px;
+  background: var(--black); color: var(--white);
+  border: none; border-radius: var(--radius);
+  font-family: Arial, sans-serif; font-size: 15px; font-weight: bold;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: background .15s;
+}
+.btn-imagen:hover:not(:disabled) { background: #333; }
+.btn-imagen:disabled { background: #ccc; color: #999; cursor: not-allowed; }
+
+/* Loading */
+.img-loading { padding: 20px 16px; display: none; }
+.img-loading.show { display: block; }
+.load-bar-bg { height: 4px; background: var(--gray2); border-radius: 2px; overflow: hidden; margin: 10px 0 8px; }
+.load-bar { height: 100%; background: var(--black); border-radius: 2px; animation: loadfill 3s ease-in-out infinite; }
+@keyframes loadfill { 0%{width:5%} 60%{width:80%} 100%{width:90%} }
+.load-txt { font-size: 13px; color: var(--gray3); text-align: center; }
+
+/* Error */
+.img-error { margin: 12px 16px; padding: 10px 14px; background: #fef2f2; border: 1px solid #fecaca; border-radius: var(--radius); font-size: 13px; color: var(--red); display: none; }
+.img-error.show { display: block; }
+
+/* Results */
+.img-results { padding: 14px 16px 16px; display: none; }
+.img-results.show { display: block; }
+.img-grid { display: grid; gap: 8px; }
+.img-grid.c1 { grid-template-columns: 1fr; }
+.img-grid.c2 { grid-template-columns: 1fr 1fr; }
+.img-grid.c3 { grid-template-columns: 1fr 1fr 1fr; }
+.img-grid.c4 { grid-template-columns: 1fr 1fr; }
+.img-item { position: relative; border-radius: var(--radius); overflow: hidden; aspect-ratio: 1; background: var(--gray); border: 1px solid var(--border); }
+.img-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.img-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,.6)); padding: 16px 10px 10px; display: flex; justify-content: flex-end; opacity: 0; transition: opacity .2s; }
+.img-item:hover .img-overlay { opacity: 1; }
+.dl-btn { padding: 5px 12px; background: var(--white); color: var(--black); border: none; border-radius: 4px; font-family: Arial, sans-serif; font-size: 12px; font-weight: bold; cursor: pointer; }
+.dl-btn:hover { background: #f0f0f0; }
+
+/* History */
+.hist-section { margin-top: 16px; }
+.hist-title { font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: .08em; color: var(--gray3); margin-bottom: 10px; }
+.hist-list { display: flex; flex-direction: column; gap: 6px; }
+.hist-item { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 14px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: border-color .15s; }
+.hist-item:hover { border-color: var(--green); }
+.hist-pip { width: 6px; height: 6px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+.hist-pip.amber { background: #d97706; }
+.hist-name { font-size: 14px; font-weight: bold; }
+.hist-meta { font-size: 11px; color: var(--gray3); font-family: monospace; margin-top: 1px; }
+.hist-time { font-size: 11px; color: var(--gray3); margin-left: auto; flex-shrink: 0; }
+.hist-empty { font-size: 13px; color: var(--gray3); text-align: center; padding: 14px 0; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-title">🌿 Plant Prompt Generator</div>
+  <div class="header-badge">Nội bộ · Imagen 4 Fast</div>
+</div>
+
+<div class="wrap">
+
+<!-- ══ LEFT: FORM ══ -->
+<div>
+<div class="card">
+  <div class="card-title">Tạo prompt ảnh sản phẩm</div>
+  <div class="form-body">
+
+    <!-- ① NGÁCH -->
+    <div class="step-label">① Ngách sản phẩm *</div>
+    <div class="niche-grid">
+      <div class="niche-opt"><input type="radio" name="niche" id="nf" value="flower"/>
+        <label class="niche-btn" for="nf"><span class="ico">🌸</span><span class="nm">FLOWER</span><span class="sb">Cây hoa</span></label></div>
+      <div class="niche-opt"><input type="radio" name="niche" id="nfr" value="fruit"/>
+        <label class="niche-btn" for="nfr"><span class="ico">🍋</span><span class="nm">FRUIT</span><span class="sb">Cây ăn quả</span></label></div>
+      <div class="niche-opt"><input type="radio" name="niche" id="nh" value="herb"/>
+        <label class="niche-btn" for="nh"><span class="ico">🌿</span><span class="nm">HERB</span><span class="sb">Thảo mộc</span></label></div>
     </div>
-    <!-- /page-wrap -->
+    <div class="err" id="err-niche">Vui lòng chọn ngách</div>
 
-    <script>
-      // ══════════════════════════════════════════════════════════
-      //  HELPERS
-      // ══════════════════════════════════════════════════════════
-      function feetToDisplay(ft) {
-        const w = Math.floor(ft),
-          i = Math.round((ft - w) * 12);
-        if (w === 0) return `${i} inches`;
-        if (i === 0) return `${w} ft`;
-        return `${w} ft ${i} in`;
-      }
-      function plugPhrase() {
-        return `It is presented strictly as a well-developed soil plug (root ball only) standing freely and upright, completely without a pot. The perfectly proportioned cylindrical base reveals dark, moist peat soil firmly bound by a dense, healthy network of intricate fine white roots.`;
-      }
-      function pottedPhrase(sz, st) {
-        const style = st || "terracotta pot";
-        const size = sz ? `a ${sz} ` : "a ";
-        return `It is presented potted in ${size}${style}, sitting upright and well-centered. The pot is clean and proportional to the plant, showcasing the plant's healthy root system and vibrant growth.`;
-      }
-      function tipAction(tip) {
-        const t = (tip || "").toLowerCase();
-        if (t.includes("water")) return "carefully watering";
-        if (t.includes("prun")) return "precisely pruning";
-        if (t.includes("fertil")) return "gently applying fertilizer to";
-        if (t.includes("repot")) return "carefully repotting";
-        if (t.includes("harvest")) return "harvesting fresh leaves from";
-        if (t.includes("mist")) return "misting";
-        if (t.includes("trim")) return "trimming";
-        return `performing ${tip || "care"} on`;
-      }
-      function tipProp(tip) {
-        const t = (tip || "").toLowerCase();
-        if (t.includes("water")) return "small copper watering can";
-        if (t.includes("prun") || t.includes("trim"))
-          return "pair of clean pruning scissors";
-        if (t.includes("fertil")) return "small bottle of liquid fertilizer";
-        if (t.includes("repot")) return "bag of fresh potting soil";
-        if (t.includes("harvest")) return "small wooden cutting board";
-        if (t.includes("mist")) return "glass spray bottle";
-        return "small gardening tool";
-      }
-      function tipContainerPhrase(pres, sz, st) {
-        if (pres === "plug")
-          return `The plant's root ball is wrapped neatly in dark moist peat soil, held without a pot.`;
-        const style = st || "terracotta pot",
-          size = sz ? `a ${sz} ` : "a ";
-        return `The plant sits in ${size}${style}.`;
-      }
+    <div class="divider"></div>
 
-      // ── DEFAULTS ──────────────────────────────────────────────
-      const DEF = {
-        flower: {
-          leaf: "textured, dark green",
-          feat: "vibrant, large velvety petals with a delicate center",
-          tip: "watering",
-        },
-        fruit: {
-          leaf: "glossy, broad green",
-          feat: "numerous bright ripe fruits hanging clustered from delicate stems",
-          tip: "watering",
-        },
-        herb: {
-          leaf: "soft, deeply veined, light green",
-          extra: "",
-          tip: "pruning",
-        },
-      };
+    <!-- ② LOẠI ẢNH -->
+    <div class="step-label">② Loại ảnh *</div>
+    <div class="type-grid">
+      <div class="type-opt"><input type="radio" name="imgtype" id="tm" value="main"/>
+        <label class="type-btn" for="tm"><span class="t-ico">📸</span><div><div class="t-name">Ảnh chính</div><div class="t-sub">Main product</div></div></label></div>
+      <div class="type-opt"><input type="radio" name="imgtype" id="tt" value="tip"/>
+        <label class="type-btn" for="tt"><span class="t-ico">💧</span><div><div class="t-name">Tip Care</div><div class="t-sub">Care guide</div></div></label></div>
+    </div>
+    <div class="err" id="err-type">Vui lòng chọn loại ảnh</div>
 
-      // ── TEMPLATE ENGINE ───────────────────────────────────────
-      function buildPrompt(
-        niche,
-        imgtype,
-        pres,
-        name,
-        hFt,
-        leaf,
-        feat,
-        extra,
-        tip,
-        potSz,
-        potSt
-      ) {
-        const h = feetToDisplay(parseFloat(hFt));
-        const bg =
-          "Isolated on a seamless pure white background. Bright, crisp studio lighting. Square aspect ratio (1:1). 8k resolution.";
-        const pl = pres === "plug" ? plugPhrase() : pottedPhrase(potSz, potSt);
+    <div class="divider"></div>
 
-        if (imgtype === "main") {
-          const l = leaf || DEF[niche].leaf;
-          if (niche === "flower") {
-            const f = feat || DEF.flower.feat;
-            return `A highly photorealistic, hyper-detailed botanical product photograph of a robust young ${name} starter plant. Standing exactly ${h} tall. The bushy plant is covered in characteristic ${l} leaves and is abundantly in bloom. It features ${f}. ${pl} ${bg}`;
-          }
-          if (niche === "fruit") {
-            const f = feat || DEF.fruit.feat;
-            return `A highly photorealistic, hyper-detailed botanical product photograph of a robust young ${name} starter plant. Standing exactly ${h} tall. The bushy plant is covered in characteristic ${l} leaves and is actively bearing fruit. It features ${f}. ${pl} ${bg}`;
-          }
-          if (niche === "herb") {
-            const e = extra ? ` ${extra}.` : "";
-            return `A highly photorealistic, hyper-detailed botanical product photograph of a robust young ${name} starter plant. Standing exactly ${h} tall. The lush, bushy plant is covered in characteristic ${l} leaves, showcasing dense, vigorous foliage typical of a healthy herb.${e} ${pl} ${bg}`;
-          }
-        }
+    <!-- ③ TRÌNH BÀY -->
+    <div class="step-label">③ Cách trình bày *</div>
+    <div class="pres-grid">
+      <div class="pres-opt"><input type="radio" name="pres" id="pp" value="plug"/>
+        <label class="pres-btn" for="pp"><span class="p-ico">🪨</span><div><div class="p-name">Soil Plug</div><div class="p-sub">Bọc đất, không chậu</div></div></label></div>
+      <div class="pres-opt"><input type="radio" name="pres" id="ppot" value="pot"/>
+        <label class="pres-btn" for="ppot"><span class="p-ico">🪴</span><div><div class="p-name">Potted</div><div class="p-sub">Trong chậu</div></div></label></div>
+    </div>
+    <div class="err" id="err-pres">Vui lòng chọn cách trình bày</div>
 
-        if (imgtype === "tip") {
-          const t = tip || DEF[niche].tip,
-            act = tipAction(t),
-            prop = tipProp(t);
-          const ct = tipContainerPhrase(pres, potSz, potSt);
-          const l = leaf || DEF[niche].leaf;
-          if (niche === "flower") {
-            const f = feat || DEF.flower.feat;
-            return `A highly photorealistic, hyper-detailed lifestyle photograph illustrating a ${t} tip for a ${name} flowering plant. The scene shows a pair of clean, well-kept hands ${act} a healthy ${name} plant (approximately ${h} tall) with ${l} leaves and ${f}. ${ct} The plant is set on a bright wooden surface or light marble countertop. Natural soft window light from the side. The background is softly blurred (shallow depth of field), creating a warm, editorial botanical atmosphere. Include a subtle prop — a small ${prop} — placed naturally nearby. Square aspect ratio (1:1). Bright, clean, airy tones. 8k resolution. No text overlays.`;
-          }
-          if (niche === "fruit") {
-            const f = feat || DEF.fruit.feat;
-            return `A highly photorealistic, hyper-detailed lifestyle photograph illustrating a ${t} tip for a ${name} fruit plant. The scene shows a pair of clean, well-kept hands ${act} a healthy ${name} plant (approximately ${h} tall) with ${l} leaves and ${f}. ${ct} The plant is placed on a bright wooden table or light stone surface. Natural soft daylight from the side. Background softly blurred, warm and editorial feel. Include a small ${prop} as a natural prop nearby. Square aspect ratio (1:1). Vivid yet natural colors. 8k resolution. No text overlays.`;
-          }
-          if (niche === "herb") {
-            const e = extra ? ` The herb displays ${extra}.` : "";
-            return `A highly photorealistic, hyper-detailed lifestyle photograph illustrating a ${t} tip for a ${name} herb plant. The scene shows a pair of clean, well-kept hands ${act} a lush ${name} plant (approximately ${h} tall) with ${l} leaves, showcasing dense healthy foliage.${e} ${ct} The herb is placed on a bright kitchen surface — wooden board or light marble. Warm natural light from a nearby window. Background softly out of focus, fresh and culinary-inspired atmosphere. Small ${prop} placed naturally as a prop. Square aspect ratio (1:1). Clean, fresh tones. 8k resolution. No text overlays.`;
-          }
-        }
-      }
+    <div class="pot-extra" id="pot-extra">
+      <div class="field"><label>Kích thước chậu <span class="opt-tag">Tùy chọn</span></label>
+        <input type="text" id="pot-size" placeholder="VD: 4 inch, 1 gallon…"/></div>
+      <div class="field"><label>Kiểu chậu <span class="opt-tag">Tùy chọn</span></label>
+        <input type="text" id="pot-style" placeholder="VD: terracotta, black nursery…"/></div>
+    </div>
 
-      // ══════════════════════════════════════════════════════════
-      //  UI
-      // ══════════════════════════════════════════════════════════
-      const NL = { flower: "🌸 FLOWER", fruit: "🍋 FRUIT", herb: "🌿 HERB" };
-      const TL = { main: "📸 MAIN", tip: "💧 TIP CARE" };
-      const PL = { plug: "🪨 SOIL PLUG", pot: "🪴 POTTED" };
-      let hist = [],
-        curPrompt = "";
+    <div class="divider"></div>
 
-      // Height hint
-      document
-        .getElementById("plant-height")
-        .addEventListener("input", function () {
-          const v = parseFloat(this.value);
-          const el = document.getElementById("height-hint");
-          if (!isNaN(v) && v > 0) {
-            el.textContent = `// ${feetToDisplay(v)} ≈ ${Math.round(
-              v * 30.48
-            )} cm`;
-          } else {
-            el.textContent = "// Nhập số thập phân, VD: 1.5 ft ≈ 18 inches";
-          }
-        });
+    <!-- ④ THÔNG TIN CÂY -->
+    <div class="step-label">④ Thông tin cây</div>
 
-      // Niche
-      document
-        .querySelectorAll('input[name="niche"]')
-        .forEach((r) => r.addEventListener("change", syncNiche));
-      function syncNiche() {
-        const n = document.querySelector('input[name="niche"]:checked')?.value;
-        if (!n) return;
-        document.getElementById("sn1").classList.add("done");
-        const fl = document.getElementById("feat-lbl"),
-          fw = document.getElementById("feat-wrap"),
-          ew = document.getElementById("extra-wrap");
-        if (n === "flower") {
-          fl.textContent = "Đặc điểm hoa nổi bật";
-          fw.style.display = "";
-          ew.style.display = "none";
-        }
-        if (n === "fruit") {
-          fl.textContent = "Đặc điểm quả nổi bật";
-          fw.style.display = "";
-          ew.style.display = "none";
-        }
-        if (n === "herb") {
-          fw.style.display = "none";
-          ew.style.display = "";
-        }
-      }
+    <div class="field">
+      <label>Tên cây <span class="req">*</span></label>
+      <input type="text" id="plant-name" placeholder="VD: Rose, Strawberry, Basil…" autocomplete="off" spellcheck="false"/>
+      <div class="err" id="err-name">Vui lòng nhập tên cây</div>
+      <div class="hint">Nhập tên tiếng Anh để AI hiểu chính xác nhất</div>
+    </div>
 
-      // Type
-      document
-        .querySelectorAll('input[name="imgtype"]')
-        .forEach((r) => r.addEventListener("change", syncType));
-      function syncType() {
-        const t = document.querySelector(
-          'input[name="imgtype"]:checked'
-        )?.value;
-        document.getElementById("sn2").classList.add("done");
-        const te = document.getElementById("tip-extra"),
-          bg = document.getElementById("btn-gen"),
-          bl = document.getElementById("btn-lbl");
-        if (t === "tip") {
-          te.classList.add("show");
-          bg.classList.add("tip-mode");
-          bl.textContent = "Generate Tip Care Prompt";
-        } else {
-          te.classList.remove("show");
-          bg.classList.remove("tip-mode");
-          bl.textContent = "Generate Prompt";
-        }
-      }
-
-      // Pres
-      document
-        .querySelectorAll('input[name="pres"]')
-        .forEach((r) => r.addEventListener("change", syncPres));
-      function syncPres() {
-        const p = document.querySelector('input[name="pres"]:checked')?.value;
-        document.getElementById("sn3").classList.add("done");
-        document
-          .getElementById("pot-extra")
-          .classList.toggle("show", p === "pot");
-      }
-
-      function toggleOpt() {
-        document.getElementById("opt-toggle").classList.toggle("open");
-        document.getElementById("opt-fields").classList.toggle("open");
-      }
-
-      function generate() {
-        ["err-niche", "err-name", "err-height", "err-type", "err-pres"].forEach(
-          (id) => document.getElementById(id).classList.remove("show")
-        );
-        ["plant-name", "plant-height"].forEach((id) =>
-          document.getElementById(id).classList.remove("err")
-        );
-
-        const niche = document.querySelector(
-          'input[name="niche"]:checked'
-        )?.value;
-        const imgtype = document.querySelector(
-          'input[name="imgtype"]:checked'
-        )?.value;
-        const pres = document.querySelector(
-          'input[name="pres"]:checked'
-        )?.value;
-        const name = document.getElementById("plant-name").value.trim();
-        const height = document.getElementById("plant-height").value.trim();
-        const leaf = document.getElementById("leaf-desc").value.trim();
-        const feat = document.getElementById("feat-desc").value.trim();
-        const extra = document.getElementById("extra-desc").value.trim();
-        const tip = document.getElementById("tip-name").value.trim();
-        const potSz = document.getElementById("pot-size").value.trim();
-        const potSt = document.getElementById("pot-style").value.trim();
-
-        let ok = true;
-        if (!niche) {
-          document.getElementById("err-niche").classList.add("show");
-          ok = false;
-        }
-        if (!imgtype) {
-          document.getElementById("err-type").classList.add("show");
-          ok = false;
-        }
-        if (!pres) {
-          document.getElementById("err-pres").classList.add("show");
-          ok = false;
-        }
-        if (!name) {
-          document.getElementById("err-name").classList.add("show");
-          document.getElementById("plant-name").classList.add("err");
-          ok = false;
-        }
-        if (!height) {
-          document.getElementById("err-height").classList.add("show");
-          document.getElementById("plant-height").classList.add("err");
-          ok = false;
-        }
-        if (!ok) return;
-
-        const prompt = buildPrompt(
-          niche,
-          imgtype,
-          pres,
-          name,
-          height,
-          leaf,
-          feat,
-          extra,
-          tip,
-          potSz,
-          potSt
-        );
-        curPrompt = prompt;
-        const isTip = imgtype === "tip";
-        document.getElementById("out-empty").style.display = "none";
-        document
-          .getElementById("out-wrap")
-          .classList.toggle("tip-theme", isTip);
-
-        const el = document.getElementById("out-prompt");
-        el.textContent = prompt;
-        el.className = "out-prompt show" + (isTip ? " tip-color" : "");
-
-        document.getElementById("out-footer").classList.add("show");
-        document.getElementById("char-info").textContent =
-          prompt.length + " chars";
-        document.getElementById("gpt-wrap").classList.add("show");
-
-        const on = document.getElementById("ob-niche"),
-          ot = document.getElementById("ob-type"),
-          op = document.getElementById("ob-pres");
-        on.textContent = NL[niche];
-        on.className = "obadge " + (isTip ? "a" : "g");
-        ot.textContent = TL[imgtype];
-        ot.className = "obadge " + (isTip ? "a" : "g");
-        op.textContent = PL[pres];
-        op.className = "obadge e";
-
-        const bc = document.getElementById("btn-copy");
-        bc.className = "btn-copy" + (isTip ? " amber" : "");
-
-        addHist(name, niche, imgtype, pres, prompt);
-      }
-
-      function copyPrompt() {
-        if (!curPrompt) return;
-        navigator.clipboard.writeText(curPrompt).then(() => {
-          const btn = document.getElementById("btn-copy"),
-            lbl = document.getElementById("copy-lbl");
-          const wasAmber = btn.classList.contains("amber");
-          btn.classList.add("done");
-          lbl.textContent = "Copied ✓";
-          setTimeout(() => {
-            btn.classList.remove("done");
-            if (wasAmber) btn.classList.add("amber");
-            lbl.textContent = "Copy";
-          }, 2200);
-        });
-      }
-
-      const GPT_URL =
-        "https://chatgpt.com/g/g-69e9e5480c608191add8b720a331b5cf-tip-care-super-pro";
-
-      function openInGPT() {
-        if (!curPrompt) return;
-        const encoded = encodeURIComponent(curPrompt);
-        window.open(`${GPT_URL}?prompt=${encoded}`, "_blank");
-      }
-
-      function resetAll() {
-        [
-          "plant-name",
-          "leaf-desc",
-          "feat-desc",
-          "extra-desc",
-          "tip-name",
-          "pot-size",
-          "pot-style",
-        ].forEach((id) => (document.getElementById(id).value = ""));
-        document.getElementById("plant-height").value = "";
-        document.getElementById("height-hint").textContent =
-          "// Nhập số thập phân, VD: 1.5 ft ≈ 18 inches";
-        document
-          .querySelectorAll(
-            'input[name="niche"],input[name="imgtype"],input[name="pres"]'
-          )
-          .forEach((r) => (r.checked = false));
-        ["err-niche", "err-name", "err-height", "err-type", "err-pres"].forEach(
-          (id) => document.getElementById(id).classList.remove("show")
-        );
-        ["plant-name", "plant-height"].forEach((id) =>
-          document.getElementById(id).classList.remove("err")
-        );
-        ["sn1", "sn2", "sn3", "sn4"].forEach((id) =>
-          document.getElementById(id).classList.remove("done")
-        );
-        document.getElementById("tip-extra").classList.remove("show");
-        document.getElementById("pot-extra").classList.remove("show");
-        document.getElementById("out-empty").style.display = "";
-        document.getElementById("out-wrap").classList.remove("tip-theme");
-        document.getElementById("out-text")?.classList?.remove("show");
-        const el = document.getElementById("out-prompt");
-        el.className = "out-prompt";
-        document.getElementById("out-footer").classList.remove("show");
-        document.getElementById("gpt-wrap").classList.remove("show");
-        ["ob-niche", "ob-type", "ob-pres"].forEach((id) => {
-          const e = document.getElementById(id);
-          e.textContent = "—";
-          e.className = "obadge";
-        });
-        document.getElementById("btn-gen").classList.remove("tip-mode");
-        document.getElementById("btn-lbl").textContent = "Generate Prompt";
-        document.getElementById("btn-copy").className = "btn-copy";
-        document.getElementById("opt-toggle").classList.remove("open");
-        document.getElementById("opt-fields").classList.remove("open");
-        curPrompt = "";
-        // Reset imagen panel
-        document.getElementById("imagen-results").classList.remove("show");
-        document.getElementById("imagen-error").classList.remove("show");
-        document.getElementById("imagen-loading").classList.remove("show");
-        document.getElementById("img-grid").innerHTML = "";
-        if (apiKey) setStatus("ready", "Sẵn sàng");
-        else setStatus("", "Chưa cấu hình");
-      }
-
-      function addHist(name, niche, imgtype, pres, prompt) {
-        hist.unshift({ name, niche, imgtype, pres, prompt, time: new Date() });
-        if (hist.length > 10) hist.pop();
-        renderHist();
-      }
-      function renderHist() {
-        const list = document.getElementById("hist-list");
-        if (!hist.length) {
-          list.innerHTML =
-            '<div class="hist-empty">No prompts generated yet</div>';
-          return;
-        }
-        list.innerHTML = hist
-          .map(
-            (h, i) => `
-    <div class="hist-item" onclick="loadHist(${i})">
-      <div class="hist-pip${h.imgtype === "tip" ? " a" : ""}"></div>
-      <div>
-        <div class="h-name">${h.name}</div>
-        <div class="h-meta">${NL[h.niche]} · ${TL[h.imgtype]} · ${
-              PL[h.pres]
-            }</div>
+    <div class="field">
+      <label>Chiều cao cây <span class="req">*</span></label>
+      <div class="height-row">
+        <input type="number" id="plant-height" placeholder="VD: 1.5" min="0.1" max="50" step="0.1"/>
+        <div class="unit-tag">ft</div>
       </div>
-      <span class="h-time">${fmt(h.time)}</span>
-    </div>`
-          )
-          .join("");
-      }
-      function loadHist(i) {
-        const h = hist[i];
-        curPrompt = h.prompt;
-        const isTip = h.imgtype === "tip";
-        document.getElementById("out-empty").style.display = "none";
-        document
-          .getElementById("out-wrap")
-          .classList.toggle("tip-theme", isTip);
-        const el = document.getElementById("out-prompt");
-        el.textContent = h.prompt;
-        el.className = "out-prompt show" + (isTip ? " tip-color" : "");
-        document.getElementById("out-footer").classList.add("show");
-        document.getElementById("char-info").textContent =
-          h.prompt.length + " chars";
-        document.getElementById("gpt-wrap").classList.add("show");
-        const on = document.getElementById("ob-niche"),
-          ot = document.getElementById("ob-type"),
-          op = document.getElementById("ob-pres");
-        on.textContent = NL[h.niche];
-        on.className = "obadge " + (isTip ? "a" : "g");
-        ot.textContent = TL[h.imgtype];
-        ot.className = "obadge " + (isTip ? "a" : "g");
-        op.textContent = PL[h.pres];
-        op.className = "obadge e";
-        document.getElementById("btn-copy").className =
-          "btn-copy" + (isTip ? " amber" : "");
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      }
-      function fmt(d) {
-        return d.toLocaleTimeString("vi-VN", {
-          hour: "2-digit",
-          minute: "2-digit",
-        });
-      }
+      <div class="err" id="err-height">Vui lòng nhập chiều cao</div>
+      <div class="hint" id="height-hint">Nhập số thập phân, VD: 1.5 ft ≈ 18 inches</div>
+    </div>
 
-      document.getElementById("plant-name").addEventListener("keydown", (e) => {
-        if (e.key === "Enter") document.getElementById("plant-height").focus();
-      });
-      document
-        .getElementById("plant-height")
-        .addEventListener("keydown", (e) => {
-          if (e.key === "Enter") generate();
-        });
+    <!-- Tip Care extra -->
+    <div class="tip-extra" id="tip-extra">
+      <div class="tip-notice">💡 <strong>Tip Care:</strong> Nhập tên mẹo để AI tạo đúng hành động.<br/>VD: <em>watering, pruning, fertilizing, repotting…</em> Để trống → dùng mặc định.</div>
+      <div class="field"><label>Tên mẹo chăm sóc <span class="opt-tag">Tùy chọn</span></label>
+        <input type="text" id="tip-name" placeholder="VD: watering, pruning, fertilizing…"/></div>
+    </div>
 
-      // ══════════════════════════════════════════════════════════
-      //  IMAGEN 4 FAST — Direct Google AI Studio API
-      // ══════════════════════════════════════════════════════════
+    <!-- Optional details -->
+    <div class="opt-toggle" id="opt-toggle" onclick="toggleOpt()">
+      <span class="opt-arrow">▸</span> Thêm đặc điểm chi tiết <span class="opt-tag">Tùy chọn</span>
+    </div>
+    <div class="opt-fields" id="opt-fields">
+      <div class="field"><label>Đặc điểm lá <span class="opt-tag">Tùy chọn</span></label>
+        <input type="text" id="leaf-desc" placeholder="VD: glossy, broad green / soft, deeply veined"/></div>
+      <div class="field" id="feat-wrap"><label><span id="feat-lbl">Đặc điểm hoa / quả</span> <span class="opt-tag">Tùy chọn</span></label>
+        <input type="text" id="feat-desc" placeholder="VD: vibrant red petals with yellow center"/></div>
+      <div class="field" id="extra-wrap" style="display:none"><label>Chi tiết bổ sung (Herb) <span class="opt-tag">Tùy chọn</span></label>
+        <input type="text" id="extra-desc" placeholder="VD: The leaves display subtle textural hairs…"/></div>
+    </div>
 
-      let apiKey = localStorage.getItem("imagenApiKey") || "";
-      let aspectRatio = "1:1";
-      let sampleCount = 1;
-      let _curPromptVal = "";
+    <button class="btn-gen" id="btn-gen" onclick="doGenerate()">
+      ▶ GENERATE PROMPT
+    </button>
+    <button class="btn-reset" onclick="resetAll()">↺ Reset Form</button>
 
-      // Redefine curPrompt as property to track changes
-      Object.defineProperty(window, "curPrompt", {
-        get() {
-          return _curPromptVal;
-        },
-        set(v) {
-          _curPromptVal = v;
-          const btn = document.getElementById("btn-imagen");
-          if (btn) btn.disabled = !(v && apiKey);
-        },
-      });
+  </div>
+</div>
 
-      // Init: restore saved key (show masked)
-      (function initKey() {
-        if (apiKey) {
-          document.getElementById("worker-url").placeholder =
-            "●●●●●●●●●●●● (đã lưu)";
-          setStatus("ready", "Sẵn sàng");
-        }
-      })();
+<!-- History -->
+<div class="hist-section">
+  <div class="hist-title">Session History</div>
+  <div class="hist-list" id="hist-list"><div class="hist-empty">Chưa có prompt nào</div></div>
+</div>
+</div>
 
-      function saveWorkerUrl() {
-        const val = document.getElementById("worker-url").value.trim();
-        if (!val) {
-          alert("Vui lòng nhập API Key");
-          return;
-        }
-        apiKey = val;
-        localStorage.setItem("imagenApiKey", val);
-        document.getElementById("worker-url").value = "";
-        document.getElementById("worker-url").placeholder =
-          "●●●●●●●●●●●● (đã lưu)";
-        setStatus("ready", "Sẵn sàng");
-        if (_curPromptVal)
-          document.getElementById("btn-imagen").disabled = false;
-        const saved = document.getElementById("worker-saved");
-        saved.classList.add("show");
-        setTimeout(() => saved.classList.remove("show"), 2000);
-      }
+<!-- ══ RIGHT: OUTPUT + IMAGEN ══ -->
+<div class="right-col">
+<div class="right-sticky">
 
-      function setStatus(type, text) {
-        document.getElementById("status-dot").className = "status-dot " + type;
-        document.getElementById("status-text").textContent = text;
-      }
+  <!-- Output card -->
+  <div class="out-card">
+    <div class="out-topbar">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="out-dots"><div class="dot d1"></div><div class="dot d2"></div><div class="dot d3"></div></div>
+        <span class="out-fname">prompt_output.txt</span>
+      </div>
+      <div class="out-tags">
+        <span class="otag" id="otag-niche">—</span>
+        <span class="otag" id="otag-type">—</span>
+        <span class="otag" id="otag-pres">—</span>
+      </div>
+    </div>
+    <div class="out-body">
+      <div class="out-empty" id="out-empty">
+        <div class="out-empty-icon">🌱</div>
+        <div>Hoàn thành 4 bước và nhấn<br/><strong>Generate Prompt</strong></div>
+      </div>
+      <pre class="out-text" id="out-text"></pre>
+    </div>
+    <div class="out-foot" id="out-foot">
+      <span class="chars" id="chars"></span>
+      <button class="btn-copy" id="btn-copy" onclick="doCopy()">📋 Copy</button>
+      <button class="btn-reset2" onclick="resetAll()">Reset</button>
+    </div>
+    <!-- GPT button -->
+    <div class="btn-gpt-wrap" id="gpt-wrap">
+      <button class="btn-gpt" onclick="openGPT()">💬 Mở ChatGPT → Tạo ảnh ngay ↗</button>
+      <div class="btn-gpt-note">TIP CARE SUPER PRO · Prompt đã nhúng sẵn</div>
+    </div>
+  </div>
 
-      function setAspect(btn) {
-        document
-          .querySelectorAll(".aspect-btn")
-          .forEach((b) => b.classList.remove("active"));
-        btn.classList.add("active");
-        aspectRatio = btn.dataset.ratio;
-      }
+  <!-- Imagen 4 Fast -->
+  <div class="imagen-card">
+    <div class="imagen-head">
+      <div class="imagen-head-left">
+        <span class="imagen-title">Imagen 4 Fast</span>
+        <span class="imagen-model">imagen-4.0-fast</span>
+      </div>
+      <div class="status-row">
+        <div class="sdot" id="sdot"></div>
+        <span class="stxt" id="stxt">Chưa cấu hình</span>
+      </div>
+    </div>
 
-      function changeCount(delta) {
-        sampleCount = Math.max(1, Math.min(4, sampleCount + delta));
-        document.getElementById("count-val").textContent = sampleCount;
-      }
+    <!-- API Key -->
+    <div class="api-row">
+      <input type="password" id="api-key-input" placeholder="AIzaSyB6FVeca3Mktp53fGZO8VSg61TjCPDi0Fw" autocomplete="off" spellcheck="false"/>
+      <button class="btn-save" onclick="saveKey()">Lưu Key</button>
+      <span class="saved-txt" id="saved-txt">✓ Đã lưu</span>
+    </div>
 
-      async function generateImage() {
-        if (!_curPromptVal) {
-          alert("Hãy tạo prompt trước!");
-          return;
-        }
-        if (!apiKey) {
-          alert("Hãy nhập API Key và nhấn Lưu!");
-          return;
-        }
+    <!-- Proxy status + instructions -->
+    <div id="proxy-banner" style="margin:0;padding:10px 16px;background:#fffbeb;border-bottom:1px solid #fde68a;font-size:13px;color:#78350f;display:none;">
+      <strong>⚠ Proxy chưa chạy</strong> — cần chạy <code style="background:#fef3c7;padding:1px 5px;border-radius:3px;font-size:12px;">python proxy.py</code> trong terminal trước khi tạo ảnh.
+    </div>
+    <div id="proxy-ok" style="margin:0;padding:8px 16px;background:#f0fdf4;border-bottom:1px solid #bbf7d0;font-size:13px;color:#166534;display:none;">
+      ✅ Proxy đang chạy — sẵn sàng tạo ảnh!
+    </div>
 
-        const btn = document.getElementById("btn-imagen");
-        const lbl = document.getElementById("btn-imagen-lbl");
-        const loading = document.getElementById("imagen-loading");
-        const loadTxt = document.getElementById("loading-text");
-        const results = document.getElementById("imagen-results");
-        const errEl = document.getElementById("imagen-error");
+    <!-- Config -->
+    <div class="config-row">
+      <span class="cfg-label">Tỉ lệ</span>
+      <div class="ratio-btns">
+        <button class="ratio-btn active" data-r="1:1" onclick="setRatio(this)">1:1</button>
+        <button class="ratio-btn" data-r="4:3" onclick="setRatio(this)">4:3</button>
+        <button class="ratio-btn" data-r="3:4" onclick="setRatio(this)">3:4</button>
+        <button class="ratio-btn" data-r="16:9" onclick="setRatio(this)">16:9</button>
+        <button class="ratio-btn" data-r="9:16" onclick="setRatio(this)">9:16</button>
+      </div>
+      <div class="count-row">
+        <button class="cnt-btn" onclick="chgCount(-1)">−</button>
+        <span class="cnt-val" id="cnt-val">1</span>
+        <button class="cnt-btn" onclick="chgCount(1)">+</button>
+        <span class="cfg-label">ảnh</span>
+      </div>
+    </div>
 
-        results.classList.remove("show");
-        errEl.classList.remove("show");
-        loading.classList.add("show");
-        btn.disabled = true;
-        lbl.textContent = "Đang tạo ảnh…";
-        setStatus("loading", "Đang xử lý…");
+    <!-- Generate btn -->
+    <div class="btn-imagen-wrap">
+      <button class="btn-imagen" id="btn-imagen" onclick="genImage()" disabled>
+        🖼 TẠO ẢNH VỚI IMAGEN 4
+      </button>
+    </div>
 
-        const msgs = [
-          "Đang gửi prompt tới Imagen 4 Fast…",
-          "AI đang vẽ ảnh của bạn…",
-          "Sắp xong rồi…",
-        ];
-        let mi = 0;
-        const ticker = setInterval(() => {
-          loadTxt.textContent = msgs[Math.min(mi++, msgs.length - 1)];
-        }, 3000);
+    <!-- Loading -->
+    <div class="img-loading" id="img-loading">
+      <div class="load-bar-bg"><div class="load-bar"></div></div>
+      <div class="load-txt" id="load-txt">Đang gửi tới Imagen 4 Fast…</div>
+    </div>
 
-        try {
-          const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-fast-generate-preview-05-20:predict?key=${apiKey}`;
+    <!-- Error -->
+    <div class="img-error" id="img-error"></div>
 
-          const res = await fetch(API_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              instances: [{ prompt: _curPromptVal.trim() }],
-              parameters: {
-                sampleCount: Math.min(sampleCount, 4),
-                aspectRatio: aspectRatio,
-                safetyFilterLevel: "block_some",
-                personGeneration: "allow_adult",
-              },
-            }),
-          });
+    <!-- Results -->
+    <div class="img-results" id="img-results">
+      <div class="img-grid" id="img-grid"></div>
+    </div>
+  </div>
 
-          const data = await res.json();
+</div><!-- /right-sticky -->
+</div><!-- /right-col -->
 
-          // API error handling
-          if (!res.ok) {
-            const msg = data?.error?.message || "";
-            if (res.status === 400 && msg.includes("safety"))
-              throw new Error(
-                "Prompt bị safety filter chặn — hãy thử chỉnh prompt"
-              );
-            if (res.status === 401 || res.status === 403)
-              throw new Error("API Key không hợp lệ hoặc đã hết hạn");
-            if (res.status === 429)
-              throw new Error("Đã đạt giới hạn request — thử lại sau 10 giây");
-            if (res.status === 404)
-              throw new Error(
-                "Model Imagen 4 chưa được kích hoạt. Vào aistudio.google.com → kiểm tra quyền truy cập Imagen 4"
-              );
-            throw new Error(msg || `Lỗi HTTP ${res.status}`);
-          }
+</div><!-- /wrap -->
 
-          const images = (data.predictions || []).map((p) => ({
-            base64: p.bytesBase64Encoded,
-            mimeType: p.mimeType || "image/png",
-          }));
+<script>
+// ══════════════════════════════════════════════════
+//  STATE — dùng biến thông thường, không dùng defineProperty
+// ══════════════════════════════════════════════════
+let currentPrompt = '';
+let apiKey        = localStorage.getItem('imagenApiKey') || '';
+let aspectRatio   = '1:1';
+let imgCount      = 1;
+let history       = [];
 
-          if (images.length === 0)
-            throw new Error("Không nhận được ảnh. Prompt có thể bị chặn.");
+const NL = { flower:'🌸 FLOWER', fruit:'🍋 FRUIT', herb:'🌿 HERB' };
+const TL = { main:'📸 MAIN', tip:'💧 TIP CARE' };
+const PL = { plug:'🪨 SOIL PLUG', pot:'🪴 POTTED' };
 
-          // Render grid
-          const grid = document.getElementById("img-grid");
-          grid.className = `img-grid cols-${images.length}`;
-          grid.innerHTML = "";
-          images.forEach((img, i) => {
-            const src = `data:${img.mimeType};base64,${img.base64}`;
-            const card = document.createElement("div");
-            card.className = "img-card";
-            card.innerHTML = `
-        <img src="${src}" alt="Plant image ${i + 1}"/>
-        <div class="img-card-overlay">
-          <button class="img-dl-btn" onclick="dlImg('${src}',${i + 1})">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            Tải xuống
-          </button>
-        </div>`;
-            grid.appendChild(card);
-          });
+// ── INIT: restore API key ──
+(function(){
+  if(apiKey){
+    document.getElementById('api-key-input').placeholder = '●●●●●●●●●●● (đã lưu — nhập key mới để thay)';
+    setStatus('ready','Sẵn sàng');
+  }
+  // Kiểm tra proxy có đang chạy không
+  checkProxy();
+})();
 
-          results.classList.add("show");
-          setStatus("ready", `✓ ${images.length} ảnh · ${aspectRatio}`);
-        } catch (err) {
-          errEl.textContent = "⚠ " + err.message;
-          errEl.classList.add("show");
-          setStatus("error", "Lỗi — xem chi tiết bên dưới");
-          console.error(err);
-        } finally {
-          clearInterval(ticker);
-          loading.classList.remove("show");
-          btn.disabled = false;
-          lbl.textContent = "Tạo ảnh với Imagen 4";
-        }
-      }
+async function checkProxy(){
+  try{
+    // Gửi OPTIONS request để test proxy
+    await fetch('http://localhost:8765/generate',{method:'OPTIONS',signal:AbortSignal.timeout(2000)});
+    document.getElementById('proxy-ok').style.display='block';
+    document.getElementById('proxy-banner').style.display='none';
+  }catch{
+    document.getElementById('proxy-banner').style.display='block';
+    document.getElementById('proxy-ok').style.display='none';
+  }
+}
 
-      function dlImg(src, idx) {
-        const a = document.createElement("a");
-        a.href = src;
-        a.download = `plant-${Date.now()}-${idx}.png`;
-        a.click();
-      }
+// ══════════════════════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════════════════════
+function ftToStr(ft){
+  const w=Math.floor(ft), i=Math.round((ft-w)*12);
+  if(w===0) return `${i} inches`;
+  if(i===0) return `${w} ft`;
+  return `${w} ft ${i} in`;
+}
+function plugPhrase(){
+  return `It is presented strictly as a well-developed soil plug (root ball only) standing freely and upright, completely without a pot. The perfectly proportioned cylindrical base reveals dark, moist peat soil firmly bound by a dense, healthy network of intricate fine white roots.`;
+}
+function potPhrase(sz,st){
+  return `It is presented potted in a ${sz?sz+' ':''}${st||'terracotta pot'}, sitting upright and well-centered. The pot is clean and proportional to the plant.`;
+}
+function tipAct(t){
+  const s=(t||'').toLowerCase();
+  if(s.includes('water'))  return 'carefully watering';
+  if(s.includes('prun'))   return 'precisely pruning';
+  if(s.includes('fertil')) return 'gently applying fertilizer to';
+  if(s.includes('repot'))  return 'carefully repotting';
+  if(s.includes('harvest'))return 'harvesting fresh leaves from';
+  if(s.includes('mist'))   return 'misting';
+  if(s.includes('trim'))   return 'trimming';
+  return `performing ${t||'care'} on`;
+}
+function tipProp(t){
+  const s=(t||'').toLowerCase();
+  if(s.includes('water'))  return 'small copper watering can';
+  if(s.includes('prun')||s.includes('trim')) return 'pair of pruning scissors';
+  if(s.includes('fertil')) return 'bottle of liquid fertilizer';
+  if(s.includes('repot'))  return 'bag of fresh potting soil';
+  if(s.includes('harvest'))return 'small wooden cutting board';
+  if(s.includes('mist'))   return 'glass spray bottle';
+  return 'small gardening tool';
+}
+function tipCont(pres,sz,st){
+  if(pres==='plug') return `The plant's root ball is wrapped in dark moist peat soil, held without a pot.`;
+  return `The plant sits in a ${sz?sz+' ':''}${st||'terracotta pot'}.`;
+}
 
-      // Enter key on API key input
-      document.getElementById("worker-url").addEventListener("keydown", (e) => {
-        if (e.key === "Enter") saveWorkerUrl();
-      });
-    </script>
-  </body>
+const DEF = {
+  flower:{ leaf:'textured, dark green', feat:'vibrant, large velvety petals with a delicate center', tip:'watering' },
+  fruit: { leaf:'glossy, broad green',  feat:'numerous bright ripe fruits hanging clustered from stems', tip:'watering' },
+  herb:  { leaf:'soft, deeply veined, light green', extra:'', tip:'pruning' }
+};
+
+function buildPrompt(niche,imgtype,pres,name,hFt,leaf,feat,extra,tip,potSz,potSt){
+  const h  = ftToStr(parseFloat(hFt));
+  const bg = 'Isolated on a seamless pure white background. Bright, crisp studio lighting. Square aspect ratio (1:1). 8k resolution.';
+  const pl = pres==='plug' ? plugPhrase() : potPhrase(potSz,potSt);
+  const l  = leaf||DEF[niche].leaf;
+
+  if(imgtype==='main'){
+    if(niche==='flower'){ const f=feat||DEF.flower.feat; return `A highly photorealistic, hyper-detailed botanical product photograph of a robust young ${name} starter plant. Standing exactly ${h} tall. The bushy plant is covered in characteristic ${l} leaves and is abundantly in bloom. It features ${f}. ${pl} ${bg}`; }
+    if(niche==='fruit') { const f=feat||DEF.fruit.feat;  return `A highly photorealistic, hyper-detailed botanical product photograph of a robust young ${name} starter plant. Standing exactly ${h} tall. The bushy plant is covered in characteristic ${l} leaves and is actively bearing fruit. It features ${f}. ${pl} ${bg}`; }
+    if(niche==='herb')  { const e=extra?` ${extra}.`:''; return `A highly photorealistic, hyper-detailed botanical product photograph of a robust young ${name} starter plant. Standing exactly ${h} tall. The lush, bushy plant is covered in characteristic ${l} leaves, showcasing dense, vigorous foliage typical of a healthy herb.${e} ${pl} ${bg}`; }
+  }
+  if(imgtype==='tip'){
+    const t=tip||DEF[niche].tip, act=tipAct(t), prop=tipProp(t), ct=tipCont(pres,potSz,potSt);
+    if(niche==='flower'){ const f=feat||DEF.flower.feat; return `A highly photorealistic, hyper-detailed lifestyle photograph illustrating a ${t} tip for a ${name} flowering plant. The scene shows a pair of clean, well-kept hands ${act} a healthy ${name} plant (approximately ${h} tall) with ${l} leaves and ${f}. ${ct} The plant is set on a bright wooden surface or light marble countertop. Natural soft window light from the side. The background is softly blurred (shallow depth of field). Include a subtle prop — a small ${prop} — placed naturally nearby. Square aspect ratio (1:1). Bright, clean, airy tones. 8k resolution. No text overlays.`; }
+    if(niche==='fruit') { const f=feat||DEF.fruit.feat;  return `A highly photorealistic, hyper-detailed lifestyle photograph illustrating a ${t} tip for a ${name} fruit plant. The scene shows a pair of clean, well-kept hands ${act} a healthy ${name} plant (approximately ${h} tall) with ${l} leaves and ${f}. ${ct} The plant is on a bright wooden table or light stone surface. Natural soft daylight from the side. Background softly blurred. Include a small ${prop} nearby. Square aspect ratio (1:1). 8k resolution. No text overlays.`; }
+    if(niche==='herb')  { const e=extra?` The herb displays ${extra}.`:''; return `A highly photorealistic, hyper-detailed lifestyle photograph illustrating a ${t} tip for a ${name} herb plant. The scene shows a pair of clean, well-kept hands ${act} a lush ${name} plant (approximately ${h} tall) with ${l} leaves, showcasing dense healthy foliage.${e} ${ct} The herb is on a bright kitchen surface. Warm natural light from a nearby window. Background softly out of focus. Small ${prop} as prop. Square aspect ratio (1:1). 8k resolution. No text overlays.`; }
+  }
+}
+
+// ══════════════════════════════════════════════════
+//  UI SYNC
+// ══════════════════════════════════════════════════
+document.querySelectorAll('input[name="niche"]').forEach(r=>r.addEventListener('change',()=>{
+  const n=r.value;
+  document.getElementById('feat-wrap').style.display = n==='herb'?'none':'';
+  document.getElementById('extra-wrap').style.display= n==='herb'?'':'none';
+  document.getElementById('feat-lbl').textContent = n==='flower'?'Đặc điểm hoa':n==='fruit'?'Đặc điểm quả':'';
+}));
+
+document.querySelectorAll('input[name="imgtype"]').forEach(r=>r.addEventListener('change',()=>{
+  const isTip = r.value==='tip';
+  document.getElementById('tip-extra').classList.toggle('show',isTip);
+  document.getElementById('btn-gen').classList.toggle('tip-mode',isTip);
+  document.getElementById('btn-gen').textContent = isTip ? '▶ GENERATE TIP CARE PROMPT' : '▶ GENERATE PROMPT';
+}));
+
+document.querySelectorAll('input[name="pres"]').forEach(r=>r.addEventListener('change',()=>{
+  document.getElementById('pot-extra').classList.toggle('show', r.value==='pot');
+}));
+
+document.getElementById('plant-height').addEventListener('input',function(){
+  const v=parseFloat(this.value);
+  document.getElementById('height-hint').textContent = (!isNaN(v)&&v>0)
+    ? `${ftToStr(v)} ≈ ${Math.round(v*30.48)} cm`
+    : 'Nhập số thập phân, VD: 1.5 ft ≈ 18 inches';
+});
+
+function toggleOpt(){
+  document.getElementById('opt-toggle').classList.toggle('open');
+  document.getElementById('opt-fields').classList.toggle('open');
+}
+
+// ── UPDATE imagen button state ──
+function updateImagenBtn(){
+  document.getElementById('btn-imagen').disabled = !(currentPrompt && apiKey);
+}
+
+// ══════════════════════════════════════════════════
+//  GENERATE PROMPT
+// ══════════════════════════════════════════════════
+function doGenerate(){
+  ['err-niche','err-name','err-height','err-type','err-pres'].forEach(id=>document.getElementById(id).classList.remove('show'));
+  ['plant-name','plant-height'].forEach(id=>document.getElementById(id).classList.remove('err-input'));
+
+  const niche  =document.querySelector('input[name="niche"]:checked')?.value;
+  const imgtype=document.querySelector('input[name="imgtype"]:checked')?.value;
+  const pres   =document.querySelector('input[name="pres"]:checked')?.value;
+  const name   =document.getElementById('plant-name').value.trim();
+  const height =document.getElementById('plant-height').value.trim();
+  const leaf   =document.getElementById('leaf-desc').value.trim();
+  const feat   =document.getElementById('feat-desc').value.trim();
+  const extra  =document.getElementById('extra-desc').value.trim();
+  const tip    =document.getElementById('tip-name').value.trim();
+  const potSz  =document.getElementById('pot-size').value.trim();
+  const potSt  =document.getElementById('pot-style').value.trim();
+
+  let ok=true;
+  if(!niche)  {document.getElementById('err-niche').classList.add('show');ok=false;}
+  if(!imgtype){document.getElementById('err-type').classList.add('show');ok=false;}
+  if(!pres)   {document.getElementById('err-pres').classList.add('show');ok=false;}
+  if(!name)   {document.getElementById('err-name').classList.add('show');document.getElementById('plant-name').classList.add('err-input');ok=false;}
+  if(!height) {document.getElementById('err-height').classList.add('show');document.getElementById('plant-height').classList.add('err-input');ok=false;}
+  if(!ok) return;
+
+  const prompt = buildPrompt(niche,imgtype,pres,name,height,leaf,feat,extra,tip,potSz,potSt);
+  currentPrompt = prompt;
+
+  const isTip = imgtype==='tip';
+  document.getElementById('out-empty').style.display='none';
+  const el=document.getElementById('out-text');
+  el.textContent=prompt;
+  el.className='out-text show'+(isTip?' tip-color':'');
+  document.getElementById('out-foot').classList.add('show');
+  document.getElementById('chars').textContent=prompt.length+' ký tự';
+  document.getElementById('gpt-wrap').classList.add('show');
+
+  const tn=document.getElementById('otag-niche'),tt=document.getElementById('otag-type'),tp=document.getElementById('otag-pres');
+  tn.textContent=NL[niche]; tn.className='otag '+(isTip?'amber':'green');
+  tt.textContent=TL[imgtype]; tt.className='otag '+(isTip?'amber':'green');
+  tp.textContent=PL[pres]; tp.className='otag white';
+
+  document.getElementById('btn-copy').className='btn-copy'+(isTip?' amber':'');
+
+  // Clear old imagen results
+  document.getElementById('img-results').classList.remove('show');
+  document.getElementById('img-error').classList.remove('show');
+  document.getElementById('img-grid').innerHTML='';
+
+  updateImagenBtn();
+  addHistory(name,niche,imgtype,pres,prompt);
+}
+
+function doCopy(){
+  if(!currentPrompt)return;
+  navigator.clipboard.writeText(currentPrompt).then(()=>{
+    const btn=document.getElementById('btn-copy');
+    const prev=btn.className;
+    btn.textContent='✓ Đã copy!';
+    btn.classList.add('done');
+    setTimeout(()=>{btn.textContent='📋 Copy';btn.className=prev;},2200);
+  });
+}
+
+const GPT_ID='https://chatgpt.com/g/g-69e9e5480c608191add8b720a331b5cf-tip-care-super-pro';
+function openGPT(){ if(!currentPrompt)return; window.open(`${GPT_ID}?prompt=${encodeURIComponent(currentPrompt)}`,'_blank'); }
+
+function resetAll(){
+  ['plant-name','leaf-desc','feat-desc','extra-desc','tip-name','pot-size','pot-style'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('plant-height').value='';
+  document.getElementById('height-hint').textContent='Nhập số thập phân, VD: 1.5 ft ≈ 18 inches';
+  document.querySelectorAll('input[name="niche"],input[name="imgtype"],input[name="pres"]').forEach(r=>r.checked=false);
+  ['err-niche','err-name','err-height','err-type','err-pres'].forEach(id=>document.getElementById(id).classList.remove('show'));
+  ['plant-name','plant-height'].forEach(id=>document.getElementById(id).classList.remove('err-input'));
+  document.getElementById('tip-extra').classList.remove('show');
+  document.getElementById('pot-extra').classList.remove('show');
+  document.getElementById('opt-toggle').classList.remove('open');
+  document.getElementById('opt-fields').classList.remove('open');
+  document.getElementById('out-empty').style.display='';
+  document.getElementById('out-text').className='out-text';
+  document.getElementById('out-foot').classList.remove('show');
+  document.getElementById('gpt-wrap').classList.remove('show');
+  ['otag-niche','otag-type','otag-pres'].forEach(id=>{const e=document.getElementById(id);e.textContent='—';e.className='otag';});
+  document.getElementById('btn-gen').textContent='▶ GENERATE PROMPT';
+  document.getElementById('btn-gen').classList.remove('tip-mode');
+  document.getElementById('btn-copy').className='btn-copy';
+  document.getElementById('img-results').classList.remove('show');
+  document.getElementById('img-error').classList.remove('show');
+  document.getElementById('img-loading').classList.remove('show');
+  document.getElementById('img-grid').innerHTML='';
+  currentPrompt='';
+  updateImagenBtn();
+}
+
+// ══════════════════════════════════════════════════
+//  HISTORY
+// ══════════════════════════════════════════════════
+function addHistory(name,niche,imgtype,pres,prompt){
+  history.unshift({name,niche,imgtype,pres,prompt,time:new Date()});
+  if(history.length>10)history.pop();
+  renderHistory();
+}
+function renderHistory(){
+  const el=document.getElementById('hist-list');
+  if(!history.length){el.innerHTML='<div class="hist-empty">Chưa có prompt nào</div>';return;}
+  el.innerHTML=history.map((h,i)=>`
+    <div class="hist-item" onclick="loadHist(${i})">
+      <div class="hist-pip${h.imgtype==='tip'?' amber':''}"></div>
+      <div><div class="hist-name">${h.name}</div><div class="hist-meta">${NL[h.niche]} · ${TL[h.imgtype]} · ${PL[h.pres]}</div></div>
+      <span class="hist-time">${fmt(h.time)}</span>
+    </div>`).join('');
+}
+function loadHist(i){
+  const h=history[i]; currentPrompt=h.prompt;
+  const isTip=h.imgtype==='tip';
+  document.getElementById('out-empty').style.display='none';
+  const el=document.getElementById('out-text');
+  el.textContent=h.prompt; el.className='out-text show'+(isTip?' tip-color':'');
+  document.getElementById('out-foot').classList.add('show');
+  document.getElementById('chars').textContent=h.prompt.length+' ký tự';
+  document.getElementById('gpt-wrap').classList.add('show');
+  const tn=document.getElementById('otag-niche'),tt=document.getElementById('otag-type'),tp=document.getElementById('otag-pres');
+  tn.textContent=NL[h.niche]; tn.className='otag '+(isTip?'amber':'green');
+  tt.textContent=TL[h.imgtype]; tt.className='otag '+(isTip?'amber':'green');
+  tp.textContent=PL[h.pres]; tp.className='otag white';
+  document.getElementById('btn-copy').className='btn-copy'+(isTip?' amber':'');
+  document.getElementById('img-results').classList.remove('show');
+  document.getElementById('img-error').classList.remove('show');
+  document.getElementById('img-grid').innerHTML='';
+  updateImagenBtn();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function fmt(d){return d.toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'});}
+
+// ══════════════════════════════════════════════════
+//  IMAGEN 4 FAST
+// ══════════════════════════════════════════════════
+function setStatus(type,text){
+  const d=document.getElementById('sdot'),t=document.getElementById('stxt');
+  d.className='sdot '+(type==='ready'?'ready':type==='loading'?'loading':type==='error'?'error':'');
+  t.textContent=text;
+}
+
+function saveKey(){
+  const val=document.getElementById('api-key-input').value.trim();
+  if(!val){alert('Vui lòng nhập API Key');return;}
+  apiKey=val;
+  localStorage.setItem('imagenApiKey',val);
+  document.getElementById('api-key-input').value='';
+  document.getElementById('api-key-input').placeholder='●●●●●●●●●●● (đã lưu — nhập key mới để thay)';
+  setStatus('ready','Sẵn sàng');
+  const s=document.getElementById('saved-txt');
+  s.classList.add('show');
+  setTimeout(()=>s.classList.remove('show'),2000);
+  updateImagenBtn();
+}
+
+function setRatio(btn){
+  document.querySelectorAll('.ratio-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  aspectRatio=btn.dataset.r;
+}
+
+function chgCount(d){
+  imgCount=Math.max(1,Math.min(4,imgCount+d));
+  document.getElementById('cnt-val').textContent=imgCount;
+}
+
+async function genImage(){
+  if(!currentPrompt){alert('Hãy tạo prompt trước!');return;}
+  if(!apiKey){alert('Hãy nhập API Key và nhấn Lưu Key!');return;}
+
+  const btn=document.getElementById('btn-imagen');
+  const loading=document.getElementById('img-loading');
+  const loadTxt=document.getElementById('load-txt');
+  const results=document.getElementById('img-results');
+  const errEl=document.getElementById('img-error');
+
+  results.classList.remove('show');
+  errEl.classList.remove('show');
+  loading.classList.add('show');
+  btn.disabled=true;
+  btn.textContent='⏳ Đang tạo ảnh…';
+  setStatus('loading','Đang xử lý…');
+
+  const msgs=['Đang gửi prompt tới Imagen 4 Fast…','AI đang vẽ ảnh của bạn…','Sắp xong rồi…'];
+  let mi=0;
+  const tick=setInterval(()=>{loadTxt.textContent=msgs[Math.min(mi++,msgs.length-1)];},3000);
+
+  try{
+    // Gọi qua proxy local — tránh lỗi CORS
+    const PROXY = 'http://localhost:8765/generate';
+    const res = await fetch(PROXY, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        prompt:      currentPrompt.trim(),
+        aspectRatio: aspectRatio,
+        sampleCount: Math.min(imgCount,4),
+        apiKey:      apiKey   // proxy nhận key, gọi Google, không bị CORS
+      })
+    });
+
+    let data;
+    try{ data = await res.json(); }
+    catch{ throw new Error('Proxy không phản hồi — hãy chắc chắn đã chạy proxy.py'); }
+
+    if(!res.ok){
+      const msg = data?.error || '';
+      if(msg.includes('API key not valid') || res.status===401 || res.status===403)
+        throw new Error('API Key không hợp lệ hoặc chưa kích hoạt Imagen 4. Kiểm tra lại tại aistudio.google.com');
+      if(res.status===429)
+        throw new Error('Đã đạt giới hạn request — thử lại sau vài giây');
+      if(msg.includes('safety'))
+        throw new Error('Prompt bị safety filter chặn — hãy thử chỉnh prompt');
+      if(res.status===404)
+        throw new Error('Model Imagen 4 chưa được kích hoạt cho API key này');
+      throw new Error(msg || `Lỗi HTTP ${res.status}`);
+    }
+
+    const imgs = data.images || [];
+    if(!imgs.length) throw new Error('Không nhận được ảnh — prompt có thể bị chặn bởi safety filter');
+
+    const grid=document.getElementById('img-grid');
+    grid.className=`img-grid c${imgs.length}`;
+    grid.innerHTML='';
+    imgs.forEach((img,i)=>{
+      const src=`data:${img.mimeType};base64,${img.base64}`;
+      const div=document.createElement('div');
+      div.className='img-item';
+      div.innerHTML=`<img src="${src}" alt="Plant ${i+1}"/>
+        <div class="img-overlay"><button class="dl-btn" onclick="dlImg('${src}',${i+1})">⬇ Tải</button></div>`;
+      grid.appendChild(div);
+    });
+    results.classList.add('show');
+    setStatus('ready',`✓ ${imgs.length} ảnh · ${aspectRatio}`);
+
+  }catch(err){
+    // Lỗi kết nối proxy
+    const msg = err.message.includes('fetch') || err.message.includes('NetworkError') || err.message.includes('Failed to fetch')
+      ? '⚠ Không kết nối được proxy — hãy chạy file proxy.py trước! (xem hướng dẫn bên dưới)'
+      : err.message;
+    errEl.innerHTML = msg.startsWith('⚠') ? msg : '⚠ ' + msg;
+    errEl.classList.add('show');
+    setStatus('error','Lỗi — xem chi tiết bên dưới');
+  }finally{
+    clearInterval(tick);
+    loading.classList.remove('show');
+    btn.disabled=false;
+    btn.textContent='🖼 TẠO ẢNH VỚI IMAGEN 4';
+  }
+}
+
+function dlImg(src,idx){
+  const a=document.createElement('a');
+  a.href=src; a.download=`plant-${Date.now()}-${idx}.png`; a.click();
+}
+
+// Keyboard shortcuts
+document.getElementById('plant-name').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('plant-height').focus();});
+document.getElementById('plant-height').addEventListener('keydown',e=>{if(e.key==='Enter')doGenerate();});
+document.getElementById('api-key-input').addEventListener('keydown',e=>{if(e.key==='Enter')saveKey();});
+</script>
+</body>
 </html>
