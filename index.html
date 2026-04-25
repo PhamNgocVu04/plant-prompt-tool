@@ -564,7 +564,7 @@ let currentPrompt = '';
 let apiKey = localStorage.getItem('plantApiKey') || '';
 let aspectRatio   = '1:1';
 let imgCount      = 1;
-let history       = [];
+let promptHistory = [];
 
 const NL = { flower:'🌸 FLOWER', fruit:'🍋 FRUIT', herb:'🌿 HERB' };
 const TL = { main:'📸 MAIN', tip:'💧 TIP CARE' };
@@ -717,6 +717,10 @@ function doGenerate(){
   if(!ok) return;
 
   const prompt = buildPrompt(niche,imgtype,pres,name,height,leaf,feat,extra,tip,potSz,potSt);
+  if(!prompt){
+    alert('Lỗi tạo prompt — vui lòng kiểm tra lại các lựa chọn');
+    return;
+  }
   currentPrompt = prompt;
 
   const isTip = imgtype==='tip';
@@ -789,14 +793,14 @@ function resetAll(){
 //  HISTORY
 // ══════════════════════════════════════════════════
 function addHistory(name,niche,imgtype,pres,prompt){
-  history.unshift({name,niche,imgtype,pres,prompt,time:new Date()});
-  if(history.length>10)history.pop();
+  promptHistory.unshift({name,niche,imgtype,pres,prompt,time:new Date()});
+  if(promptHistory.length>10)promptHistory.pop();
   renderHistory();
 }
 function renderHistory(){
   const el=document.getElementById('hist-list');
-  if(!history.length){el.innerHTML='<div class="hist-empty">Chưa có prompt nào</div>';return;}
-  el.innerHTML=history.map((h,i)=>`
+  if(!promptHistory.length){el.innerHTML='<div class="hist-empty">Chưa có prompt nào</div>';return;}
+  el.innerHTML=promptHistory.map((h,i)=>`
     <div class="hist-item" onclick="loadHist(${i})">
       <div class="hist-pip${h.imgtype==='tip'?' amber':''}"></div>
       <div><div class="hist-name">${h.name}</div><div class="hist-meta">${NL[h.niche]} · ${TL[h.imgtype]} · ${PL[h.pres]}</div></div>
@@ -804,7 +808,7 @@ function renderHistory(){
     </div>`).join('');
 }
 function loadHist(i){
-  const h=history[i]; currentPrompt=h.prompt;
+  const h=promptHistory[i]; currentPrompt=h.prompt;
   const isTip=h.imgtype==='tip';
   document.getElementById('out-empty').style.display='none';
   const el=document.getElementById('out-text');
