@@ -468,17 +468,17 @@ input.err-input { border-color: var(--red) !important; }
 
     <!-- API Key -->
     <div class="api-row">
-      <input type="password" id="api-key-input" placeholder="AIzaSyBTKmgazcJ_I-CUUrEGxXqXpqSDLb8U68o" autocomplete="off" spellcheck="false"/>
+      <input type="text" id="api-key-input" placeholder="Dán API Key vào đây (AIzaSy...)" autocomplete="off" spellcheck="false" style="font-family:monospace;font-size:12px;color:#333;"/>
       <button class="btn-save" onclick="saveKey()">Lưu Key</button>
       <span class="saved-txt" id="saved-txt">✓ Đã lưu</span>
     </div>
 
     <!-- Proxy status + instructions -->
     <div id="proxy-banner" style="margin:0;padding:10px 16px;background:#fffbeb;border-bottom:1px solid #fde68a;font-size:13px;color:#78350f;display:none;">
-      <strong>⚠ Proxy chưa chạy</strong> — cần chạy <code style="background:#fef3c7;padding:1px 5px;border-radius:3px;font-size:12px;">python proxy.py</code> trong terminal trước khi tạo ảnh.
+      ⚠ <strong>Proxy chưa chạy</strong> — mở terminal, chạy: <code style="background:#fef3c7;padding:2px 6px;border-radius:3px;">python proxy.py</code>
     </div>
     <div id="proxy-ok" style="margin:0;padding:8px 16px;background:#f0fdf4;border-bottom:1px solid #bbf7d0;font-size:13px;color:#166534;display:none;">
-      ✅ Proxy đang chạy — sẵn sàng tạo ảnh!
+      ✅ Proxy đang chạy — nhập API Key bên dưới rồi nhấn <strong>Lưu Key</strong>
     </div>
 
     <!-- Config -->
@@ -531,7 +531,7 @@ input.err-input { border-color: var(--red) !important; }
 //  STATE — dùng biến thông thường, không dùng defineProperty
 // ══════════════════════════════════════════════════
 let currentPrompt = '';
-let apiKey        = localStorage.getItem('imagenApiKey') || '';
+let apiKey = '';  // Không lưu localStorage — nhập trực tiếp mỗi lần
 let aspectRatio   = '1:1';
 let imgCount      = 1;
 let history       = [];
@@ -540,13 +540,8 @@ const NL = { flower:'🌸 FLOWER', fruit:'🍋 FRUIT', herb:'🌿 HERB' };
 const TL = { main:'📸 MAIN', tip:'💧 TIP CARE' };
 const PL = { plug:'🪨 SOIL PLUG', pot:'🪴 POTTED' };
 
-// ── INIT: restore API key ──
+// Init: kiểm tra proxy
 (function(){
-  if(apiKey){
-    document.getElementById('api-key-input').placeholder = '●●●●●●●●●●● (đã lưu — nhập key mới để thay)';
-    setStatus('ready','Sẵn sàng');
-  }
-  // Kiểm tra proxy có đang chạy không
   checkProxy();
 })();
 
@@ -812,17 +807,17 @@ function setStatus(type,text){
 }
 
 function saveKey(){
-  const val=document.getElementById('api-key-input').value.trim();
-  if(!val){alert('Vui lòng nhập API Key');return;}
-  apiKey=val;
-  localStorage.setItem('imagenApiKey',val);
-  document.getElementById('api-key-input').value='';
-  document.getElementById('api-key-input').placeholder='●●●●●●●●●●● (đã lưu — nhập key mới để thay)';
-  setStatus('ready','Sẵn sàng');
-  const s=document.getElementById('saved-txt');
-  s.classList.add('show');
-  setTimeout(()=>s.classList.remove('show'),2000);
+  const val = document.getElementById('api-key-input').value.trim();
+  if(!val){ alert('Vui lòng nhập API Key!'); return; }
+  if(!val.startsWith('AIza')){ alert('API Key không đúng định dạng — phải bắt đầu bằng AIza...'); return; }
+  apiKey = val;
+  // Không lưu localStorage — giữ key trong bộ nhớ phiên làm việc
+  document.getElementById('api-key-input').value = val; // Hiện rõ key để xác nhận
+  setStatus('ready','Sẵn sàng — Key hợp lệ ✓');
   updateImagenBtn();
+  const s = document.getElementById('saved-txt');
+  s.classList.add('show');
+  setTimeout(()=>s.classList.remove('show'), 3000);
 }
 
 function setRatio(btn){
