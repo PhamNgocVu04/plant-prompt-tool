@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Plant Prompt Generator</title>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
+<title>Plant Prompt Generator v6</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
@@ -306,7 +309,7 @@ input.err-input { border-color: var(--red) !important; }
 
 <div class="header">
   <div class="header-title">🌿 Plant Prompt Generator</div>
-  <div class="header-badge">Nội bộ · YEScale Imagen 4 Fast</div>
+  <div class="header-badge">Nội bộ · Gemini Flash Image</div>
 </div>
 
 <div class="wrap">
@@ -487,8 +490,8 @@ input.err-input { border-color: var(--red) !important; }
   <div class="imagen-card">
     <div class="imagen-head">
       <div class="imagen-head-left">
-        <span class="imagen-title">YEScale · Imagen 4 Fast</span>
-        <span class="imagen-model">imagen4-fast</span>
+        <span class="imagen-title">YEScale · Gemini Flash Image</span>
+        <span class="imagen-model">gemini-2.5-flash-image</span>
       </div>
       <div class="status-row">
         <div class="sdot" id="sdot"></div>
@@ -529,7 +532,7 @@ input.err-input { border-color: var(--red) !important; }
     <!-- Generate btn -->
     <div class="btn-imagen-wrap">
       <button class="btn-imagen" id="btn-imagen" onclick="genImage()" disabled>
-        🖼 TẠO ẢNH VỚI IMAGEN 4
+        🖼 TẠO ẢNH VỚI GEMINI FLASH
       </button>
     </div>
 
@@ -882,14 +885,14 @@ async function genImage(){
   loading.classList.add('show');
   btn.disabled = true;
   btn.textContent = '⏳ Đang tạo ảnh…';
-  setStatus('loading','Đang gửi tới YEScale…');
+  setStatus('loading','Đang gửi tới Gemini Flash…');
 
-  const msgs = ['Đang gửi prompt tới Imagen 4 Fast…','AI đang vẽ ảnh…','Sắp xong rồi…'];
+  const msgs = ['Đang gửi prompt tới Gemini Flash Image…','AI đang vẽ ảnh…','Sắp xong rồi…'];
   let mi = 0;
   const tick = setInterval(()=>{ loadTxt.textContent = msgs[Math.min(mi++, msgs.length-1)]; }, 3000);
 
   try {
-    // YEScale — OpenAI-compatible, endpoint /v1/images/generations
+    // YEScale — Gemini Flash Image (OpenAI-compatible)
     const URL = 'https://api.yescale.io/v1/images/generations';
 
     const res = await fetch(URL, {
@@ -899,7 +902,7 @@ async function genImage(){
         'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model:   'imagen4-fast',
+        model:   'gemini-2.5-flash-image',
         prompt:  currentPrompt.trim(),
         n:       Math.min(imgCount, 4),
         size:    aspectRatioToSize(aspectRatio),
@@ -947,7 +950,7 @@ async function genImage(){
     });
 
     results.classList.add('show');
-    setStatus('ready', `✓ ${images.length} ảnh xong · ~400 VND/ảnh`);
+    setStatus('ready', `✓ ${images.length} ảnh xong · Gemini Flash Image`);
 
   } catch(err){
     errEl.innerHTML = '⚠ ' + err.message;
@@ -958,7 +961,7 @@ async function genImage(){
     clearInterval(tick);
     loading.classList.remove('show');
     btn.disabled   = false;
-    btn.textContent = '🖼 TẠO ẢNH VỚI IMAGEN 4';
+    btn.textContent = '🖼 TẠO ẢNH VỚI GEMINI FLASH';
   }
 }
 
