@@ -306,7 +306,7 @@ input.err-input { border-color: var(--red) !important; }
 
 <div class="header">
   <div class="header-title">🌿 Plant Prompt Generator</div>
-  <div class="header-badge">Nội bộ · Imagen 4 Fast</div>
+  <div class="header-badge">Nội bộ · YEScale Imagen 4 Fast</div>
 </div>
 
 <div class="wrap">
@@ -354,10 +354,40 @@ input.err-input { border-color: var(--red) !important; }
     <div class="err" id="err-pres">Vui lòng chọn cách trình bày</div>
 
     <div class="pot-extra" id="pot-extra">
-      <div class="field"><label>Kích thước chậu <span class="opt-tag">Tùy chọn</span></label>
-        <input type="text" id="pot-size" placeholder="VD: 4 inch, 1 gallon…"/></div>
-      <div class="field"><label>Kiểu chậu <span class="opt-tag">Tùy chọn</span></label>
-        <input type="text" id="pot-style" placeholder="VD: terracotta, black nursery…"/></div>
+      <div class="field">
+        <label>Kích thước chậu <span class="opt-tag">Tùy chọn</span></label>
+        <input type="text" id="pot-size" placeholder="Chọn hoặc tự nhập…" list="pot-size-list" autocomplete="off"/>
+        <datalist id="pot-size-list">
+          <option value="2 inch pot">
+          <option value="4 inch pot">
+          <option value="6 inch pot">
+          <option value="8 inch pot">
+          <option value="10 inch pot">
+          <option value="12 inch pot">
+          <option value="1 gallon pot">
+          <option value="2 gallon pot">
+          <option value="3 gallon pot">
+          <option value="5 gallon pot">
+          <option value="7 gallon pot">
+          <option value="10 gallon pot">
+        </datalist>
+      </div>
+      <div class="field">
+        <label>Kiểu chậu <span class="opt-tag">Tùy chọn</span></label>
+        <input type="text" id="pot-style" placeholder="Chọn hoặc tự nhập…" list="pot-style-list" autocomplete="off"/>
+        <datalist id="pot-style-list">
+          <option value="terracotta pot">
+          <option value="black nursery pot">
+          <option value="white ceramic pot">
+          <option value="gray concrete pot">
+          <option value="woven basket planter">
+          <option value="brown plastic nursery pot">
+          <option value="glazed ceramic pot">
+          <option value="wooden planter box">
+          <option value="hanging basket">
+          <option value="self-watering pot">
+        </datalist>
+      </div>
     </div>
 
     <div class="divider"></div>
@@ -457,8 +487,8 @@ input.err-input { border-color: var(--red) !important; }
   <div class="imagen-card">
     <div class="imagen-head">
       <div class="imagen-head-left">
-        <span class="imagen-title">Imagen 4 Fast</span>
-        <span class="imagen-model">imagen-4.0-fast-generate-001</span>
+        <span class="imagen-title">YEScale · Imagen 4 Fast</span>
+        <span class="imagen-model">imagen4-fast</span>
       </div>
       <div class="status-row">
         <div class="sdot" id="sdot"></div>
@@ -468,9 +498,14 @@ input.err-input { border-color: var(--red) !important; }
 
     <!-- API Key -->
     <div class="api-row">
-      <input type="text" id="api-key-input" placeholder="Dán API Key vào đây (AIzaSy...)" autocomplete="off" spellcheck="false" style="font-family:monospace;font-size:12px;color:#333;"/>
-      <button class="btn-save" onclick="saveKey()">Lưu Key</button>
+      <input type="password" id="api-key-input" placeholder="Dán YEScale API Key (sk-...)" autocomplete="off" spellcheck="false" style="font-family:monospace;font-size:12px;color:#333;"/>
+      <button class="btn-save" onclick="toggleShowKey()" id="btn-show" title="Hiện/ẩn key" style="background:#555;padding:9px 10px;">👁</button>
+      <button class="btn-save" onclick="saveKey()">Lưu</button>
+      <button class="btn-save" onclick="deleteKey()" style="background:#c0392b;" title="Xóa key">🗑</button>
       <span class="saved-txt" id="saved-txt">✓ Đã lưu</span>
+    </div>
+    <div style="padding:6px 16px 10px;font-size:11px;color:#888;background:#fafafa;border-bottom:1px solid #eee;">
+      🔒 Key được lưu vào máy tính này — không cần nhập lại lần sau
     </div>
 
     <!-- Config -->
@@ -523,7 +558,7 @@ input.err-input { border-color: var(--red) !important; }
 //  STATE — dùng biến thông thường, không dùng defineProperty
 // ══════════════════════════════════════════════════
 let currentPrompt = '';
-let apiKey = '';  // Không lưu localStorage — nhập trực tiếp mỗi lần
+let apiKey = localStorage.getItem('plantApiKey') || '';
 let aspectRatio   = '1:1';
 let imgCount      = 1;
 let history       = [];
@@ -532,8 +567,12 @@ const NL = { flower:'🌸 FLOWER', fruit:'🍋 FRUIT', herb:'🌿 HERB' };
 const TL = { main:'📸 MAIN', tip:'💧 TIP CARE' };
 const PL = { plug:'🪨 SOIL PLUG', pot:'🪴 POTTED' };
 
-// Init: kiểm tra proxy
+// Init
 (function(){
+  if(apiKey){
+    document.getElementById('api-key-input').value = apiKey;
+    setStatus('ready','Key đã lưu ✓');
+  }
   checkProxy();
 })();
 
@@ -795,18 +834,29 @@ function setStatus(type,text){
 function saveKey(){
   const val = document.getElementById('api-key-input').value.trim();
   if(!val){ alert('Vui lòng nhập API Key!'); return; }
-  if(!val.startsWith('AIza')){ alert('API Key không đúng định dạng — phải bắt đầu bằng AIza...'); return; }
+  if(!val.startsWith('sk-')){ alert('YEScale API Key phải bắt đầu bằng sk-'); return; }
   apiKey = val;
-  // Không lưu localStorage — giữ key trong bộ nhớ phiên làm việc
-  document.getElementById('api-key-input').value = val; // Hiện rõ key để xác nhận
-  setStatus('ready','Sẵn sàng — Key hợp lệ ✓');
+  localStorage.setItem('plantApiKey', val);
+  setStatus('ready','YEScale Key đã lưu ✓');
   updateImagenBtn();
   const s = document.getElementById('saved-txt');
   s.classList.add('show');
   setTimeout(()=>s.classList.remove('show'), 3000);
 }
 
-function setRatio(btn){
+function deleteKey(){
+  if(!confirm('Xóa API Key đã lưu?')) return;
+  apiKey = '';
+  localStorage.removeItem('plantApiKey');
+  document.getElementById('api-key-input').value = '';
+  setStatus('','Chưa cấu hình');
+  updateImagenBtn();
+}
+
+function toggleShowKey(){
+  const inp = document.getElementById('api-key-input');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
   document.querySelectorAll('.ratio-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   aspectRatio=btn.dataset.r;
@@ -819,7 +869,7 @@ function chgCount(d){
 
 async function genImage(){
   if(!currentPrompt){alert('Hãy tạo prompt trước!');return;}
-  if(!apiKey){alert('Hãy nhập API Key và nhấn Lưu Key!');return;}
+  if(!apiKey){alert('Hãy nhập YEScale API Key và nhấn Lưu!');return;}
 
   const btn     = document.getElementById('btn-imagen');
   const loading = document.getElementById('img-loading');
@@ -832,70 +882,64 @@ async function genImage(){
   loading.classList.add('show');
   btn.disabled = true;
   btn.textContent = '⏳ Đang tạo ảnh…';
-  setStatus('loading','Đang xử lý…');
+  setStatus('loading','Đang gửi tới YEScale…');
 
-  const msgs = ['Đang gửi tới Imagen 4 Fast…','AI đang vẽ ảnh của bạn…','Sắp xong rồi…'];
+  const msgs = ['Đang gửi prompt tới Imagen 4 Fast…','AI đang vẽ ảnh…','Sắp xong rồi…'];
   let mi = 0;
   const tick = setInterval(()=>{ loadTxt.textContent = msgs[Math.min(mi++, msgs.length-1)]; }, 3000);
 
   try {
-    // Gọi thẳng Gemini 2.0 Flash Image — không cần proxy
-    // Imagen 4 Fast — endpoint :predict
-    const MODEL = 'imagen-4.0-fast-generate-001';
-    const URL   = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:predict?key=${apiKey}`;
+    // YEScale — OpenAI-compatible, endpoint /v1/images/generations
+    const URL = 'https://api.yescale.io/v1/images/generations';
 
     const res = await fetch(URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type':  'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
       body: JSON.stringify({
-        instances: [{ prompt: currentPrompt.trim() }],
-        parameters: {
-          sampleCount:       Math.min(imgCount, 4),
-          aspectRatio:       aspectRatio,
-          safetyFilterLevel: 'block_some',
-          personGeneration:  'allow_adult'
-        }
+        model:   'imagen4-fast',
+        prompt:  currentPrompt.trim(),
+        n:       Math.min(imgCount, 4),
+        size:    aspectRatioToSize(aspectRatio),
+        response_format: 'b64_json'
       })
     });
 
     const data = await res.json();
 
-    // Xử lý lỗi từ Google
-    if (!res.ok || data.error) {
-      const errMsg = data?.error?.message || data?.error || '';
-      const code   = data?.error?.code || res.status;
-      if (code === 400 && errMsg.toLowerCase().includes('api key'))
-        throw new Error('API Key không đúng. Vào aistudio.google.com → Get API key → tạo key mới.');
-      if (code === 401 || code === 403)
-        throw new Error('API Key không có quyền. Kiểm tra billing tại aistudio.google.com → Billing.');
-      if (code === 429)
-        throw new Error('Quá nhiều request — thử lại sau 10 giây.');
-      if (errMsg.toLowerCase().includes('safety'))
-        throw new Error('Prompt bị safety filter — thử chỉnh prompt.');
-      throw new Error(errMsg || `Lỗi HTTP ${code}`);
+    if(!res.ok || data.error){
+      const msg = data?.error?.message || data?.error || '';
+      if(res.status===401) throw new Error('API Key không đúng — kiểm tra lại key tại yescale.io');
+      if(res.status===402) throw new Error('Hết credit YEScale — vào yescale.io để nạp thêm');
+      if(res.status===429) throw new Error('Quá nhiều request — thử lại sau 10 giây');
+      if(msg.toLowerCase().includes('safety')||msg.toLowerCase().includes('block'))
+        throw new Error('Prompt bị safety filter — hãy chỉnh prompt');
+      throw new Error(msg || `Lỗi HTTP ${res.status}`);
     }
 
-    // Parse response Imagen 4 — format: predictions[].bytesBase64Encoded
-    const preds = data?.predictions || [];
-    const imgs  = preds.map(p => ({
-      base64:   p.bytesBase64Encoded,
-      mimeType: p.mimeType || 'image/png'
-    })).filter(p => p.base64);
+    // Parse OpenAI image response: data[].b64_json hoặc data[].url
+    const images = (data.data || []);
+    if(!images.length) throw new Error('Không nhận được ảnh từ YEScale');
 
-    if (!imgs.length) {
-      throw new Error('Không nhận được ảnh. Thử lại hoặc chỉnh prompt.');
-    }
-
-    // Hiển thị ảnh
     const grid = document.getElementById('img-grid');
-    grid.className = `img-grid c${imgs.length}`;
+    grid.className = `img-grid c${images.length}`;
     grid.innerHTML = '';
-    imgs.forEach((img, i) => {
-      const src = `data:${img.mimeType};base64,${img.base64}`;
+
+    images.forEach((img, i) => {
+      let src;
+      if(img.b64_json){
+        src = `data:image/png;base64,${img.b64_json}`;
+      } else if(img.url){
+        src = img.url;
+      } else {
+        return;
+      }
       const div = document.createElement('div');
       div.className = 'img-item';
       div.innerHTML = `
-        <img src="${src}" alt="Plant ${i+1}"/>
+        <img src="${src}" alt="Plant ${i+1}" crossorigin="anonymous"/>
         <div class="img-overlay">
           <button class="dl-btn" onclick="dlImg('${src}',${i+1})">⬇ Tải</button>
         </div>`;
@@ -903,19 +947,31 @@ async function genImage(){
     });
 
     results.classList.add('show');
-    setStatus('ready', `✓ ${imgs.length} ảnh xong!`);
+    setStatus('ready', `✓ ${images.length} ảnh xong · ~400 VND/ảnh`);
 
-  } catch(err) {
+  } catch(err){
     errEl.innerHTML = '⚠ ' + err.message;
     errEl.classList.add('show');
-    setStatus('error', 'Lỗi');
-    console.error('[GenImage]', err);
+    setStatus('error','Lỗi');
+    console.error('[YEScale]', err);
   } finally {
     clearInterval(tick);
     loading.classList.remove('show');
     btn.disabled   = false;
     btn.textContent = '🖼 TẠO ẢNH VỚI IMAGEN 4';
   }
+}
+
+// Chuyển aspect ratio sang size string cho OpenAI format
+function aspectRatioToSize(ratio){
+  const map = {
+    '1:1':  '1024x1024',
+    '4:3':  '1024x768',
+    '3:4':  '768x1024',
+    '16:9': '1792x1024',
+    '9:16': '1024x1792'
+  };
+  return map[ratio] || '1024x1024';
 }
 
 function dlImg(src,idx){
