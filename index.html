@@ -499,7 +499,8 @@ input.err-input { border-color: var(--red) !important; }
       <span class="cfg-label">Model</span>
       <select id="model-select" onchange="onModelChange()">
         <option value="gemini-2.0-flash-exp-image-generation" selected>gemini-2.0-flash-exp-image-generation</option>
-        <option value="gemini-2.0-flash-preview-image-generation">gemini-2.0-flash-preview-image-generation</option>
+        <option value="gemini-2.5-flash-image">gemini-2.5-flash-image (Nano Banana)</option>
+        <option value="imagen4-fast">imagen4-fast</option>
       </select>
     </div>
 
@@ -876,8 +877,7 @@ async function genImage() {
   const tick = setInterval(() => { loadTxt.textContent = msgs[Math.min(mi++, msgs.length - 1)]; }, 3500);
 
   const model = document.getElementById('model-select').value;
-  const ratioHint = aspectRatio !== '1:1' ? ` Image aspect ratio: ${aspectRatio}.` : '';
-  const promptFull = currentPrompt.trim() + ratioHint;
+  const promptFull = currentPrompt.trim();
 
   // Tạo n ảnh song song
   const tasks = [];
@@ -913,13 +913,24 @@ async function genImage() {
 }
 
 /**
- * Gọi YEScale API — OpenAI Chat format
- * POST https://api.yescale.io/v1/chat/completions
+ * Gọi YEScale API — dùng DALL-E endpoint /v1/images/generations
+ * Đây là endpoint YEScale hỗ trợ cho Gemini image & imagen4-fast
+ * POST https://api.yescale.io/v1/images/generations
  * Authorization: Bearer sk-...
- * Response: choices[0].message.content = [{type:"image_url", image_url:{url:"data:image/png;base64,..."}}]
  */
 async function callYEScale(model, prompt) {
-  const res = await fetch(`${YESCALE_BASE}/v1/chat/completions`, {
+  // Map aspect ratio → size (DALL-E format)
+  const sizeMap = {
+    '1:1': '1024x1024',
+    '4:3': '1024x768',
+    '3:4': '768x1024',
+    '16:9': '1024x576',
+    '9:16': '576x1024'
+  };
+  const size = sizeMap[aspectRatio] || '1024x1024';
+
+  // Thử DALL-E endpoint trước (YEScale docs: /v1/images/generations cho Gemini image)
+  const res = await fetch(`${YESCALE_BASE}/v1/images/generations`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -927,8 +938,10 @@ async function callYEScale(model, prompt) {
     },
     body: JSON.stringify({
       model: model,
-      messages: [{ role: 'user', content: prompt }],
-      modalities: ['image', 'text']
+      prompt: prompt,
+      n: 1,
+      size: size,
+      response_format: 'b64_json'
     })
   });
 
@@ -939,53 +952,47 @@ async function callYEScale(model, prompt) {
   // Xử lý lỗi HTTP
   if (!res.ok) {
     const msg = data?.error?.message || data?.message || '';
-    if (res.status === 401) throw new Error('API Key không hợp lệ hoặc hết hạn. Kiểm tra lại tại yescale.io/apikeys');
+    console.error('[YEScale error]', res.status, msg);
+    if (res.status === 401) throw new Error('API Key không hợp lệ. Kiểm tra lại tại yescale.io/apikeys');
     if (res.status === 402) throw new Error('Tài khoản YEScale hết credit. Vào yescale.io để nạp thêm.');
-    if (res.status === 403) throw new Error('Không có quyền dùng model này. Kiểm tra group key.');
+    if (res.status === 403 || msg.includes('not available in group'))
+      throw new Error('Key này không được dùng model image. Hãy dùng key group "normal" (sk-...) thay vì key group "gemini".');
     if (res.status === 404) throw new Error(`Model "${model}" không tồn tại trên YEScale.`);
     if (res.status === 429) throw new Error('Quá nhiều request — đợi vài giây rồi thử lại.');
     throw new Error(msg || `YEScale lỗi HTTP ${res.status}`);
   }
 
-  // Parse ảnh từ response
-  // YEScale trả về ảnh trong content dạng array hoặc base64 string
-  const content = data?.choices?.[0]?.message?.content;
-  if (!content) throw new Error('Response không có content. Thử lại.');
-
-  // Case 1: content là array [{type:"image_url", image_url:{url:"data:image/png;base64,..."}}]
-  if (Array.isArray(content)) {
-    const imgItem = content.find(c => c.type === 'image_url' && c.image_url?.url?.startsWith('data:image'));
-    if (imgItem) {
-      const dataUrl = imgItem.image_url.url;
-      const [meta, base64] = dataUrl.split(',');
-      const mimeType = meta.replace('data:', '').replace(';base64', '');
-      return { base64, mimeType };
-    }
-    // Fallback: tìm image_url dạng URL thường
-    const urlItem = content.find(c => c.type === 'image_url');
-    if (urlItem) throw new Error('YEScale trả về URL ảnh thay vì base64 — không hỗ trợ hiển thị trực tiếp.');
+  // Parse ảnh từ DALL-E response: data[0].b64_json hoặc data[0].url
+  const item = data?.data?.[0];
+  if (!item) {
+    console.error('[YEScale response]', JSON.stringify(data).slice(0, 300));
+    throw new Error('Không nhận được ảnh từ YEScale. Thử lại.');
   }
 
-  // Case 2: content là string base64 thuần
-  if (typeof content === 'string' && content.length > 100) {
-    // Có thể là data URL hoặc base64 thuần
-    if (content.startsWith('data:image')) {
-      const [meta, base64] = content.split(',');
-      const mimeType = meta.replace('data:', '').replace(';base64', '');
-      return { base64, mimeType };
-    }
-    // base64 thuần
-    return { base64: content, mimeType: 'image/png' };
+  // b64_json trực tiếp
+  if (item.b64_json) {
+    return { base64: item.b64_json, mimeType: 'image/png' };
   }
 
-  // Case 3: YEScale dùng format Gemini native (inlineData)
-  const parts = data?.choices?.[0]?.message?.parts || [];
-  const imgPart = parts.find(p => p.inlineData?.mimeType?.startsWith('image/'));
-  if (imgPart) return { base64: imgPart.inlineData.data, mimeType: imgPart.inlineData.mimeType };
+  // URL ảnh — fetch về rồi convert base64
+  if (item.url) {
+    const imgRes = await fetch(item.url);
+    const blob = await imgRes.blob();
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const dataUrl = reader.result;
+        const [meta, base64] = dataUrl.split(',');
+        const mimeType = meta.replace('data:', '').replace(';base64', '');
+        resolve({ base64, mimeType });
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }
 
-  // Không tìm được ảnh — log để debug
-  console.error('[YEScale response]', JSON.stringify(data).slice(0, 500));
-  throw new Error('Không nhận được ảnh từ YEScale. Thử lại hoặc đổi model.');
+  console.error('[YEScale response]', JSON.stringify(data).slice(0, 300));
+  throw new Error('Không nhận được ảnh. Thử lại hoặc đổi model.');
 }
 
 function dlImg(src, idx) { const a = document.createElement('a'); a.href = src; a.download = `plant-${Date.now()}-${idx}.png`; a.click(); }
