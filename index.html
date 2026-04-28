@@ -904,8 +904,16 @@ async function genImage() {
     results.classList.add('show'); setStatus('ready', `✓ ${imgs.length} ảnh xong!`);
     if (errs.length) { errEl.innerHTML = `⚠ ${errs.length} ảnh lỗi: ${errs.join(' | ')}`; errEl.classList.add('show'); }
   } catch (err) {
-    errEl.innerHTML = '⚠ ' + err.message; errEl.classList.add('show');
-    setStatus('error', 'Lỗi'); console.error('[GenImage]', err);
+    const errEl2 = document.getElementById('img-error');
+    errEl2.innerHTML = `⚠ <strong>Lỗi:</strong> ${err.message}
+<br/><br/>💡 <strong>Hướng dẫn lấy key đúng:</strong><br/>
+→ Vào <a href="https://yescale.io/apikeys" target="_blank" style="color:#1565c0">yescale.io/apikeys</a><br/>
+→ Dùng key <strong>group "normal"</strong> (không phải "gemini")<br/>
+→ Nếu chưa có: nhấn <strong>"+ Create Key"</strong> → chọn Group = <strong>normal</strong>`;
+    errEl2.classList.add('show');
+    errEl2.style.lineHeight = '1.8';
+    setStatus('error', 'Lỗi — xem chi tiết bên dưới');
+    console.error('[GenImage]', err);
   } finally {
     clearInterval(tick); loading.classList.remove('show');
     btn.disabled = false; btn.textContent = '🖼 TẠO ẢNH NGAY';
@@ -913,86 +921,120 @@ async function genImage() {
 }
 
 /**
- * Gọi YEScale API — dùng DALL-E endpoint /v1/images/generations
- * Đây là endpoint YEScale hỗ trợ cho Gemini image & imagen4-fast
- * POST https://api.yescale.io/v1/images/generations
- * Authorization: Bearer sk-...
+ * Gọi YEScale API để tạo ảnh
+ * Gemini image-generation dùng /v1/chat/completions (OpenAI Chat format)
+ * imagen4-fast dùng /v1/images/generations (DALL-E format)
  */
 async function callYEScale(model, prompt) {
-  // Map aspect ratio → size (DALL-E format)
-  const sizeMap = {
-    '1:1': '1024x1024',
-    '4:3': '1024x768',
-    '3:4': '768x1024',
-    '16:9': '1024x576',
-    '9:16': '576x1024'
-  };
+  const sizeMap = { '1:1':'1024x1024', '4:3':'1024x768', '3:4':'768x1024', '16:9':'1024x576', '9:16':'576x1024' };
   const size = sizeMap[aspectRatio] || '1024x1024';
 
-  // Thử DALL-E endpoint trước (YEScale docs: /v1/images/generations cho Gemini image)
-  const res = await fetch(`${YESCALE_BASE}/v1/images/generations`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`
-    },
-    body: JSON.stringify({
-      model: model,
-      prompt: prompt,
-      n: 1,
-      size: size,
-      response_format: 'b64_json'
-    })
-  });
+  const isGeminiImg = model.includes('gemini') || model.includes('flash');
+  const isImagen    = model.includes('imagen');
 
-  let data;
-  try { data = await res.json(); }
-  catch (e) { throw new Error(`Không đọc được response (HTTP ${res.status})`); }
-
-  // Xử lý lỗi HTTP
-  if (!res.ok) {
-    const msg = data?.error?.message || data?.message || '';
-    console.error('[YEScale error]', res.status, msg);
-    if (res.status === 401) throw new Error('API Key không hợp lệ. Kiểm tra lại tại yescale.io/apikeys');
-    if (res.status === 402) throw new Error('Tài khoản YEScale hết credit. Vào yescale.io để nạp thêm.');
-    if (res.status === 403 || msg.includes('not available in group'))
-      throw new Error('Key này không được dùng model image. Hãy dùng key group "normal" (sk-...) thay vì key group "gemini".');
-    if (res.status === 404) throw new Error(`Model "${model}" không tồn tại trên YEScale.`);
-    if (res.status === 429) throw new Error('Quá nhiều request — đợi vài giây rồi thử lại.');
-    throw new Error(msg || `YEScale lỗi HTTP ${res.status}`);
-  }
-
-  // Parse ảnh từ DALL-E response: data[0].b64_json hoặc data[0].url
-  const item = data?.data?.[0];
-  if (!item) {
-    console.error('[YEScale response]', JSON.stringify(data).slice(0, 300));
-    throw new Error('Không nhận được ảnh từ YEScale. Thử lại.');
-  }
-
-  // b64_json trực tiếp
-  if (item.b64_json) {
-    return { base64: item.b64_json, mimeType: 'image/png' };
-  }
-
-  // URL ảnh — fetch về rồi convert base64
-  if (item.url) {
-    const imgRes = await fetch(item.url);
-    const blob = await imgRes.blob();
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const dataUrl = reader.result;
-        const [meta, base64] = dataUrl.split(',');
-        const mimeType = meta.replace('data:', '').replace(';base64', '');
-        resolve({ base64, mimeType });
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
+  // ── Gemini image → Chat endpoint ──────────────────
+  if (isGeminiImg) {
+    const res = await fetch(`${YESCALE_BASE}/v1/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+      body: JSON.stringify({
+        model: model,
+        messages: [{ role: 'user', content: prompt }],
+        stream: false
+      })
     });
+
+    let data;
+    try { data = await res.json(); } catch(e) { throw new Error(`HTTP ${res.status} — không đọc được response`); }
+
+    if (!res.ok) {
+      const raw = data?.error?.message || data?.message || JSON.stringify(data).slice(0, 200);
+      throw new Error(`[${res.status}] ${raw}`);
+    }
+
+    // Parse content — có thể là string, array, hoặc data URL
+    const content = data?.choices?.[0]?.message?.content;
+    const result = extractImageFromContent(content);
+    if (result) return result;
+
+    // Không tìm được ảnh — log raw để debug
+    const rawStr = JSON.stringify(data).slice(0, 400);
+    console.warn('[YEScale chat raw]', rawStr);
+    throw new Error(`Model ${model} không trả về ảnh qua chat endpoint.\nRaw: ${rawStr}`);
   }
 
-  console.error('[YEScale response]', JSON.stringify(data).slice(0, 300));
-  throw new Error('Không nhận được ảnh. Thử lại hoặc đổi model.');
+  // ── imagen4-fast → DALL-E endpoint ────────────────
+  if (isImagen) {
+    const res = await fetch(`${YESCALE_BASE}/v1/images/generations`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+      body: JSON.stringify({ model, prompt, n: 1, size, response_format: 'b64_json' })
+    });
+
+    let data;
+    try { data = await res.json(); } catch(e) { throw new Error(`HTTP ${res.status} — không đọc được response`); }
+
+    if (!res.ok) {
+      const raw = data?.error?.message || data?.message || JSON.stringify(data).slice(0, 200);
+      throw new Error(`[${res.status}] ${raw}`);
+    }
+
+    const item = data?.data?.[0];
+    if (item?.b64_json) return { base64: item.b64_json, mimeType: 'image/png' };
+    if (item?.url) return await fetchUrlToBase64(item.url);
+
+    throw new Error('imagen4-fast không trả về ảnh. Raw: ' + JSON.stringify(data).slice(0, 200));
+  }
+
+  throw new Error(`Model không xác định: ${model}`);
+}
+
+/** Parse ảnh từ mọi dạng content có thể của YEScale */
+function extractImageFromContent(content) {
+  if (!content) return null;
+
+  // Array of parts: [{type:'image_url', image_url:{url:'data:image/...'}}]
+  if (Array.isArray(content)) {
+    for (const c of content) {
+      if (c.type === 'image_url') {
+        const url = c.image_url?.url || c.url || '';
+        if (url.startsWith('data:image')) {
+          const [meta, b64] = url.split(',');
+          return { base64: b64, mimeType: meta.replace('data:','').replace(';base64','') };
+        }
+      }
+    }
+    return null;
+  }
+
+  // String: data URL
+  if (typeof content === 'string') {
+    if (content.startsWith('data:image')) {
+      const [meta, b64] = content.split(',');
+      return { base64: b64, mimeType: meta.replace('data:','').replace(';base64','') };
+    }
+    // base64 thuần (>500 chars, chỉ có ký tự base64)
+    if (content.length > 500 && /^[A-Za-z0-9+/=]+$/.test(content.slice(0,50))) {
+      return { base64: content, mimeType: 'image/png' };
+    }
+  }
+
+  return null;
+}
+
+/** Fetch URL ảnh rồi convert sang base64 */
+async function fetchUrlToBase64(url) {
+  const r = await fetch(url);
+  const blob = await r.blob();
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const [meta, b64] = reader.result.split(',');
+      resolve({ base64: b64, mimeType: meta.replace('data:','').replace(';base64','') });
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
 }
 
 function dlImg(src, idx) { const a = document.createElement('a'); a.href = src; a.download = `plant-${Date.now()}-${idx}.png`; a.click(); }
