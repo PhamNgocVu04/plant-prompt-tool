@@ -473,8 +473,8 @@ input.err-input { border-color: var(--red) !important; }
   <div class="imagen-card">
     <div class="imagen-head">
       <div class="imagen-head-left">
-        <span class="imagen-title">Gemini Image Generation</span>
-        <span class="imagen-model" id="model-badge">gemini-2.0-flash-exp</span>
+        <span class="imagen-title">YEScale · Gemini Image</span>
+        <span class="imagen-model" id="model-badge">gemini-2.0-flash-exp-image-generation</span>
       </div>
       <div class="status-row">
         <div class="sdot" id="sdot"></div>
@@ -486,15 +486,10 @@ input.err-input { border-color: var(--red) !important; }
       <div style="display:flex;flex-direction:column;gap:8px;">
         <div class="input-row">
           <label>API Key</label>
-          <input type="password" id="api-key-input" placeholder="AIzaSy..." autocomplete="off"/>
-        </div>
-        <div class="input-row">
-          <label>Proxy URL</label>
-          <input type="text" id="proxy-url-input" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off"/>
+          <input type="password" id="api-key-input" placeholder="sk-..." autocomplete="off" spellcheck="false"/>
         </div>
         <div style="display:flex;gap:8px;margin-top:4px;">
-          <button class="btn-verify" onclick="testProxy()" style="flex:1;">🔗 Test kết nối</button>
-          <button class="btn-save" onclick="saveConfig()" style="flex:1;">✓ Lưu cấu hình</button>
+          <button class="btn-save" onclick="saveConfig()" style="flex:1;">✓ Lưu API Key</button>
           <span class="saved-txt" id="saved-txt">✓ Đã lưu!</span>
         </div>
       </div>
@@ -503,8 +498,8 @@ input.err-input { border-color: var(--red) !important; }
     <div class="model-row">
       <span class="cfg-label">Model</span>
       <select id="model-select" onchange="onModelChange()">
-        <option value="gemini-2.0-flash-preview-image-generation">gemini-2.0-flash-preview-image-generation (Mới)</option>
         <option value="gemini-2.0-flash-exp-image-generation" selected>gemini-2.0-flash-exp-image-generation</option>
+        <option value="gemini-2.0-flash-preview-image-generation">gemini-2.0-flash-preview-image-generation</option>
       </select>
     </div>
 
@@ -549,10 +544,12 @@ input.err-input { border-color: var(--red) !important; }
 // ══════════════════════════════════════════════════
 let currentPrompt = '';
 let apiKey = '';
-let proxyURL = '';
 let aspectRatio = '1:1';
 let imgCount = 1;
 let sessionHistory = [];
+
+// YEScale base URL — gọi thẳng, không cần proxy
+const YESCALE_BASE = 'https://api.yescale.io';
 
 // ══════════════════════════════════════════════════
 //  PROMPT BUILDER — theo đúng template mới
@@ -690,7 +687,7 @@ function onModelChange() {
   document.getElementById('model-badge').textContent = document.getElementById('model-select').value.replace('-image-generation','');
 }
 function updateImagenBtn() {
-  document.getElementById('btn-imagen').disabled = !(currentPrompt && apiKey && proxyURL);
+  document.getElementById('btn-imagen').disabled = !(currentPrompt && apiKey);
 }
 function setStatus(type, text) {
   const d = document.getElementById('sdot'), t = document.getElementById('stxt');
@@ -841,45 +838,28 @@ function loadHist(i) {
 function fmt(d) { return d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }); }
 
 // ══════════════════════════════════════════════════
-//  CONFIG
+//  CONFIG — YEScale sk-... key
 // ══════════════════════════════════════════════════
 function saveConfig() {
   const key = document.getElementById('api-key-input').value.trim();
-  const url = document.getElementById('proxy-url-input').value.trim();
   if (!key) { alert('Vui lòng nhập API Key!'); return; }
-  if (!key.startsWith('AIza')) { alert('API Key phải bắt đầu bằng "AIza..."'); return; }
-  if (!url) { alert('Vui lòng nhập Proxy URL!'); return; }
-  if (!url.includes('script.google.com')) { alert('Proxy URL phải là URL từ Google Apps Script'); return; }
-  apiKey = key; proxyURL = url;
-  setStatus('ready', 'Cấu hình OK ✓');
+  if (!key.startsWith('sk-')) { alert('YEScale API Key phải bắt đầu bằng "sk-..."'); return; }
+  apiKey = key;
+  setStatus('ready', 'Key hợp lệ ✓ — Sẵn sàng tạo ảnh');
   updateImagenBtn();
   const s = document.getElementById('saved-txt'); s.classList.add('show');
   setTimeout(() => s.classList.remove('show'), 3000);
 }
-async function testProxy() {
-  const url = document.getElementById('proxy-url-input').value.trim();
-  if (!url) { alert('Nhập Proxy URL trước!'); return; }
-  setStatus('loading', 'Đang test…');
-  try {
-    const r = await fetch(url, { method: 'GET' });
-    const d = await r.json();
-    if (d.ok) { setStatus('ready', 'Proxy hoạt động ✓'); alert('✅ Proxy OK! Nhấn "Lưu cấu hình" để tiếp tục.'); }
-    else throw new Error(JSON.stringify(d));
-  } catch (e) {
-    setStatus('error', 'Proxy lỗi');
-    alert('❌ Proxy không phản hồi:\n' + e.message);
-  }
-}
 
 // ══════════════════════════════════════════════════
-//  IMAGE GENERATION
+//  IMAGE GENERATION — gọi thẳng YEScale API
 // ══════════════════════════════════════════════════
 function setRatio(btn) { document.querySelectorAll('.ratio-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); aspectRatio = btn.dataset.r; }
 function chgCount(d) { imgCount = Math.max(1, Math.min(4, imgCount + d)); document.getElementById('cnt-val').textContent = imgCount; }
 
 async function genImage() {
   if (!currentPrompt) { alert('Hãy tạo prompt trước!'); return; }
-  if (!apiKey || !proxyURL) { alert('Hãy cấu hình API Key và Proxy URL!'); return; }
+  if (!apiKey) { alert('Hãy nhập API Key YEScale và nhấn Lưu!'); return; }
 
   const btn = document.getElementById('btn-imagen');
   const loading = document.getElementById('img-loading');
@@ -891,20 +871,25 @@ async function genImage() {
   loading.classList.add('show'); btn.disabled = true; btn.textContent = '⏳ Đang tạo ảnh…';
   setStatus('loading', 'Đang xử lý…');
 
-  const msgs = ['Đang gửi tới proxy…', 'Gemini đang vẽ…', 'Đang xử lý ảnh…', 'Sắp xong…'];
+  const msgs = ['Đang gửi tới YEScale…', 'Gemini đang vẽ…', 'Đang xử lý ảnh…', 'Sắp xong…'];
   let mi = 0;
   const tick = setInterval(() => { loadTxt.textContent = msgs[Math.min(mi++, msgs.length - 1)]; }, 3500);
 
   const model = document.getElementById('model-select').value;
   const ratioHint = aspectRatio !== '1:1' ? ` Image aspect ratio: ${aspectRatio}.` : '';
   const promptFull = currentPrompt.trim() + ratioHint;
+
+  // Tạo n ảnh song song
   const tasks = [];
-  for (let i = 0; i < imgCount; i++) tasks.push(callViaProxy(model, promptFull));
+  for (let i = 0; i < imgCount; i++) tasks.push(callYEScale(model, promptFull));
 
   try {
     const settled = await Promise.allSettled(tasks);
     const imgs = [], errs = [];
-    settled.forEach((r, i) => { if (r.status === 'fulfilled' && r.value) imgs.push(r.value); else errs.push(r.reason?.message || `Ảnh ${i + 1} lỗi`); });
+    settled.forEach((r, i) => {
+      if (r.status === 'fulfilled' && r.value) imgs.push(r.value);
+      else errs.push(r.reason?.message || `Ảnh ${i + 1} lỗi`);
+    });
     if (!imgs.length) throw new Error(errs[0] || 'Không nhận được ảnh');
 
     const grid = document.getElementById('img-grid');
@@ -927,35 +912,80 @@ async function genImage() {
   }
 }
 
-async function callViaProxy(model, prompt) {
-  const res = await fetch(proxyURL, {
+/**
+ * Gọi YEScale API — OpenAI Chat format
+ * POST https://api.yescale.io/v1/chat/completions
+ * Authorization: Bearer sk-...
+ * Response: choices[0].message.content = [{type:"image_url", image_url:{url:"data:image/png;base64,..."}}]
+ */
+async function callYEScale(model, prompt) {
+  const res = await fetch(`${YESCALE_BASE}/v1/chat/completions`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ apiKey, model, prompt })
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({
+      model: model,
+      messages: [{ role: 'user', content: prompt }],
+      modalities: ['image', 'text']
+    })
   });
-  let outer;
-  try { outer = await res.json(); } catch (e) { throw new Error('Proxy không trả về JSON hợp lệ'); }
-  if (outer.error) throw new Error('Proxy error: ' + outer.error);
-  const code = outer.status, data = outer.body;
-  if (code !== 200) {
-    const msg = data?.error?.message || '';
-    if (code === 400 && msg.toLowerCase().includes('api key')) throw new Error('API Key không hợp lệ');
-    if (code === 401 || code === 403) throw new Error(`Không có quyền (${code})`);
-    if (code === 404) throw new Error(`Model không tồn tại. Thử chọn model khác.`);
-    if (code === 429) throw new Error('Rate limit — đợi vài giây rồi thử lại');
-    if (msg.toLowerCase().includes('safety')) throw new Error('Prompt bị safety filter');
-    throw new Error(msg || `Gemini lỗi HTTP ${code}`);
+
+  let data;
+  try { data = await res.json(); }
+  catch (e) { throw new Error(`Không đọc được response (HTTP ${res.status})`); }
+
+  // Xử lý lỗi HTTP
+  if (!res.ok) {
+    const msg = data?.error?.message || data?.message || '';
+    if (res.status === 401) throw new Error('API Key không hợp lệ hoặc hết hạn. Kiểm tra lại tại yescale.io/apikeys');
+    if (res.status === 402) throw new Error('Tài khoản YEScale hết credit. Vào yescale.io để nạp thêm.');
+    if (res.status === 403) throw new Error('Không có quyền dùng model này. Kiểm tra group key.');
+    if (res.status === 404) throw new Error(`Model "${model}" không tồn tại trên YEScale.`);
+    if (res.status === 429) throw new Error('Quá nhiều request — đợi vài giây rồi thử lại.');
+    throw new Error(msg || `YEScale lỗi HTTP ${res.status}`);
   }
-  const parts = data?.candidates?.[0]?.content?.parts || [];
+
+  // Parse ảnh từ response
+  // YEScale trả về ảnh trong content dạng array hoặc base64 string
+  const content = data?.choices?.[0]?.message?.content;
+  if (!content) throw new Error('Response không có content. Thử lại.');
+
+  // Case 1: content là array [{type:"image_url", image_url:{url:"data:image/png;base64,..."}}]
+  if (Array.isArray(content)) {
+    const imgItem = content.find(c => c.type === 'image_url' && c.image_url?.url?.startsWith('data:image'));
+    if (imgItem) {
+      const dataUrl = imgItem.image_url.url;
+      const [meta, base64] = dataUrl.split(',');
+      const mimeType = meta.replace('data:', '').replace(';base64', '');
+      return { base64, mimeType };
+    }
+    // Fallback: tìm image_url dạng URL thường
+    const urlItem = content.find(c => c.type === 'image_url');
+    if (urlItem) throw new Error('YEScale trả về URL ảnh thay vì base64 — không hỗ trợ hiển thị trực tiếp.');
+  }
+
+  // Case 2: content là string base64 thuần
+  if (typeof content === 'string' && content.length > 100) {
+    // Có thể là data URL hoặc base64 thuần
+    if (content.startsWith('data:image')) {
+      const [meta, base64] = content.split(',');
+      const mimeType = meta.replace('data:', '').replace(';base64', '');
+      return { base64, mimeType };
+    }
+    // base64 thuần
+    return { base64: content, mimeType: 'image/png' };
+  }
+
+  // Case 3: YEScale dùng format Gemini native (inlineData)
+  const parts = data?.choices?.[0]?.message?.parts || [];
   const imgPart = parts.find(p => p.inlineData?.mimeType?.startsWith('image/'));
-  if (!imgPart) {
-    const reason = data?.candidates?.[0]?.finishReason;
-    const text = parts.filter(p => p.text).map(p => p.text).join(' ');
-    if (reason === 'SAFETY') throw new Error('Bị chặn safety filter');
-    if (text) throw new Error(`Gemini không tạo ảnh: "${text.slice(0, 100)}"`);
-    throw new Error('Không nhận được ảnh. Thử lại hoặc đổi model.');
-  }
-  return { base64: imgPart.inlineData.data, mimeType: imgPart.inlineData.mimeType };
+  if (imgPart) return { base64: imgPart.inlineData.data, mimeType: imgPart.inlineData.mimeType };
+
+  // Không tìm được ảnh — log để debug
+  console.error('[YEScale response]', JSON.stringify(data).slice(0, 500));
+  throw new Error('Không nhận được ảnh từ YEScale. Thử lại hoặc đổi model.');
 }
 
 function dlImg(src, idx) { const a = document.createElement('a'); a.href = src; a.download = `plant-${Date.now()}-${idx}.png`; a.click(); }
