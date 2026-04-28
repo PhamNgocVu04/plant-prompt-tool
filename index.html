@@ -151,13 +151,6 @@ input.err-input { border-color: var(--red) !important; }
 .stxt { font-size: 12px; color: rgba(255,255,255,.4); font-family: monospace; }
 
 .setup-panel { padding: 14px 16px; border-bottom: 1px solid var(--border); background: #fafafa; }
-.setup-steps { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
-.setup-step { display: flex; align-items: flex-start; gap: 10px; }
-.step-num { width: 22px; height: 22px; border-radius: 50%; background: var(--black); color: var(--white);
-  font-size: 12px; font-weight: bold; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
-.step-txt { font-size: 13px; line-height: 1.5; color: #333; }
-.step-txt a { color: #1565c0; font-weight: bold; }
-.step-txt code { background: #e8e8e8; padding: 1px 6px; border-radius: 3px; font-family: monospace; font-size: 12px; }
 .input-row { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
 .input-row input { flex: 1; font-family: monospace; font-size: 13px; }
 .input-row label { font-size: 12px; font-weight: bold; color: var(--gray4); white-space: nowrap; min-width: 80px; }
@@ -171,6 +164,12 @@ input.err-input { border-color: var(--red) !important; }
 .btn-verify:hover { background: #0d47a1; }
 .saved-txt { font-size: 12px; color: var(--green); display: none; font-weight: bold; }
 .saved-txt.show { display: inline; }
+
+/* Combobox = input + datalist */
+.combo-wrap { position: relative; }
+.combo-wrap input[type=text] { padding-right: 32px; }
+.combo-wrap::after { content: '▾'; position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+  font-size: 13px; color: var(--gray3); pointer-events: none; }
 
 .config-row { padding: 12px 16px; border-bottom: 1px solid var(--border);
   display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
@@ -332,12 +331,48 @@ input.err-input { border-color: var(--red) !important; }
     <div class="pot-extra" id="pot-extra">
       <div class="field">
         <label>Kích thước chậu <span class="req">*</span></label>
-        <input type="text" id="pot-size" placeholder="VD: 1-gallon, 4-inch, 3-gallon…"/>
+        <div class="combo-wrap">
+          <input type="text" id="pot-size" placeholder="VD: 1-gallon, 4-inch…" list="pot-size-list" autocomplete="off"/>
+          <datalist id="pot-size-list">
+            <option value="2-inch">2-inch</option>
+            <option value="3-inch">3-inch</option>
+            <option value="4-inch">4-inch</option>
+            <option value="6-inch">6-inch</option>
+            <option value="8-inch">8-inch</option>
+            <option value="10-inch">10-inch</option>
+            <option value="1-gallon">1-gallon</option>
+            <option value="2-gallon">2-gallon</option>
+            <option value="3-gallon">3-gallon</option>
+            <option value="5-gallon">5-gallon</option>
+            <option value="7-gallon">7-gallon</option>
+            <option value="10-gallon">10-gallon</option>
+            <option value="15-gallon">15-gallon</option>
+            <option value="4x4 inch square">4x4 inch square</option>
+            <option value="6x6 inch square">6x6 inch square</option>
+          </datalist>
+        </div>
         <div class="err" id="err-pot-size">Vui lòng nhập kích thước chậu</div>
       </div>
       <div class="field">
         <label>Màu + chất liệu chậu <span class="req">*</span></label>
-        <input type="text" id="pot-desc" placeholder="VD: black plastic nursery pot, terracotta pot…"/>
+        <div class="combo-wrap">
+          <input type="text" id="pot-desc" placeholder="VD: black plastic nursery pot…" list="pot-desc-list" autocomplete="off"/>
+          <datalist id="pot-desc-list">
+            <option value="black plastic nursery pot">black plastic nursery pot</option>
+            <option value="white plastic nursery pot">white plastic nursery pot</option>
+            <option value="green plastic nursery pot">green plastic nursery pot</option>
+            <option value="terracotta pot">terracotta pot</option>
+            <option value="white ceramic pot">white ceramic pot</option>
+            <option value="black ceramic pot">black ceramic pot</option>
+            <option value="gray concrete pot">gray concrete pot</option>
+            <option value="brown coco coir pot">brown coco coir pot</option>
+            <option value="black fabric grow bag">black fabric grow bag</option>
+            <option value="tan burlap pot">tan burlap pot</option>
+            <option value="clear plastic pot">clear plastic pot</option>
+            <option value="red clay pot">red clay pot</option>
+
+          </datalist>
+        </div>
         <div class="err" id="err-pot-desc">Vui lòng nhập mô tả chậu</div>
       </div>
     </div>
@@ -346,7 +381,21 @@ input.err-input { border-color: var(--red) !important; }
     <div class="plug-extra" id="plug-extra">
       <div class="field">
         <label>Kích thước soil plug <span class="opt-tag">Tùy chọn</span></label>
-        <input type="text" id="plug-size" placeholder="VD: 2-inch, 4-inch plug…"/>
+        <div class="combo-wrap">
+          <input type="text" id="plug-size" placeholder="VD: 2-inch plug…" list="plug-size-list" autocomplete="off"/>
+          <datalist id="plug-size-list">
+            <option value="1-inch plug">1-inch plug</option>
+            <option value="1.5-inch plug">1.5-inch plug</option>
+            <option value="2-inch plug">2-inch plug</option>
+            <option value="2.5-inch plug">2.5-inch plug</option>
+            <option value="3-inch plug">3-inch plug</option>
+            <option value="4-inch plug">4-inch plug</option>
+            <option value="6-inch plug">6-inch plug</option>
+            <option value="small plug tray cell">small plug tray cell</option>
+            <option value="medium plug tray cell">medium plug tray cell</option>
+            <option value="large plug tray cell">large plug tray cell</option>
+          </datalist>
+        </div>
       </div>
     </div>
 
@@ -434,24 +483,6 @@ input.err-input { border-color: var(--red) !important; }
     </div>
 
     <div class="setup-panel">
-      <div class="setup-steps">
-        <div class="setup-step">
-          <div class="step-num">1</div>
-          <div class="step-txt">Lấy <strong>Gemini API Key</strong> tại
-            <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com/app/apikey</a>
-            — Key dạng <code>AIzaSy...</code></div>
-        </div>
-        <div class="setup-step">
-          <div class="step-num">2</div>
-          <div class="step-txt">Deploy <strong>Google Apps Script proxy</strong> (file <code>Code.gs</code>) tại
-            <a href="https://script.google.com" target="_blank">script.google.com</a>
-            → Deploy → Web app → Anyone → Copy URL</div>
-        </div>
-        <div class="setup-step">
-          <div class="step-num">3</div>
-          <div class="step-txt">Dán <strong>API Key</strong> + <strong>Proxy URL</strong> vào bên dưới → <strong>Lưu & Test</strong></div>
-        </div>
-      </div>
       <div style="display:flex;flex-direction:column;gap:8px;">
         <div class="input-row">
           <label>API Key</label>
